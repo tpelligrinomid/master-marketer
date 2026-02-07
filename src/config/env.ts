@@ -6,7 +6,6 @@ const envSchema = z.object({
   ANTHROPIC_API_KEY: z.string().min(1),
   TRIGGER_SECRET_KEY: z.string().min(1),
   API_KEY: z.string().min(1),
-  FRONTEND_URL: z.string().default("http://localhost:3000"),
 });
 
 export type Env = z.infer<typeof envSchema>;
