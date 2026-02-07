@@ -1,10 +1,8 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-  PORT: z.string().default("3001"),
+  PORT: z.string().default("10000"),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-  SUPABASE_URL: z.string().url(),
-  SUPABASE_SERVICE_KEY: z.string().min(1),
   ANTHROPIC_API_KEY: z.string().min(1),
   TRIGGER_SECRET_KEY: z.string().min(1),
   API_KEY: z.string().min(1),
