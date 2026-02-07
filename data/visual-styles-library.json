@@ -1,0 +1,115 @@
+{
+  "version": "1.0",
+  "description": "Library of proven B2B ad visual formats. Used to guide visual direction in ad output so designers get varied, specific creative briefs — not generic 'split screen' suggestions.",
+
+  "visual_formats": [
+    {
+      "id": "bold-typography",
+      "name": "Bold Typography on Color",
+      "description": "The text IS the visual. Large, bold headline fills most of the image. Minimal imagery — the words do the work. Background is a solid or subtly textured color.",
+      "works_best_for": ["statement", "pain_point", "question"],
+      "layout": "Headline dominates 60-70% of the frame. Supporting text small underneath. CTA button anchored bottom-right or bottom-center.",
+      "example_reference": "Apple's 'Think Different' campaign or Stripe's billboard ads — massive text, clean background, zero clutter",
+      "design_notes": "Use only 1-2 font weights. Let whitespace (or color-space) do the heavy lifting. The headline should be readable from 6 feet away in a conference room."
+    },
+    {
+      "id": "data-callout",
+      "name": "Single Metric Spotlight",
+      "description": "One number or statistic dominates the image — oversized, impossible to miss. Everything else is secondary. The number tells the story.",
+      "works_best_for": ["numbers", "comparison", "social_proof"],
+      "layout": "Giant number or metric centered or left-aligned, taking up 40-50% of the visual area. Brief context line below or beside it. Logo and CTA in the footer.",
+      "example_reference": "Think scoreboard or stock ticker — one number that makes you stop. Datadog and New Relic ads often use this format with a single dashboard metric blown up.",
+      "design_notes": "The number should be in a contrasting color or weight from everything else. Use tabular/monospace numerals for technical audiences. Include the unit or context ('73% faster', not just '73%')."
+    },
+    {
+      "id": "screenshot-annotated",
+      "name": "Annotated Product Screenshot",
+      "description": "A real or mock product screenshot with callout annotations pointing to key features or results. Shows the product in action rather than describing it.",
+      "works_best_for": ["how_to", "statement", "testimonial"],
+      "layout": "Product screenshot fills 60% of the image. 2-3 annotation callouts with brief labels. Headline text overlaid at top or bottom. CTA in contrasting color.",
+      "example_reference": "Monday.com and Notion ads frequently use this — show the tool with arrows pointing to 'this is where the magic happens'. Figma does this with design screenshots.",
+      "design_notes": "The screenshot should look real, not mockup-perfect. Annotations should use a hand-drawn or marker style to feel human. Don't annotate more than 3 things."
+    },
+    {
+      "id": "quote-card",
+      "name": "Customer Quote Card",
+      "description": "A testimonial or customer quote presented as a card or social proof element. Large quotation marks, customer name/title, optional company logo. Feels like reading a real review.",
+      "works_best_for": ["testimonial", "social_proof"],
+      "layout": "Large opening quotation mark top-left. Quote text centered or left-aligned. Attribution (name, title, company) below the quote. Company logo optional. CTA at bottom.",
+      "example_reference": "G2 review cards, LinkedIn recommendation format, or Slack's customer testimonial ads — the quote feels like it was pulled from a real conversation",
+      "design_notes": "Use serif or slightly stylized font for the quote to distinguish it from marketing copy. Keep the quote under 20 words. The attribution should include role and company to build credibility with B2B audiences."
+    },
+    {
+      "id": "before-after-stack",
+      "name": "Before/After Vertical Stack",
+      "description": "Two states stacked vertically — the painful 'before' on top (muted, messy) and the better 'after' on bottom (clean, glowing). NOT a side-by-side split screen — a top-bottom narrative flow.",
+      "works_best_for": ["comparison", "pain_point"],
+      "layout": "Top 45%: 'before' state with muted colors, crossed out or red indicators. Bottom 45%: 'after' state with brand colors, green/positive indicators. Dividing line or arrow between them. CTA at very bottom.",
+      "example_reference": "Think Slack's 'before Slack / with Slack' ads, but vertical not horizontal. Or a code diff view — red lines removed, green lines added.",
+      "design_notes": "The 'before' should feel genuinely painful — don't make it cartoonish. The 'after' should feel calm and resolved, not flashy. The contrast should be in visual weight, not just color."
+    },
+    {
+      "id": "icon-grid",
+      "name": "Icon Grid with Headline",
+      "description": "A grid of 3-6 simple icons representing features, channels, or benefits. Bold headline above or below the grid. Each icon has a 1-3 word label. Clean and scannable.",
+      "works_best_for": ["how_to", "social_proof", "statement"],
+      "layout": "Headline at top (30% of image). 2x3 or 3x2 icon grid in the center. Each icon is simple line-art with a short label. CTA button at bottom.",
+      "example_reference": "HubSpot and Salesforce product ads that show 'Pipeline | Analytics | Automation | Reporting' as an icon grid. Apple Watch feature grids.",
+      "design_notes": "Icons should be consistent style (all line art or all filled). Use brand color as accent on one or two key icons. Don't try to explain each icon — labels should be 1-3 words max."
+    },
+    {
+      "id": "bold-question",
+      "name": "Full-Bleed Question",
+      "description": "A provocative question fills the entire image. Nothing else competes for attention. The question mark is part of the design. Background is dark or bold color.",
+      "works_best_for": ["question", "pain_point"],
+      "layout": "Question text fills 70-80% of the frame. Centered or left-aligned. Company logo small in corner. CTA text (not button) at bottom. No supporting text — the question stands alone.",
+      "example_reference": "Think of a movie poster where the tagline IS the poster. Or LinkedIn's own thought leadership ads that are just a question on a gradient.",
+      "design_notes": "The question mark should be visually prominent — consider making it oversized or in a contrasting color. Use a single font. The emptiness around the text is what makes it powerful."
+    },
+    {
+      "id": "social-proof-bar",
+      "name": "Logo Bar with Headline",
+      "description": "A row of recognizable customer logos with a bold claim above them. The logos do the selling. Simple, trust-building format.",
+      "works_best_for": ["social_proof", "testimonial", "numbers"],
+      "layout": "Bold headline top half. Row of 4-6 grayscale customer logos in the bottom half. CTA below or beside the logos. Clean, minimal background.",
+      "example_reference": "Every SaaS company's website hero section, but as an ad. Snowflake, Twilio, and Gong do this well — 'Trusted by X companies' with a logo strip.",
+      "design_notes": "Logos should be grayscale or single-color to avoid visual chaos. Space them evenly. The headline should make a claim the logos validate. Never use more than 6 logos."
+    },
+    {
+      "id": "editorial-photo",
+      "name": "Editorial Photo with Text Overlay",
+      "description": "A real or stock photo of a person, workspace, or industry scene with text overlaid. Feels like a magazine ad or editorial piece. The photo creates emotional context.",
+      "works_best_for": ["testimonial", "pain_point", "statement"],
+      "layout": "Photo fills the frame. Semi-transparent dark overlay on one side (left or bottom). Text sits on the overlay. CTA button in contrasting color.",
+      "example_reference": "LinkedIn's own sponsored content template, IBM's campaign photography, or Salesforce's 'Trailblazer' campaign — real people in real settings with minimal text overlay",
+      "design_notes": "Photo should show someone in the target audience's world — a factory floor, a boardroom, a robotics lab. Avoid generic 'person at laptop' stock photos. The person should look like someone the audience would recognize as a peer."
+    },
+    {
+      "id": "checklist-card",
+      "name": "Checklist or Scorecard",
+      "description": "A visual checklist, scorecard, or audit-style layout showing what the audience should be doing (or isn't doing). Creates FOMO and self-assessment impulse.",
+      "works_best_for": ["how_to", "comparison", "pain_point"],
+      "layout": "Headline at top. 4-5 checklist items with checkmarks or X marks. Some items checked (they're doing this), some X'd (they're missing this). CTA at bottom inviting them to get their score.",
+      "example_reference": "BuzzFeed-style quizzes but for B2B — 'Are you doing these 5 things?' format. Security audit checklists or marketing maturity assessments.",
+      "design_notes": "Use green checks and red X's for instant visual scanning. The unchecked items should be the most important — they create the gap the audience wants to close. Keep items to 4-6 words each."
+    },
+    {
+      "id": "minimal-dark",
+      "name": "Minimal Dark with Accent",
+      "description": "Near-black background with a single accent color element — a line, a word, an underline. Ultra-clean, premium feel. The restraint itself signals authority.",
+      "works_best_for": ["statement", "question", "comparison"],
+      "layout": "Dark background. Headline text in white or light gray, with one key word or phrase in the accent color. Logo small bottom-left. CTA as text, not button, bottom-right.",
+      "example_reference": "Tesla's ad aesthetic — dark, minimal, the product or claim speaks for itself. Or Vercel's developer marketing — black background, white text, one blue accent.",
+      "design_notes": "Use only ONE accent color — the brand's primary. The accent should highlight the single most important word or metric. Everything else is white on dark. Resist adding anything."
+    },
+    {
+      "id": "comparison-table",
+      "name": "Mini Comparison Table",
+      "description": "A simplified 2-column table showing 'them vs. us' or 'before vs. after' with 3-4 rows. Visual shorthand for competitive positioning without writing paragraphs.",
+      "works_best_for": ["comparison", "numbers"],
+      "layout": "Small headline at top. 2-column table with 3-4 rows. Left column (competitor/before) in muted color. Right column (us/after) in brand color with checkmarks. CTA at bottom.",
+      "example_reference": "Monday.com vs. spreadsheets comparison ads. Or any SaaS company's pricing page comparison table — but distilled to 3-4 key differentiators.",
+      "design_notes": "Keep it to 3-4 rows maximum — this is a banner ad, not a spreadsheet. Each cell should be 1-3 words or an icon. The visual weight should clearly favor the right column."
+    }
+  ]
+}

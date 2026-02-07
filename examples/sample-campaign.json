@@ -1,0 +1,103 @@
+{
+  "campaign_name": "Q1 2026 - Acme DevSecOps Platform - CISO Lead Gen",
+
+  "company": {
+    "company_name": "Acme Security",
+    "company_website": "https://acmesecurity.io",
+    "product_summary": "DevSecOps platform that finds and fixes vulnerabilities in code before they reach production, integrating directly into CI/CD pipelines.",
+    "differentiators": [
+      "Scans in under 90 seconds — 10x faster than legacy SAST tools",
+      "Zero false positive guarantee with AI-powered triage",
+      "Native integrations with GitHub, GitLab, Jenkins, and Azure DevOps"
+    ],
+    "proof_points": [
+      "Used by 400+ engineering teams",
+      "Reduces mean time to remediation by 73%",
+      "SOC 2 Type II and ISO 27001 certified"
+    ],
+    "customer_references": [
+      "Stripe",
+      "Datadog",
+      "HashiCorp"
+    ],
+    "category": "application security",
+    "pricing_hook": "Free for teams under 10 developers"
+  },
+
+  "audience": {
+    "job_titles": [
+      "CISO",
+      "VP of Security",
+      "Head of Application Security",
+      "Director of Information Security"
+    ],
+    "seniority": ["c_suite", "vp", "director"],
+    "pain_points": [
+      "Security scanning slows down developer velocity",
+      "Too many false positives from existing SAST/DAST tools",
+      "Lack of visibility into vulnerability remediation timelines",
+      "Board pressure to reduce security risk without increasing headcount"
+    ],
+    "buying_triggers": [
+      "Recent security audit findings",
+      "Compliance deadline approaching",
+      "Engineering team complaints about current security tooling",
+      "New CISO starting role and evaluating the security stack"
+    ],
+    "verticals": ["FinTech", "SaaS", "Healthcare IT"],
+    "company_size": "mid_market",
+    "decision_criteria": [
+      "Speed of scanning",
+      "False positive rate",
+      "CI/CD integration depth",
+      "Developer adoption and experience"
+    ],
+    "current_tools": [
+      "Snyk",
+      "Checkmarx",
+      "SonarQube",
+      "Veracode"
+    ]
+  },
+
+  "objectives": {
+    "primary_cta": "Request a Demo",
+    "offer": "30-minute personalized demo showing scan results on your actual codebase",
+    "goal": "demo_requests",
+    "funnel_stage": "middle",
+    "primary_message": "Stop choosing between security and speed — scan code in 90 seconds with zero false positives",
+    "supporting_messages": [
+      "Engineering teams at Stripe and Datadog trust Acme to ship secure code fast",
+      "Reduce remediation time by 73% without adding headcount",
+      "Integrates into your existing CI/CD in under 15 minutes"
+    ]
+  },
+
+  "platform": {
+    "platforms": ["linkedin", "display"],
+    "ad_types": ["numbers", "pain_point", "testimonial", "comparison"],
+    "variations_per_type": 3
+  },
+
+  "tone": {
+    "voice": "authoritative",
+    "guidelines": [
+      "Speak directly to the CISO — use 'your team' not 'teams'",
+      "Be specific with numbers, never vague",
+      "Avoid buzzwords like 'next-gen', 'cutting-edge', 'revolutionary'",
+      "Short sentences. Punch over prose."
+    ],
+    "blacklist": [
+      "next-generation",
+      "cutting-edge",
+      "revolutionary",
+      "game-changing",
+      "best-in-class",
+      "world-class"
+    ],
+    "must_include": [
+      "90 seconds",
+      "zero false positives"
+    ]
+  }
+}

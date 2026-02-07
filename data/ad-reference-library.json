@@ -1,0 +1,411 @@
+{
+  "version": "1.0",
+  "description": "Curated library of high-performing B2B ad examples. Used as few-shot examples for ad copy generation. Each entry includes the copy, format, what makes it effective, and the audience context.",
+
+  "ad_types": {
+    "numbers": {
+      "description": "Lead with a compelling statistic, metric, or quantifiable claim. Numbers stop the scroll because they're specific and credible.",
+      "guidelines": [
+        "The number should be the first thing the reader sees",
+        "Use specific numbers (73%) not vague ones ('significant improvement')",
+        "The metric must matter to the target audience's KPIs",
+        "Pair the number with a clear 'so what' — what does it mean for them"
+      ]
+    },
+    "pain_point": {
+      "description": "Open with the problem the audience is actively experiencing. Mirror their frustration, then pivot to the solution.",
+      "guidelines": [
+        "Name the specific pain, not a generic category",
+        "Use language the audience actually uses (not marketing-speak)",
+        "The pain should feel urgent, not abstract",
+        "The pivot to solution should feel natural, not salesy"
+      ]
+    },
+    "testimonial": {
+      "description": "Lead with a customer quote, result, or named reference. Social proof from recognizable companies or relatable peers.",
+      "guidelines": [
+        "Use the customer's actual words when possible",
+        "Name the company and ideally the person's role",
+        "The result should be specific and measurable",
+        "The reader should think 'that could be me'"
+      ]
+    },
+    "statement": {
+      "description": "A bold, confident claim or value proposition. Direct and assertive — no hedging.",
+      "guidelines": [
+        "One clear idea, not three crammed together",
+        "Should be specific to the product, not interchangeable with any competitor",
+        "Confidence without arrogance — backed by substance",
+        "Works best when the claim is slightly surprising or counterintuitive"
+      ]
+    },
+    "comparison": {
+      "description": "Position against alternatives or the status quo. Show the gap between what they have and what they could have.",
+      "guidelines": [
+        "Compare to the category/approach, not by naming competitors directly",
+        "Use concrete contrasts (time, cost, complexity)",
+        "The comparison should make the reader feel the cost of inaction",
+        "Be fair — exaggerated claims erode trust"
+      ]
+    },
+    "question": {
+      "description": "Open with a provocative question that the audience can't scroll past. The question should imply a problem they recognize.",
+      "guidelines": [
+        "The reader should immediately think 'yes, that's me'",
+        "Don't ask questions with obvious answers",
+        "The question should be specific to their role and challenges",
+        "Follow with a concise answer that introduces the product"
+      ]
+    },
+    "social_proof": {
+      "description": "Lead with trust signals — customer logos, user counts, industry recognition. Establishes credibility before making a pitch.",
+      "guidelines": [
+        "Use logos or names the target audience will recognize",
+        "Specificity wins: '400+ engineering teams' beats 'thousands of users'",
+        "Match the social proof to the audience's peer group",
+        "Works best for top-of-funnel awareness"
+      ]
+    },
+    "how_to": {
+      "description": "Educational angle — teach something useful while positioning the product as the solution. Gives value before asking for anything.",
+      "guidelines": [
+        "The insight should be genuinely useful, not a disguised pitch",
+        "Frame it as solving a problem the audience is actively working on",
+        "Keep it actionable — '3 steps to X' or 'How [Company] achieved Y'",
+        "The product tie-in should feel earned, not forced"
+      ]
+    }
+  },
+
+  "examples": [
+    {
+      "id": "num-001",
+      "ad_type": "numbers",
+      "platform": "linkedin",
+      "industry": "DevTools",
+      "headline": "73% faster time to remediation.",
+      "body": "Security doesn't have to slow your team down. Engineering teams using Acme scan every commit in 90 seconds — and fix vulnerabilities before they reach production.",
+      "cta": "See it in action →",
+      "target_role": "VP of Engineering",
+      "why_it_works": "Leads with a specific, impressive metric that speaks directly to the VP of Eng's concern: developer velocity. The '90 seconds' detail adds credibility. Short, punchy sentences."
+    },
+    {
+      "id": "num-002",
+      "ad_type": "numbers",
+      "platform": "linkedin",
+      "industry": "SaaS",
+      "headline": "400+ engineering teams. Zero false positives.",
+      "body": "Your security tools shouldn't create more work for developers. Acme's AI-powered triage means every alert is real — so your team fixes what matters.",
+      "cta": "Request a demo",
+      "target_role": "CISO",
+      "why_it_works": "Two numbers that address the biggest pain points: scale (social proof) and accuracy (false positives). The body connects directly to the CISO's operational concern."
+    },
+    {
+      "id": "num-003",
+      "ad_type": "numbers",
+      "platform": "display",
+      "industry": "SaaS",
+      "headline": "90-second scans.",
+      "body": "Security at the speed of your CI/CD pipeline.",
+      "cta": "Try free",
+      "target_role": "DevOps Lead",
+      "why_it_works": "Display ads need extreme brevity. The number is the entire hook. Subtext connects to the reader's daily reality (CI/CD). CTA is low-friction."
+    },
+    {
+      "id": "pain-001",
+      "ad_type": "pain_point",
+      "platform": "linkedin",
+      "industry": "Enterprise Software",
+      "headline": "Your security scanner is your biggest bottleneck.",
+      "body": "If every pull request waits 30 minutes for a security scan, your developers aren't just frustrated — they're bypassing the process entirely. There's a faster way.",
+      "cta": "See how →",
+      "target_role": "VP of Engineering",
+      "why_it_works": "Names the exact pain (slow scans) and the consequence (developers bypassing security). The audience immediately recognizes this problem. Doesn't pitch — just teases 'a faster way.'"
+    },
+    {
+      "id": "pain-002",
+      "ad_type": "pain_point",
+      "platform": "linkedin",
+      "industry": "FinTech",
+      "headline": "Tired of triaging 200 alerts that turn out to be nothing?",
+      "body": "False positives aren't just annoying — they're eroding your team's trust in security tooling. When everything is urgent, nothing is. Acme's AI triage delivers zero false positives, so every alert deserves attention.",
+      "cta": "Request a demo",
+      "target_role": "Head of Application Security",
+      "why_it_works": "Specific number (200 alerts) makes the pain visceral. The insight about trust erosion is the kind of thing this audience thinks but rarely sees in ads. The pivot to zero false positives directly solves the named problem."
+    },
+    {
+      "id": "pain-003",
+      "ad_type": "pain_point",
+      "platform": "display",
+      "industry": "SaaS",
+      "headline": "Still waiting on security scans?",
+      "body": "Ship secure code in 90 seconds.",
+      "cta": "Learn more",
+      "target_role": "Engineering Manager",
+      "why_it_works": "Display format — one sharp question that names the pain, one line that solves it. No wasted words."
+    },
+    {
+      "id": "test-001",
+      "ad_type": "testimonial",
+      "platform": "linkedin",
+      "industry": "FinTech",
+      "headline": "\"We cut our remediation time by 73% in the first quarter.\"",
+      "body": "— Head of Security, Series C FinTech\n\nWhen your compliance deadlines don't wait, your security tools can't either. See why 400+ engineering teams trust Acme.",
+      "cta": "Read the case study",
+      "target_role": "CISO",
+      "why_it_works": "Opens with a quote in the voice of a peer (Head of Security at a similar company). Specific metric (73%) and timeframe (first quarter) make it credible. The compliance angle resonates with CISOs."
+    },
+    {
+      "id": "test-002",
+      "ad_type": "testimonial",
+      "platform": "linkedin",
+      "industry": "DevTools",
+      "headline": "Datadog's security team scans every commit in under 90 seconds.",
+      "body": "No queue. No bottleneck. No false positives. When you're shipping hundreds of times a day, your security tooling has to keep up.",
+      "cta": "See how they do it →",
+      "target_role": "VP of Engineering",
+      "why_it_works": "Named reference (Datadog) immediately signals credibility to engineering leaders. The rhythm of 'No queue. No bottleneck. No false positives.' is memorable and scannable."
+    },
+    {
+      "id": "test-003",
+      "ad_type": "testimonial",
+      "platform": "display",
+      "industry": "SaaS",
+      "headline": "Trusted by Stripe's engineering team.",
+      "body": "Scan code. Fix vulnerabilities. Ship fast.",
+      "cta": "Get started free",
+      "target_role": "Engineering Manager",
+      "why_it_works": "For display, the name drop IS the ad. Three action verbs mirror the developer workflow. Low-friction CTA."
+    },
+    {
+      "id": "stmt-001",
+      "ad_type": "statement",
+      "platform": "linkedin",
+      "industry": "Cybersecurity",
+      "headline": "Security scanning should take seconds, not minutes.",
+      "body": "Your CI/CD pipeline moves fast. Your security tooling should too. Acme scans every commit in 90 seconds with zero false positives — so your team ships secure code without slowing down.",
+      "cta": "Request a demo",
+      "target_role": "DevOps Lead",
+      "why_it_works": "The headline makes a clear, opinionated statement that the audience already believes but doesn't see reflected in their current tools. It positions Acme on the side of the developer, not against them."
+    },
+    {
+      "id": "stmt-002",
+      "ad_type": "statement",
+      "platform": "linkedin",
+      "industry": "Enterprise Software",
+      "headline": "You don't need more security tools. You need one that actually works.",
+      "body": "The average enterprise runs 7 security scanners. Most of them generate noise. Acme replaces the noise with signal: zero false positives, 90-second scans, native CI/CD integration.",
+      "cta": "See the difference →",
+      "target_role": "CISO",
+      "why_it_works": "Contrarian statement that challenges the 'buy more tools' mindset CISOs are tired of. The stat about 7 scanners validates the reader's frustration. Then delivers a clear alternative."
+    },
+    {
+      "id": "comp-001",
+      "ad_type": "comparison",
+      "platform": "linkedin",
+      "industry": "SaaS",
+      "headline": "Legacy scanners: 30 minutes. Acme: 90 seconds.",
+      "body": "Same codebase. Same coverage. 20x faster. When your developers are waiting on security scans, they're not shipping. Switch to scans that keep up with your pipeline.",
+      "cta": "See a side-by-side comparison",
+      "target_role": "VP of Engineering",
+      "why_it_works": "Direct speed comparison is impossible to ignore. Doesn't name a specific competitor — compares to the category ('legacy scanners'). The math is simple and the implication is clear."
+    },
+    {
+      "id": "comp-002",
+      "ad_type": "comparison",
+      "platform": "linkedin",
+      "industry": "FinTech",
+      "headline": "What if your next security audit found nothing?",
+      "body": "Companies using Acme catch and fix vulnerabilities before auditors do. Reduce findings by 85% and show your board a clean report — without hiring more security engineers.",
+      "cta": "Learn how →",
+      "target_role": "CISO",
+      "why_it_works": "Compares the reader's current reality (audit findings) with a better alternative. The 85% metric is specific. The 'without hiring' angle addresses budget constraints that CISOs face."
+    },
+    {
+      "id": "comp-003",
+      "ad_type": "comparison",
+      "platform": "display",
+      "industry": "SaaS",
+      "headline": "30 min scans → 90 sec scans.",
+      "body": "Same coverage. 20x faster.",
+      "cta": "Switch now",
+      "target_role": "DevOps Lead",
+      "why_it_works": "Display format uses an arrow to show the transformation. Minimal words, maximum contrast. Action-oriented CTA."
+    },
+    {
+      "id": "quest-001",
+      "ad_type": "question",
+      "platform": "linkedin",
+      "industry": "SaaS",
+      "headline": "How many false positives did your team triage this week?",
+      "body": "If the answer is 'too many,' you're not alone. 67% of AppSec teams say false positives are their #1 frustration. Acme eliminates them entirely with AI-powered triage — so every alert your team sees is real.",
+      "cta": "See zero false positives in action",
+      "target_role": "Head of Application Security",
+      "why_it_works": "The question forces self-reflection. The stat (67%) validates the reader's frustration as industry-wide. The promise of 'zero' is bold and specific."
+    },
+    {
+      "id": "quest-002",
+      "ad_type": "question",
+      "platform": "linkedin",
+      "industry": "Enterprise Software",
+      "headline": "What would your team ship if security scans took 90 seconds?",
+      "body": "Most teams lose hours a week to slow scanning. Acme gives that time back — with faster scans, fewer false positives, and native CI/CD integration that just works.",
+      "cta": "Get your time back →",
+      "target_role": "VP of Engineering",
+      "why_it_works": "Aspirational question that makes the reader imagine a better world. Then quantifies the current cost ('hours a week'). The CTA mirrors the promise."
+    },
+    {
+      "id": "social-001",
+      "ad_type": "social_proof",
+      "platform": "linkedin",
+      "industry": "SaaS",
+      "headline": "Stripe. Datadog. HashiCorp. 400+ teams trust Acme.",
+      "body": "The fastest-moving engineering teams in the world chose Acme for one reason: security that keeps up with their pace. See why.",
+      "cta": "Explore customer stories",
+      "target_role": "VP of Engineering",
+      "why_it_works": "Opens with three names that every engineering leader respects. The number (400+) adds scale. The body reframes trust as a competitive advantage."
+    },
+    {
+      "id": "social-002",
+      "ad_type": "social_proof",
+      "platform": "display",
+      "industry": "SaaS",
+      "headline": "Trusted by 400+ engineering teams.",
+      "body": "Including Stripe, Datadog, and HashiCorp.",
+      "cta": "Join them",
+      "target_role": "Engineering Manager",
+      "why_it_works": "Display social proof is about recognition, not reading. The logos do the work. CTA creates belonging."
+    },
+    {
+      "id": "howto-001",
+      "ad_type": "how_to",
+      "platform": "linkedin",
+      "industry": "Cybersecurity",
+      "headline": "3 ways to reduce your mean time to remediation — without adding headcount.",
+      "body": "Your board wants less risk. Your team is already stretched thin. Here's how the fastest security teams close the gap:\n\n1. Shift scanning left into CI/CD\n2. Eliminate false positive noise\n3. Auto-prioritize by actual exploitability\n\nAcme does all three in one platform.",
+      "cta": "See how it works",
+      "target_role": "CISO",
+      "why_it_works": "Listicle format that delivers genuine value before asking for anything. Each point addresses a real practice. The product tie-in at the end feels earned because the advice is sound."
+    },
+    {
+      "id": "howto-002",
+      "ad_type": "how_to",
+      "platform": "linkedin",
+      "industry": "DevTools",
+      "headline": "How Datadog's security team scans 500+ repos without slowing down CI/CD.",
+      "body": "At Datadog's scale, security scanning has to be invisible to developers. Here's their approach: embed scanning directly in the pipeline, triage with AI to eliminate noise, and give developers fix guidance in their IDE. The result: 73% faster remediation.",
+      "cta": "Read the full story →",
+      "target_role": "VP of Engineering",
+      "why_it_works": "Uses a named customer as a case study that the reader wants to emulate. The tactical details are specific enough to be valuable. The result is measurable."
+    },
+    {
+      "id": "pain-004",
+      "ad_type": "pain_point",
+      "platform": "linkedin",
+      "industry": "SaaS",
+      "headline": "Your developers are bypassing security checks.",
+      "body": "Not because they don't care. Because your scanning tool takes 30 minutes and they have a deploy to ship. When security is a bottleneck, people route around it. Make it invisible instead.",
+      "cta": "See 90-second scans →",
+      "target_role": "Director of Engineering",
+      "why_it_works": "Opens with a provocative claim the reader knows is true. Then provides empathy — it's a tools problem, not a people problem. The word 'invisible' reframes security as enablement."
+    },
+    {
+      "id": "stmt-003",
+      "ad_type": "statement",
+      "platform": "display",
+      "industry": "SaaS",
+      "headline": "Security at the speed of CI/CD.",
+      "body": "90-second scans. Zero false positives.",
+      "cta": "Try free",
+      "target_role": "DevOps Lead",
+      "why_it_works": "Display format — one clear statement, two proof points. The phrase 'at the speed of CI/CD' speaks directly to the DevOps audience."
+    },
+    {
+      "id": "num-004",
+      "ad_type": "numbers",
+      "platform": "linkedin",
+      "industry": "Healthcare IT",
+      "headline": "85% fewer audit findings. First quarter.",
+      "body": "Healthcare companies using Acme catch vulnerabilities before auditors do. With HIPAA deadlines and patient data at stake, your security tools can't afford to be slow — or wrong.",
+      "cta": "See healthcare case studies",
+      "target_role": "CISO",
+      "why_it_works": "Industry-specific angle (Healthcare IT) makes this feel targeted, not generic. The compliance hook (HIPAA) adds urgency. 'First quarter' implies fast time-to-value."
+    },
+    {
+      "id": "quest-003",
+      "ad_type": "question",
+      "platform": "display",
+      "industry": "SaaS",
+      "headline": "Still triaging false positives?",
+      "body": "There's a better way.",
+      "cta": "Learn more",
+      "target_role": "AppSec Engineer",
+      "why_it_works": "Display ads need to be digestible in under 2 seconds. One question, one implied answer. The reader either resonates or doesn't — no wasted attention."
+    },
+    {
+      "id": "comp-004",
+      "ad_type": "comparison",
+      "platform": "linkedin",
+      "industry": "SaaS",
+      "headline": "Your current scanner was built for a different era.",
+      "body": "When your team shipped weekly, 30-minute scans were fine. Now you deploy dozens of times a day. Your security tooling needs to match your velocity — not throttle it.",
+      "cta": "See the modern alternative →",
+      "target_role": "CTO",
+      "why_it_works": "Frames the comparison as legacy vs. modern without naming competitors. The CTO audience thinks in terms of technical evolution. The word 'era' makes the current tool feel outdated."
+    },
+    {
+      "id": "test-004",
+      "ad_type": "testimonial",
+      "platform": "display",
+      "industry": "FinTech",
+      "headline": "\"73% faster remediation.\"",
+      "body": "— Head of Security, Series C FinTech",
+      "cta": "See the case study",
+      "target_role": "CISO",
+      "why_it_works": "Display testimonial — the quote IS the headline. Attribution adds credibility. Simple and scannable."
+    },
+    {
+      "id": "social-003",
+      "ad_type": "social_proof",
+      "platform": "linkedin",
+      "industry": "Enterprise Software",
+      "headline": "SOC 2. ISO 27001. 400+ customers. Zero false positives.",
+      "body": "When enterprise security teams evaluate Acme, they find exactly what they're looking for: a platform that meets their compliance requirements and actually delivers on its promises.",
+      "cta": "See our security posture",
+      "target_role": "Security Compliance Manager",
+      "why_it_works": "Stacks multiple trust signals that a compliance-focused buyer specifically looks for. The copy acknowledges the evaluation process and preempts concerns."
+    },
+    {
+      "id": "howto-003",
+      "ad_type": "how_to",
+      "platform": "display",
+      "industry": "SaaS",
+      "headline": "Shift security left.",
+      "body": "Scan every commit in 90 seconds.",
+      "cta": "See how",
+      "target_role": "DevOps Lead",
+      "why_it_works": "The concept of 'shift left' is a known practice in the target audience. The body tells them exactly how. Two lines, one clear message."
+    }
+  ],
+
+  "platform_formats": {
+    "linkedin": {
+      "name": "LinkedIn Sponsored Content",
+      "fields": {
+        "headline": { "max_chars": 70, "description": "Appears below the image/video. This is the hook." },
+        "body": { "max_chars": 600, "description": "Intro text above the creative. Front-load the value — only first ~150 chars visible before 'see more'." },
+        "cta": { "description": "Call to action text on the button or end of copy." }
+      },
+      "notes": "Professional audience. Decision-makers scroll fast. First line of body text must earn the click to 'see more'. Questions, stats, and bold claims work as openers."
+    },
+    "display": {
+      "name": "Display / Banner Ads (AdRoll, GDN, Programmatic)",
+      "fields": {
+        "headline": { "max_chars": 30, "description": "The primary text. Must convey the message alone." },
+        "body": { "max_chars": 90, "description": "Supporting text. Keep it to one line." },
+        "cta": { "max_chars": 15, "description": "Button text." }
+      },
+      "notes": "2-second attention window. One idea per ad. The headline must work without the body. Visual-first — the copy supports the image, not the other way around."
+    }
+  }
+}
