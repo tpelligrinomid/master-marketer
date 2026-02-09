@@ -77,14 +77,14 @@ export async function getPPCKeywords(
 
   const data = await spyfuRequest<SpyFuPPCResponse>({
     apiKey,
-    endpoint: "ppc_research_api/v2/getPaidSerps",
+    endpoint: "serp_api/v2/ppc/getPaidSerps",
     params: {
-      domain: cleanDomain,
+      query: cleanDomain,
       countryCode: "US",
       pageSize: String(limit),
-      pageNumber: "1",
-      sortBy: "ppcCost",
-      sortOrder: "descending",
+      startingRow: "1",
+      sortBy: "SearchVolume",
+      sortOrder: "Descending",
     },
     proxyUrl,
   });
@@ -132,12 +132,12 @@ export async function getAdHistory(
 
   const data = await spyfuRequest<SpyFuAdHistoryResponse>({
     apiKey,
-    endpoint: "ad_history_api/v2/getDomainAdHistory",
+    endpoint: "cloud_ad_history_api/v2/domain/getDomainAdHistory",
     params: {
       domain: cleanDomain,
       countryCode: "US",
       pageSize: String(limit),
-      pageNumber: "1",
+      startingRow: "1",
     },
     proxyUrl,
   });
