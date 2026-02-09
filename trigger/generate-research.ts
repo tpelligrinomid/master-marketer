@@ -20,7 +20,7 @@ import {
 import { extractJson } from "../src/lib/json-utils";
 
 const MODEL = "claude-opus-4-20250514";
-const MAX_TOKENS = 8192;
+const MAX_TOKENS = 16384;
 
 async function callClaude(
   client: Anthropic,
