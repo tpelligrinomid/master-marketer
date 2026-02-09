@@ -19,11 +19,25 @@ async function spyfuRequest<T>(options: SpyFuRequestOptions): Promise<T> {
     url.searchParams.set(key, value);
   }
 
-  const fetchUrl = options.proxyUrl
-    ? `${options.proxyUrl}?${new URLSearchParams({ url: url.toString() })}`
-    : url.toString();
+  let fetchUrl: string;
+  const headers: Record<string, string> = {};
 
-  const response = await fetch(fetchUrl);
+  if (options.proxyUrl) {
+    // Parse proxy URL to extract embedded credentials (user:pass@host)
+    const proxyParsed = new URL(options.proxyUrl);
+    if (proxyParsed.username) {
+      headers["Authorization"] =
+        `Basic ${Buffer.from(`${decodeURIComponent(proxyParsed.username)}:${decodeURIComponent(proxyParsed.password)}`).toString("base64")}`;
+      // Rebuild proxy URL without credentials
+      proxyParsed.username = "";
+      proxyParsed.password = "";
+    }
+    fetchUrl = `${proxyParsed.toString()}?${new URLSearchParams({ url: url.toString() })}`;
+  } else {
+    fetchUrl = url.toString();
+  }
+
+  const response = await fetch(fetchUrl, { headers });
 
   if (!response.ok) {
     const text = await response.text();

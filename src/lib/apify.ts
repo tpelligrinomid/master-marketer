@@ -19,9 +19,9 @@ export async function scrapeLinkedInCompany(
     ? linkedinHandle
     : `https://www.linkedin.com/${linkedinHandle}`;
 
-  const run = await client.actor("anchor/linkedin-company-scraper").call({
+  const run = await client.actor("curious_coder/linkedin-company-scraper").call({
     urls: [profileUrl],
-    proxy: { useApifyProxy: true },
+    proxyConfiguration: { useApifyProxy: true },
   });
 
   const { items } = await client.dataset(run.defaultDatasetId).listItems();
@@ -68,12 +68,14 @@ export async function scrapeLinkedInAds(
 ): Promise<LinkedInAd[]> {
   const client = new ApifyClient({ token: apiKey });
 
+  const adLibraryUrl = `https://www.linkedin.com/ad-library/search?accountOwner=${encodeURIComponent(companyName)}`;
+
   const run = await client
     .actor("silva95gustavo/linkedin-ad-library-scraper")
     .call({
-      searchQuery: companyName,
-      maxResults: 20,
-      proxy: { useApifyProxy: true },
+      startUrls: [{ url: adLibraryUrl }],
+      resultsLimit: 20,
+      proxyConfiguration: { useApifyProxy: true },
     });
 
   const { items } = await client.dataset(run.defaultDatasetId).listItems();
@@ -106,9 +108,8 @@ export async function scrapeGoogleAds(
   const run = await client
     .actor("xtech/google-ad-transparency-scraper")
     .call({
-      searchQuery: companyName,
-      maxResults: 20,
-      proxy: { useApifyProxy: true },
+      searchInputs: [companyName],
+      mode: "FULL",
     });
 
   const { items } = await client.dataset(run.defaultDatasetId).listItems();

@@ -16,7 +16,7 @@ async function mozRequest<T>(options: MozRequestOptions): Promise<T> {
   const response = await fetch(`${MOZ_API_BASE}/${options.endpoint}`, {
     method: "POST",
     headers: {
-      Authorization: `Basic ${Buffer.from(options.apiKey).toString("base64")}`,
+      "x-moz-token": options.apiKey,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(options.body),
