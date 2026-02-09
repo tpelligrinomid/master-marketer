@@ -27,12 +27,14 @@ async function callClaude(
   system: string,
   user: string
 ): Promise<string> {
-  const response = await client.messages.create({
+  const stream = client.messages.stream({
     model: MODEL,
     max_tokens: MAX_TOKENS,
     system,
     messages: [{ role: "user", content: user }],
   });
+
+  const response = await stream.finalMessage();
 
   const textContent = response.content.find((c) => c.type === "text");
   if (!textContent || textContent.type !== "text") {
