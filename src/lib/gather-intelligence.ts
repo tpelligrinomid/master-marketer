@@ -5,6 +5,7 @@ import {
   SocialMediaIntelligence,
   OrganicIntelligence,
   PaidMediaIntelligence,
+  WebResearchResult,
 } from "../types/research-intelligence";
 import { scrapeLinkedInCompany, scrapeLinkedInAds, scrapeGoogleAds } from "./apify";
 import { getYouTubeChannelData } from "./youtube";
@@ -12,8 +13,9 @@ import { getDomainMetrics, getKeywordRankings, getTopPages } from "./moz";
 import { scrapeWebsite } from "./firecrawl";
 import { getPPCKeywords, getAdHistory } from "./spyfu";
 import { analyzeAdCreatives } from "./ad-analysis";
+import { searchWebResearch } from "./exa";
 
-interface GatherConfig {
+export interface GatherConfig {
   anthropicApiKey: string;
   firecrawlApiKey?: string;
   mozApiKey?: string;
@@ -22,6 +24,7 @@ interface GatherConfig {
   spyfuApiId?: string;
   spyfuApiKey?: string;
   spyfuProxyUrl?: string;
+  exaApiKey?: string;
 }
 
 /**
@@ -257,33 +260,72 @@ async function gatherPaid(
 }
 
 /**
+ * Gather web research via Exa.ai for market and industry context.
+ */
+async function gatherWebResearch(
+  client: CompanyInfo,
+  competitors: CompanyInfo[],
+  industry: string,
+  solutionCategory: string | undefined,
+  config: GatherConfig
+): Promise<WebResearchResult[]> {
+  if (!config.exaApiKey) {
+    console.warn("[Exa] SKIPPED — no EXA_API_KEY configured");
+    return [];
+  }
+
+  try {
+    return await searchWebResearch(config.exaApiKey, {
+      clientName: client.company_name,
+      competitorNames: competitors.map((c) => c.company_name),
+      industry,
+      solutionCategory,
+    });
+  } catch (err) {
+    console.error(
+      "[Exa] Web research failed:",
+      err instanceof Error ? err.message : err
+    );
+    return [];
+  }
+}
+
+/**
  * Gather intelligence for all companies in parallel.
- * Runs all companies simultaneously, with 3 streams per company.
+ * Runs all companies simultaneously, with 3 streams per company,
+ * plus a parallel web research stream via Exa.ai.
  */
 export async function gatherAllIntelligence(
   client: CompanyInfo,
   competitors: CompanyInfo[],
-  config: GatherConfig
+  config: GatherConfig,
+  context?: { industry: string; solutionCategory?: string }
 ): Promise<IntelligencePackage> {
   const allCompanies = [client, ...competitors];
 
-  const results = await Promise.allSettled(
-    allCompanies.map((company) => gatherCompanyIntelligence(company, config))
-  );
+  // Run company intelligence + web research in parallel
+  const [companyResults, webResearch] = await Promise.all([
+    Promise.allSettled(
+      allCompanies.map((company) => gatherCompanyIntelligence(company, config))
+    ),
+    context
+      ? gatherWebResearch(client, competitors, context.industry, context.solutionCategory, config)
+      : Promise.resolve([]),
+  ]);
 
   const clientResult =
-    results[0].status === "fulfilled"
-      ? results[0].value
+    companyResults[0].status === "fulfilled"
+      ? companyResults[0].value
       : {
           company_name: client.company_name,
           domain: client.domain,
           social: {},
           organic: {},
           paid: {},
-          errors: [`Complete failure: ${results[0].status === "rejected" ? results[0].reason : "unknown"}`],
+          errors: [`Complete failure: ${companyResults[0].status === "rejected" ? companyResults[0].reason : "unknown"}`],
         };
 
-  const competitorResults = results.slice(1).map((r, i) =>
+  const competitorResults = companyResults.slice(1).map((r, i) =>
     r.status === "fulfilled"
       ? r.value
       : {
@@ -299,6 +341,7 @@ export async function gatherAllIntelligence(
   return {
     client: clientResult,
     competitors: competitorResults,
+    web_research: webResearch.length > 0 ? webResearch : undefined,
     gathered_at: new Date().toISOString(),
   };
 }

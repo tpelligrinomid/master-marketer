@@ -14,6 +14,7 @@ const envSchema = z.object({
   SPYFU_API_ID: z.string().optional(),
   SPYFU_API_KEY: z.string().optional(),
   SPYFU_PROXY_URL: z.string().optional(),
+  EXA_API_KEY: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

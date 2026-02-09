@@ -118,12 +118,17 @@ export const generateResearch = task({
       spyfuApiId: process.env.SPYFU_API_ID,
       spyfuApiKey: process.env.SPYFU_API_KEY,
       spyfuProxyUrl: process.env.SPYFU_PROXY_URL,
+      exaApiKey: process.env.EXA_API_KEY,
     };
 
     const intelligence: IntelligencePackage = await gatherAllIntelligence(
       input.client,
       input.competitors,
-      gatherConfig
+      gatherConfig,
+      {
+        industry: input.context.industry_description,
+        solutionCategory: input.context.solution_category,
+      }
     );
 
     // Count data source successes/failures

@@ -162,10 +162,20 @@ export interface CompanyIntelligence {
   errors: string[]; // Tracks which data sources failed
 }
 
+// --- Web Research (Exa.ai) ---
+
+export interface WebResearchResult {
+  title: string;
+  url: string;
+  content: string;
+  query: string;
+}
+
 // --- Full Intelligence Package ---
 
 export interface IntelligencePackage {
   client: CompanyIntelligence;
   competitors: CompanyIntelligence[];
+  web_research?: WebResearchResult[];
   gathered_at: string;
 }
