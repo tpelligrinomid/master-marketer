@@ -46,7 +46,7 @@ async function gatherCompanyIntelligence(
   });
 
   // Stream 3: Paid media (Apify ads + SpyFu + ad analysis)
-  const paidPromise = gatherPaid(company, config).catch((err) => {
+  const paidPromise = gatherPaid(company, config, errors).catch((err) => {
     errors.push(`Paid stream failed for ${company.company_name}: ${err.message}`);
     return {} as PaidMediaIntelligence;
   });
@@ -167,7 +167,8 @@ async function gatherOrganic(
 
 async function gatherPaid(
   company: CompanyInfo,
-  config: GatherConfig
+  config: GatherConfig,
+  errors: string[]
 ): Promise<PaidMediaIntelligence> {
   const results: PaidMediaIntelligence = {};
 
@@ -199,13 +200,17 @@ async function gatherPaid(
 
   // SpyFu PPC keywords
   if (config.spyfuApiId && config.spyfuApiKey) {
+    console.log(`[SpyFu] Starting PPC + Ad History for ${company.domain} (apiId=${config.spyfuApiId.slice(0, 4)}..., proxy=${!!config.spyfuProxyUrl})`);
     promises.push(
       getPPCKeywords(company.domain, config.spyfuApiId, config.spyfuApiKey, config.spyfuProxyUrl)
         .then((data) => {
+          console.log(`[SpyFu] PPC success for ${company.domain}: ${data.length} keywords`);
           results.spyfu_ppc_keywords = data;
         })
         .catch((err) => {
-          console.warn(`SpyFu PPC failed for ${company.domain}:`, err.message);
+          const msg = `SpyFu PPC failed for ${company.domain}: ${err.message}`;
+          console.error(`[SpyFu] ${msg}`);
+          errors.push(msg);
         })
     );
 
@@ -213,12 +218,17 @@ async function gatherPaid(
     promises.push(
       getAdHistory(company.domain, config.spyfuApiId, config.spyfuApiKey, config.spyfuProxyUrl)
         .then((data) => {
+          console.log(`[SpyFu] Ad History success for ${company.domain}: ${data.length} ads`);
           results.spyfu_ad_history = data;
         })
         .catch((err) => {
-          console.warn(`SpyFu ad history failed for ${company.domain}:`, err.message);
+          const msg = `SpyFu ad history failed for ${company.domain}: ${err.message}`;
+          console.error(`[SpyFu] ${msg}`);
+          errors.push(msg);
         })
     );
+  } else {
+    console.warn(`[SpyFu] SKIPPED for ${company.domain} — apiId=${!!config.spyfuApiId}, apiKey=${!!config.spyfuApiKey}`);
   }
 
   await Promise.allSettled(promises);
