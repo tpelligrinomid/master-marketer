@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { runs } from "@trigger.dev/sdk/v3";
 import { jobStore } from "../lib/job-store";
-import { JobResponse, MeetingNotesOutput } from "../types/meeting-notes";
+import { JobResponse } from "../types/meeting-notes";
 
 const router = Router();
 
@@ -22,7 +22,7 @@ router.get("/:jobId", async (req: Request, res: Response, next: NextFunction) =>
       const response: JobResponse = {
         jobId: job.id,
         status: job.status,
-        output: job.output as MeetingNotesOutput | undefined,
+        output: job.output,
         error: job.error,
       };
       res.json(response);
@@ -36,7 +36,7 @@ router.get("/:jobId", async (req: Request, res: Response, next: NextFunction) =>
 
         if (run.status === "COMPLETED") {
           // Extract output and cache it
-          const output = run.output as MeetingNotesOutput;
+          const output = run.output;
           jobStore.setOutput(jobId, output);
 
           const response: JobResponse = {

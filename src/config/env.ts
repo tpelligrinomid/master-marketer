@@ -6,6 +6,13 @@ const envSchema = z.object({
   ANTHROPIC_API_KEY: z.string().min(1),
   TRIGGER_SECRET_KEY: z.string().min(1),
   API_KEY: z.string().min(1),
+  // Research pipeline data sources
+  FIRECRAWL_API_KEY: z.string().optional(),
+  MOZ_API_KEY: z.string().optional(),
+  APIFY_API_KEY: z.string().optional(),
+  YOUTUBE_API_KEY: z.string().optional(),
+  SPYFU_API_KEY: z.string().optional(),
+  SPYFU_PROXY_URL: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

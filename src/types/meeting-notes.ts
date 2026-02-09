@@ -61,10 +61,10 @@ export interface MeetingNotesOutput {
 
 export type JobStatus = "accepted" | "processing" | "complete" | "failed";
 
-export interface JobResponse {
+export interface JobResponse<T = unknown> {
   jobId: string;
   status: JobStatus;
   progress?: string;
-  output?: MeetingNotesOutput;
+  output?: T;
   error?: string;
 }

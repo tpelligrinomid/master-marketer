@@ -4,7 +4,7 @@ export default defineConfig({
   project: "proj_gnaoyrrpmfvdbrxsyhzu",
   runtime: "node",
   logLevel: "log",
-  maxDuration: 120, // 2 minutes for Claude API calls
+  maxDuration: 900, // 15 minutes for research pipeline (intelligence gathering + sequential Claude calls)
   retries: {
     enabledInDev: true,
     default: {

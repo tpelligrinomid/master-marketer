@@ -6,6 +6,7 @@ import pdfParse from "pdf-parse";
 import mammoth from "mammoth";
 import { CampaignInputSchema } from "./types/campaign-input";
 import { INTAKE_SYSTEM_PROMPT, buildIntakePrompt } from "./prompts/intake";
+import { extractJson } from "./lib/json-utils";
 
 // --- Configuration ---
 
@@ -71,16 +72,6 @@ async function loadSourceDocuments(
   }
 
   return docs;
-}
-
-// --- Extraction ---
-
-function extractJson(text: string): unknown {
-  const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  if (codeBlockMatch) {
-    return JSON.parse(codeBlockMatch[1].trim());
-  }
-  return JSON.parse(text.trim());
 }
 
 // --- Main ---

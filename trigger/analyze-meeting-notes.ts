@@ -9,19 +9,10 @@ import {
   MEETING_NOTES_SYSTEM_PROMPT,
   buildMeetingNotesPrompt,
 } from "../src/prompts/meeting-notes";
+import { extractJson } from "../src/lib/json-utils";
 
 const MODEL = "claude-opus-4-20250514";
 const MAX_TOKENS = 4096;
-
-function extractJson(text: string): unknown {
-  // Try to extract JSON from Claude's response — handle markdown code blocks
-  const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  if (codeBlockMatch) {
-    return JSON.parse(codeBlockMatch[1].trim());
-  }
-  // Try direct parse
-  return JSON.parse(text.trim());
-}
 
 export const analyzeMeetingNotes = task({
   id: "analyze-meeting-notes",
