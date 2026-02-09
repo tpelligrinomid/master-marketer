@@ -11,6 +11,7 @@ const envSchema = z.object({
   MOZ_API_KEY: z.string().optional(),
   APIFY_API_KEY: z.string().optional(),
   YOUTUBE_API_KEY: z.string().optional(),
+  SPYFU_API_ID: z.string().optional(),
   SPYFU_API_KEY: z.string().optional(),
   SPYFU_PROXY_URL: z.string().optional(),
 });

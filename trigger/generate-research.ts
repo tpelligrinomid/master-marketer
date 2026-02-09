@@ -113,6 +113,7 @@ export const generateResearch = task({
       mozApiKey: process.env.MOZ_API_KEY,
       apifyApiKey: process.env.APIFY_API_KEY,
       youtubeApiKey: process.env.YOUTUBE_API_KEY,
+      spyfuApiId: process.env.SPYFU_API_ID,
       spyfuApiKey: process.env.SPYFU_API_KEY,
       spyfuProxyUrl: process.env.SPYFU_PROXY_URL,
     };

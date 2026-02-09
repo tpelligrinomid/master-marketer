@@ -19,6 +19,7 @@ interface GatherConfig {
   mozApiKey?: string;
   apifyApiKey?: string;
   youtubeApiKey?: string;
+  spyfuApiId?: string;
   spyfuApiKey?: string;
   spyfuProxyUrl?: string;
 }
@@ -197,9 +198,9 @@ async function gatherPaid(
   }
 
   // SpyFu PPC keywords
-  if (config.spyfuApiKey) {
+  if (config.spyfuApiId && config.spyfuApiKey) {
     promises.push(
-      getPPCKeywords(company.domain, config.spyfuApiKey, config.spyfuProxyUrl)
+      getPPCKeywords(company.domain, config.spyfuApiId, config.spyfuApiKey, config.spyfuProxyUrl)
         .then((data) => {
           results.spyfu_ppc_keywords = data;
         })
@@ -210,7 +211,7 @@ async function gatherPaid(
 
     // SpyFu Ad History
     promises.push(
-      getAdHistory(company.domain, config.spyfuApiKey, config.spyfuProxyUrl)
+      getAdHistory(company.domain, config.spyfuApiId, config.spyfuApiKey, config.spyfuProxyUrl)
         .then((data) => {
           results.spyfu_ad_history = data;
         })

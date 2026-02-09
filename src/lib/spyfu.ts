@@ -2,10 +2,12 @@ import {
   SpyFuPPCKeyword,
   SpyFuAdHistory,
 } from "../types/research-intelligence";
+import { ProxyAgent } from "undici";
 
-const SPYFU_API_BASE = "https://api.spyfu.com/apis";
+const SPYFU_API_BASE = "https://www.spyfu.com/apis";
 
 interface SpyFuRequestOptions {
+  apiId: string;
   apiKey: string;
   endpoint: string;
   params: Record<string, string>;
@@ -14,45 +16,26 @@ interface SpyFuRequestOptions {
 
 async function spyfuRequest<T>(options: SpyFuRequestOptions): Promise<T> {
   const url = new URL(`${SPYFU_API_BASE}/${options.endpoint}`);
-  url.searchParams.set("api_key", options.apiKey);
   for (const [key, value] of Object.entries(options.params)) {
     url.searchParams.set(key, value);
   }
 
-  // Try direct first, fall back to proxy if direct fails
-  const directUrl = url.toString();
+  const headers: Record<string, string> = {
+    Authorization: `Basic ${Buffer.from(`${options.apiId}:${options.apiKey}`).toString("base64")}`,
+  };
 
-  try {
-    const directResponse = await fetch(directUrl);
-    if (directResponse.ok) {
-      return directResponse.json() as Promise<T>;
-    }
-    // If direct fails and we have a proxy, try proxy
-    if (!options.proxyUrl) {
-      const text = await directResponse.text();
-      throw new Error(`SpyFu API error (${directResponse.status}): ${text.slice(0, 200)}`);
-    }
-  } catch (err) {
-    if (!options.proxyUrl) throw err;
-    console.warn(`SpyFu direct request failed, trying proxy: ${err instanceof Error ? err.message : err}`);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const fetchOptions: any = { headers };
+
+  if (options.proxyUrl) {
+    fetchOptions.dispatcher = new ProxyAgent(options.proxyUrl);
   }
 
-  // Proxy fallback
-  const headers: Record<string, string> = {};
-  const proxyParsed = new URL(options.proxyUrl!);
-  if (proxyParsed.username) {
-    headers["Authorization"] =
-      `Basic ${Buffer.from(`${decodeURIComponent(proxyParsed.username)}:${decodeURIComponent(proxyParsed.password)}`).toString("base64")}`;
-    proxyParsed.username = "";
-    proxyParsed.password = "";
-  }
-  const proxyFetchUrl = `${proxyParsed.toString()}?${new URLSearchParams({ url: directUrl })}`;
-
-  const response = await fetch(proxyFetchUrl, { headers });
+  const response = await fetch(url.toString(), fetchOptions);
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`SpyFu API error via proxy (${response.status}): ${text.slice(0, 200)}`);
+    throw new Error(`SpyFu API error (${response.status}): ${text.slice(0, 300)}`);
   }
 
   return response.json() as Promise<T>;
@@ -60,9 +43,11 @@ async function spyfuRequest<T>(options: SpyFuRequestOptions): Promise<T> {
 
 /**
  * Get top PPC keywords for a domain from SpyFu.
+ * Matches working n8n config: keyword_api/v2/ppc/getMostSuccessful
  */
 export async function getPPCKeywords(
   domain: string,
+  apiId: string,
   apiKey: string,
   proxyUrl?: string,
   limit: number = 50
@@ -88,15 +73,13 @@ export async function getPPCKeywords(
   }
 
   const data = await spyfuRequest<SpyFuPPCResponse>({
+    apiId,
     apiKey,
-    endpoint: "serp_api/v2/ppc/getPaidSerps",
+    endpoint: "keyword_api/v2/ppc/getMostSuccessful",
     params: {
       query: cleanDomain,
-      countryCode: "US",
+      country: "US",
       pageSize: String(limit),
-      startingRow: "1",
-      sortBy: "SearchVolume",
-      sortOrder: "Descending",
     },
     proxyUrl,
   });
@@ -116,6 +99,7 @@ export async function getPPCKeywords(
  */
 export async function getAdHistory(
   domain: string,
+  apiId: string,
   apiKey: string,
   proxyUrl?: string,
   limit: number = 50
@@ -143,13 +127,13 @@ export async function getAdHistory(
   }
 
   const data = await spyfuRequest<SpyFuAdHistoryResponse>({
+    apiId,
     apiKey,
     endpoint: "cloud_ad_history_api/v2/domain/getDomainAdHistory",
     params: {
       domain: cleanDomain,
-      countryCode: "US",
+      country: "US",
       pageSize: String(limit),
-      startingRow: "1",
     },
     proxyUrl,
   });
