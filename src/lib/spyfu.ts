@@ -19,28 +19,40 @@ async function spyfuRequest<T>(options: SpyFuRequestOptions): Promise<T> {
     url.searchParams.set(key, value);
   }
 
-  let fetchUrl: string;
-  const headers: Record<string, string> = {};
+  // Try direct first, fall back to proxy if direct fails
+  const directUrl = url.toString();
 
-  if (options.proxyUrl) {
-    // Parse proxy URL to extract embedded credentials (user:pass@host)
-    const proxyParsed = new URL(options.proxyUrl);
-    if (proxyParsed.username) {
-      headers["Authorization"] =
-        `Basic ${Buffer.from(`${decodeURIComponent(proxyParsed.username)}:${decodeURIComponent(proxyParsed.password)}`).toString("base64")}`;
-      proxyParsed.username = "";
-      proxyParsed.password = "";
+  try {
+    const directResponse = await fetch(directUrl);
+    if (directResponse.ok) {
+      return directResponse.json() as Promise<T>;
     }
-    fetchUrl = `${proxyParsed.toString()}?${new URLSearchParams({ url: url.toString() })}`;
-  } else {
-    fetchUrl = url.toString();
+    // If direct fails and we have a proxy, try proxy
+    if (!options.proxyUrl) {
+      const text = await directResponse.text();
+      throw new Error(`SpyFu API error (${directResponse.status}): ${text.slice(0, 200)}`);
+    }
+  } catch (err) {
+    if (!options.proxyUrl) throw err;
+    console.warn(`SpyFu direct request failed, trying proxy: ${err instanceof Error ? err.message : err}`);
   }
 
-  const response = await fetch(fetchUrl, { headers });
+  // Proxy fallback
+  const headers: Record<string, string> = {};
+  const proxyParsed = new URL(options.proxyUrl!);
+  if (proxyParsed.username) {
+    headers["Authorization"] =
+      `Basic ${Buffer.from(`${decodeURIComponent(proxyParsed.username)}:${decodeURIComponent(proxyParsed.password)}`).toString("base64")}`;
+    proxyParsed.username = "";
+    proxyParsed.password = "";
+  }
+  const proxyFetchUrl = `${proxyParsed.toString()}?${new URLSearchParams({ url: directUrl })}`;
+
+  const response = await fetch(proxyFetchUrl, { headers });
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`SpyFu API error (${response.status}): ${text}`);
+    throw new Error(`SpyFu API error via proxy (${response.status}): ${text.slice(0, 200)}`);
   }
 
   return response.json() as Promise<T>;
