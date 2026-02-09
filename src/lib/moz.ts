@@ -16,7 +16,7 @@ async function mozRequest<T>(options: MozRequestOptions): Promise<T> {
   const response = await fetch(`${MOZ_API_BASE}/${options.endpoint}`, {
     method: "POST",
     headers: {
-      "x-moz-token": options.apiKey,
+      Authorization: `Bearer ${options.apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(options.body),
@@ -30,6 +30,16 @@ async function mozRequest<T>(options: MozRequestOptions): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+function extractRootDomain(domain: string): string {
+  try {
+    const url = domain.startsWith("http") ? domain : `https://${domain}`;
+    const parsed = new URL(url);
+    return parsed.hostname.replace(/^www\./, "");
+  } catch {
+    return domain.replace(/^(https?:\/\/)?(www\.)?/, "").split("/")[0];
+  }
+}
+
 /**
  * Get domain-level authority metrics from Moz.
  */
@@ -37,74 +47,42 @@ export async function getDomainMetrics(
   domain: string,
   apiKey: string
 ): Promise<MozDomainMetrics> {
-  const cleanDomain = domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  const rootDomain = extractRootDomain(domain);
 
-  interface MozDomainResponse {
+  interface MozMetricResult {
     domain_authority?: number;
     page_authority?: number;
     spam_score?: number;
-    external_pages_to_domain?: number;
+    root_domains_to_root_domain?: number;
+    pages_to_root_domain?: number;
     external_pages_to_root_domain?: number;
   }
 
-  const data = await mozRequest<MozDomainResponse>({
+  interface MozUrlMetricsResponse {
+    results?: MozMetricResult[];
+  }
+
+  const data = await mozRequest<MozUrlMetricsResponse>({
     apiKey,
     endpoint: "url_metrics",
     body: {
-      targets: [cleanDomain],
-      daily_history_values: false,
+      targets: [rootDomain],
     },
   });
+
+  const result = data.results?.[0];
+  if (!result) {
+    return { domain: rootDomain };
+  }
 
   return {
-    domain: cleanDomain,
-    domain_authority: data.domain_authority,
-    page_authority: data.page_authority,
-    spam_score: data.spam_score,
-    external_links: data.external_pages_to_domain,
-    linking_domains: data.external_pages_to_root_domain,
+    domain: rootDomain,
+    domain_authority: result.domain_authority ? Math.round(result.domain_authority) : undefined,
+    page_authority: result.page_authority ? Math.round(result.page_authority) : undefined,
+    spam_score: result.spam_score ? Math.round(result.spam_score * 100) : undefined,
+    external_links: result.pages_to_root_domain || result.external_pages_to_root_domain,
+    linking_domains: result.root_domains_to_root_domain,
   };
-}
-
-/**
- * Get top keyword rankings for a domain from Moz.
- */
-export async function getKeywordRankings(
-  domain: string,
-  apiKey: string,
-  limit: number = 50
-): Promise<MozKeyword[]> {
-  const cleanDomain = domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
-
-  interface MozKeywordResult {
-    keyword?: string;
-    ranking_position?: number;
-    search_volume?: number;
-    difficulty?: number;
-  }
-
-  interface MozKeywordsResponse {
-    keyword_rankings?: MozKeywordResult[];
-    results?: MozKeywordResult[];
-  }
-
-  const data = await mozRequest<MozKeywordsResponse>({
-    apiKey,
-    endpoint: "keyword_rankings",
-    body: {
-      target: cleanDomain,
-      scope: "domain",
-      limit,
-    },
-  });
-
-  const results = data.keyword_rankings || data.results || [];
-  return results.map((r) => ({
-    keyword: r.keyword || "",
-    ranking_position: r.ranking_position,
-    search_volume: r.search_volume,
-    difficulty: r.difficulty,
-  }));
 }
 
 /**
@@ -115,36 +93,75 @@ export async function getTopPages(
   apiKey: string,
   limit: number = 50
 ): Promise<MozTopPage[]> {
-  const cleanDomain = domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  const rootDomain = extractRootDomain(domain);
 
   interface MozTopPageResult {
     page?: string;
     url?: string;
-    page_authority?: number;
-    external_pages_to_page?: number;
     title?: string;
+    page_authority?: number;
+    root_domains_to_page?: number;
   }
 
   interface MozTopPagesResponse {
     results?: MozTopPageResult[];
-    top_pages?: MozTopPageResult[];
   }
 
   const data = await mozRequest<MozTopPagesResponse>({
     apiKey,
     endpoint: "top_pages",
     body: {
-      target: cleanDomain,
-      scope: "domain",
+      target: rootDomain,
+      scope: "root_domain",
       limit,
+      sort: "page_authority",
     },
   });
 
-  const results = data.results || data.top_pages || [];
-  return results.map((r) => ({
+  return (data.results || []).map((r) => ({
     url: r.page || r.url || "",
-    page_authority: r.page_authority,
-    external_links: r.external_pages_to_page,
+    page_authority: r.page_authority ? Math.round(r.page_authority) : undefined,
+    external_links: r.root_domains_to_page,
     title: r.title,
+  }));
+}
+
+/**
+ * Get keyword rankings for a domain from Moz.
+ * Note: This uses the anchor_text endpoint as a proxy for keyword visibility,
+ * since the Moz Links API doesn't have a dedicated keyword rankings endpoint.
+ */
+export async function getKeywordRankings(
+  domain: string,
+  apiKey: string,
+  limit: number = 50
+): Promise<MozKeyword[]> {
+  const rootDomain = extractRootDomain(domain);
+
+  interface MozAnchorResult {
+    anchor_text?: string;
+    external_pages?: number;
+    external_root_domains?: number;
+  }
+
+  interface MozAnchorResponse {
+    results?: MozAnchorResult[];
+  }
+
+  const data = await mozRequest<MozAnchorResponse>({
+    apiKey,
+    endpoint: "anchor_text",
+    body: {
+      target: rootDomain,
+      scope: "root_domain",
+      limit,
+      sort: "external_root_domains",
+    },
+  });
+
+  return (data.results || []).map((r) => ({
+    keyword: r.anchor_text || "",
+    search_volume: r.external_pages,
+    difficulty: r.external_root_domains,
   }));
 }

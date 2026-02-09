@@ -1,157 +1,103 @@
-import FirecrawlApp from "@mendable/firecrawl-js";
+import Firecrawl from "@mendable/firecrawl-js";
 import { FirecrawlPage } from "../types/research-intelligence";
 
-// URL patterns to target for marketing intelligence
-const TARGET_PATHS = [
-  "/",
+const MAX_CHARS_PER_PAGE = 2000;
+
+// Target URL paths for marketing intelligence
+const PAGE_PATHS = [
+  "",              // Homepage
   "/about",
   "/about-us",
+  "/about/team",
+  "/company",
   "/solutions",
   "/products",
   "/services",
   "/platform",
+  "/technology",
   "/features",
-  "/pricing",
-  "/customers",
   "/case-studies",
+  "/case-study",
+  "/casestudies",
+  "/customers",
+  "/customer-stories",
+  "/success-stories",
   "/testimonials",
-  "/blog",
-  "/resources",
+  "/pricing",
   "/partners",
   "/industries",
-  "/technology",
-  "/why-*",
-  "/company",
-  "/team",
+  "/resources",
+  "/blog",
+  "/insights",
+  "/why-us",
+  "/contact",
 ];
 
-const MAX_PAGES = 20;
-const MAX_CHARS_PER_PAGE = 2000;
-
-interface FirecrawlMapResult {
-  links?: string[];
-}
-
-interface FirecrawlScrapeResult {
-  success: boolean;
-  data?: {
-    markdown?: string;
-    metadata?: {
-      title?: string;
-      statusCode?: number;
-    };
-  };
+function normalizeUrl(domain: string): string {
+  const url = domain.startsWith("http") ? domain : `https://${domain}`;
+  return url.replace(/\/+$/, "");
 }
 
 /**
- * Scrape up to 20 targeted pages from a domain using Firecrawl.
- * Returns clean markdown for each page, truncated to 2000 chars.
+ * Scrape a single URL via Firecrawl. Returns null on failure.
+ */
+async function scrapeSingleUrl(
+  client: Firecrawl,
+  url: string
+): Promise<FirecrawlPage | null> {
+  try {
+    const result = await client.scrape(url, {
+      formats: ["markdown"],
+    });
+
+    // v2 API returns data directly
+    const markdown = (result as { markdown?: string }).markdown || "";
+    if (!markdown) return null;
+
+    const metadata = (result as { metadata?: { title?: string; statusCode?: number } }).metadata;
+
+    return {
+      url,
+      title: metadata?.title,
+      markdown: markdown.slice(0, MAX_CHARS_PER_PAGE),
+      status_code: metadata?.statusCode,
+    };
+  } catch (error: unknown) {
+    const err = error as { statusCode?: number; message?: string };
+    if (err?.statusCode === 404 || err?.message?.includes("404")) {
+      // Expected — many target paths won't exist
+      return null;
+    }
+    console.warn(`Firecrawl scrape failed for ${url}:`, err?.message || error);
+    return null;
+  }
+}
+
+/**
+ * Scrape targeted pages from a domain using Firecrawl.
+ * Tries common marketing-relevant paths and returns whatever succeeds.
  */
 export async function scrapeWebsite(
   domain: string,
   apiKey: string
 ): Promise<FirecrawlPage[]> {
-  const app = new FirecrawlApp({ apiKey });
-  const baseUrl = domain.startsWith("http") ? domain : `https://${domain}`;
+  const client = new Firecrawl({ apiKey });
+  const baseUrl = normalizeUrl(domain);
 
-  // Step 1: Map the site to discover URLs
-  let urls: string[] = [];
-  try {
-    const mapResult = (await app.mapUrl(baseUrl)) as FirecrawlMapResult;
-    urls = mapResult.links || [];
-  } catch (err) {
-    console.warn(`Firecrawl map failed for ${domain}, falling back to target paths:`, err);
-    // Fall back to constructing URLs from target paths
-    urls = TARGET_PATHS.map((path) => `${baseUrl}${path}`);
-  }
+  const pageUrls = PAGE_PATHS.map((path) => `${baseUrl}${path}`);
 
-  // Step 2: Filter and prioritize URLs matching target patterns
-  const prioritized = prioritizeUrls(urls, baseUrl);
-  const toScrape = prioritized.slice(0, MAX_PAGES);
+  // Scrape all pages in parallel
+  const results = await Promise.allSettled(
+    pageUrls.map((url) => scrapeSingleUrl(client, url))
+  );
 
-  // Step 3: Scrape each URL
-  const pages: FirecrawlPage[] = [];
-  const scrapePromises = toScrape.map(async (url) => {
-    try {
-      const result = (await app.scrapeUrl(url, {
-        formats: ["markdown"],
-      })) as FirecrawlScrapeResult;
-
-      if (result.success && result.data?.markdown) {
-        return {
-          url,
-          title: result.data.metadata?.title,
-          markdown: result.data.markdown.slice(0, MAX_CHARS_PER_PAGE),
-          status_code: result.data.metadata?.statusCode,
-        };
-      }
-    } catch (err) {
-      console.warn(`Firecrawl scrape failed for ${url}:`, err);
-    }
-    return null;
-  });
-
-  const results = await Promise.allSettled(scrapePromises);
-  for (const result of results) {
-    if (result.status === "fulfilled" && result.value) {
-      pages.push(result.value);
-    }
-  }
+  const pages: FirecrawlPage[] = results
+    .filter(
+      (r): r is PromiseFulfilledResult<FirecrawlPage | null> =>
+        r.status === "fulfilled"
+    )
+    .map((r) => r.value)
+    .filter((page): page is FirecrawlPage => page !== null);
 
   return pages;
-}
-
-/**
- * Prioritize URLs based on marketing-relevant path patterns.
- */
-function prioritizeUrls(urls: string[], baseUrl: string): string[] {
-  const scored: { url: string; score: number }[] = [];
-
-  for (const url of urls) {
-    // Skip external links, PDFs, images, etc.
-    try {
-      const parsed = new URL(url);
-      const base = new URL(baseUrl);
-      if (parsed.hostname !== base.hostname) continue;
-      if (/\.(pdf|png|jpg|jpeg|gif|svg|css|js|xml|json)$/i.test(parsed.pathname)) continue;
-    } catch {
-      continue;
-    }
-
-    let score = 0;
-    const lower = url.toLowerCase();
-
-    // High-value pages
-    if (lower.includes("/about") || lower.includes("/company")) score += 10;
-    if (lower.includes("/solution") || lower.includes("/product")) score += 10;
-    if (lower.includes("/platform") || lower.includes("/feature")) score += 9;
-    if (lower.includes("/case-stud") || lower.includes("/testimonial")) score += 9;
-    if (lower.includes("/customer")) score += 8;
-    if (lower.includes("/pricing")) score += 8;
-    if (lower.includes("/service")) score += 7;
-    if (lower.includes("/industr")) score += 7;
-    if (lower.includes("/technolog")) score += 6;
-    if (lower.includes("/partner")) score += 6;
-    if (lower.includes("/blog")) score += 5;
-    if (lower.includes("/resource")) score += 5;
-    if (lower.includes("/why")) score += 5;
-
-    // Homepage gets high priority
-    try {
-      const parsed = new URL(url);
-      if (parsed.pathname === "/" || parsed.pathname === "") score += 10;
-    } catch {
-      // ignore
-    }
-
-    // Penalize deep paths (likely blog posts, not main pages)
-    const pathDepth = (url.split("/").length - 3); // subtract protocol + domain parts
-    if (pathDepth > 3) score -= 3;
-
-    scored.push({ url, score });
-  }
-
-  return scored
-    .sort((a, b) => b.score - a.score)
-    .map((s) => s.url);
 }

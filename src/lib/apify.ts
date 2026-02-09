@@ -19,10 +19,11 @@ export async function scrapeLinkedInCompany(
     ? linkedinHandle
     : `https://www.linkedin.com/${linkedinHandle}`;
 
-  const run = await client.actor("curious_coder/linkedin-company-scraper").call({
-    urls: [profileUrl],
-    proxyConfiguration: { useApifyProxy: true },
-  });
+  // Actor ID 3rgDeYgLhr6XrVnjs — same as MiD Offers (proven working)
+  const run = await client.actor("3rgDeYgLhr6XrVnjs").call(
+    { urls: [profileUrl] },
+    { timeout: 120 }
+  );
 
   const { items } = await client.dataset(run.defaultDatasetId).listItems();
   const item = items[0] as Record<string, unknown> | undefined;
@@ -46,10 +47,10 @@ export async function scrapeLinkedInCompany(
   }
 
   return {
-    name: (item.name as string) || linkedinHandle,
-    description: item.description as string | undefined,
-    followers: item.followers as number | undefined,
-    employee_count: item.employeeCount as string | undefined,
+    name: (item.name as string) || (item.companyName as string) || linkedinHandle,
+    description: (item.description as string) || (item.about as string) || undefined,
+    followers: (item.followersCount as number) || (item.followers as number) || undefined,
+    employee_count: (item.employeeCount as string) || (item.employees as string) || (item.staffCount as string) || undefined,
     specialties: item.specialties as string[] | undefined,
     headquarters: item.headquarters as string | undefined,
     industry: item.industry as string | undefined,
