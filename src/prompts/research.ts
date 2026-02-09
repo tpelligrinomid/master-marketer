@@ -44,7 +44,10 @@ function formatCompanyIntelligence(
     parts.push(`- Employees: ${li.employee_count ?? "N/A"}`);
     parts.push(`- Industry: ${li.industry ?? "N/A"}`);
     if (li.description) parts.push(`- Description: ${li.description.slice(0, 300)}`);
-    if (li.specialties?.length) parts.push(`- Specialties: ${li.specialties.join(", ")}`);
+    if (li.specialties) {
+      const specs = Array.isArray(li.specialties) ? li.specialties : [li.specialties];
+      parts.push(`- Specialties: ${specs.join(", ")}`);
+    }
     if (li.recent_posts?.length) {
       parts.push(`- Recent Posts (${li.recent_posts.length}):`);
       for (const post of li.recent_posts.slice(0, 5)) {

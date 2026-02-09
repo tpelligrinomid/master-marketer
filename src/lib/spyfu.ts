@@ -3,7 +3,7 @@ import {
   SpyFuAdHistory,
 } from "../types/research-intelligence";
 
-const SPYFU_API_BASE = "https://www.spyfu.com/apis/v2";
+const SPYFU_API_BASE = "https://api.spyfu.com/apis";
 
 interface SpyFuRequestOptions {
   apiKey: string;
@@ -28,7 +28,6 @@ async function spyfuRequest<T>(options: SpyFuRequestOptions): Promise<T> {
     if (proxyParsed.username) {
       headers["Authorization"] =
         `Basic ${Buffer.from(`${decodeURIComponent(proxyParsed.username)}:${decodeURIComponent(proxyParsed.password)}`).toString("base64")}`;
-      // Rebuild proxy URL without credentials
       proxyParsed.username = "";
       proxyParsed.password = "";
     }
@@ -59,37 +58,43 @@ export async function getPPCKeywords(
   const cleanDomain = domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
   interface SpyFuPPCResult {
+    term?: string;
     keyword?: string;
+    rankPaid?: number;
     position?: number;
     costPerClick?: number;
+    ppcClicks?: number;
     monthlyClicks?: number;
+    ppcCost?: number;
     monthlyCost?: number;
     adCount?: number;
   }
 
   interface SpyFuPPCResponse {
     results?: SpyFuPPCResult[];
+    resultCount?: number;
   }
 
   const data = await spyfuRequest<SpyFuPPCResponse>({
     apiKey,
-    endpoint: "domain/ppc_keywords",
+    endpoint: "ppc_research_api/v2/getPaidSerps",
     params: {
       domain: cleanDomain,
-      country: "US",
-      limit: String(limit),
-      sort_by: "monthly_cost",
-      sort_order: "desc",
+      countryCode: "US",
+      pageSize: String(limit),
+      pageNumber: "1",
+      sortBy: "ppcCost",
+      sortOrder: "descending",
     },
     proxyUrl,
   });
 
   return (data.results || []).map((r) => ({
-    keyword: r.keyword || "",
-    position: r.position,
+    keyword: r.term || r.keyword || "",
+    position: r.rankPaid || r.position,
     cost_per_click: r.costPerClick,
-    monthly_clicks: r.monthlyClicks,
-    monthly_cost: r.monthlyCost,
+    monthly_clicks: r.ppcClicks || r.monthlyClicks,
+    monthly_cost: r.ppcCost || r.monthlyCost,
     ad_count: r.adCount,
   }));
 }
@@ -106,11 +111,15 @@ export async function getAdHistory(
   const cleanDomain = domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
   interface SpyFuAdHistoryResult {
+    term?: string;
     keyword?: string;
+    adTitle?: string;
     headline?: string;
+    adDescription?: string;
     description?: string;
     displayUrl?: string;
     landingPage?: string;
+    destUrl?: string;
     firstSeen?: string;
     lastSeen?: string;
     position?: number;
@@ -118,25 +127,27 @@ export async function getAdHistory(
 
   interface SpyFuAdHistoryResponse {
     results?: SpyFuAdHistoryResult[];
+    resultCount?: number;
   }
 
   const data = await spyfuRequest<SpyFuAdHistoryResponse>({
     apiKey,
-    endpoint: "domain/ad_history",
+    endpoint: "ad_history_api/v2/getDomainAdHistory",
     params: {
       domain: cleanDomain,
-      country: "US",
-      limit: String(limit),
+      countryCode: "US",
+      pageSize: String(limit),
+      pageNumber: "1",
     },
     proxyUrl,
   });
 
   return (data.results || []).map((r) => ({
-    keyword: r.keyword,
-    headline: r.headline,
-    description: r.description,
+    keyword: r.term || r.keyword,
+    headline: r.adTitle || r.headline,
+    description: r.adDescription || r.description,
     display_url: r.displayUrl,
-    landing_page: r.landingPage,
+    landing_page: r.landingPage || r.destUrl,
     first_seen: r.firstSeen,
     last_seen: r.lastSeen,
     ad_position: r.position,
