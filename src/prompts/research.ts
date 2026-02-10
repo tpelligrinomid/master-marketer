@@ -186,6 +186,57 @@ function formatCompanyIntelligence(
   return parts.join("\n");
 }
 
+function formatKnowledgeBase(input: ResearchInput): string {
+  const parts: string[] = [];
+
+  // New structured knowledge_base from MiD App
+  if (input.knowledge_base) {
+    const kb = input.knowledge_base;
+
+    if (kb.primary_meetings?.length) {
+      parts.push("## Primary Discovery Meetings");
+      parts.push("These are the key client meetings and discovery sessions.\n");
+      for (const meeting of kb.primary_meetings) {
+        parts.push(typeof meeting === "string" ? meeting : JSON.stringify(meeting, null, 2));
+        parts.push("\n---\n");
+      }
+    }
+
+    if (kb.other_meetings?.length) {
+      parts.push("## Additional Meetings");
+      for (const meeting of kb.other_meetings) {
+        parts.push(typeof meeting === "string" ? meeting : JSON.stringify(meeting, null, 2));
+        parts.push("\n---\n");
+      }
+    }
+
+    if (kb.notes?.length) {
+      parts.push("## Strategist Notes");
+      for (const note of kb.notes) {
+        parts.push(typeof note === "string" ? note : JSON.stringify(note, null, 2));
+        parts.push("\n---\n");
+      }
+    }
+
+    if (kb.processes?.length) {
+      parts.push("## Processes & Workflows");
+      for (const process of kb.processes) {
+        parts.push(typeof process === "string" ? process : JSON.stringify(process, null, 2));
+        parts.push("\n---\n");
+      }
+    }
+  }
+
+  // Legacy rag_context (still supported for backwards compatibility)
+  if (input.rag_context) {
+    parts.push("## Discovery Notes / Meeting Context");
+    parts.push(input.rag_context.slice(0, 4000));
+  }
+
+  if (parts.length === 0) return "";
+  return "# Knowledge Base & Discovery Context\n\n" + parts.join("\n");
+}
+
 function formatWebResearch(webResearch: IntelligencePackage["web_research"]): string {
   if (!webResearch?.length) return "";
 
@@ -435,23 +486,29 @@ export function buildMainSectionPrompt(
   const priorContext = summarizePriorSections(priorSections);
   const webResearchBlock = formatWebResearch(intelligence.web_research);
 
+  const knowledgeBlock = formatKnowledgeBase(input);
+
   const contextBlock = [
     `# Client: ${input.client.company_name}`,
-    `Industry: ${input.context.industry_description}`,
-    input.context.solution_category
+    input.context?.industry_description
+      ? `Industry: ${input.context.industry_description}`
+      : null,
+    input.context?.solution_category
       ? `Solution Category: ${input.context.solution_category}`
       : null,
-    input.context.target_verticals?.length
+    input.context?.target_verticals?.length
       ? `Target Verticals: ${input.context.target_verticals.join(", ")}`
       : null,
-    input.rag_context
-      ? `\n## Discovery Notes / Meeting Context\n${input.rag_context.slice(0, 2000)}`
+    input.instructions
+      ? `\n## Strategist Instructions\n${input.instructions}`
       : null,
   ]
     .filter(Boolean)
     .join("\n");
 
   const user = `${contextBlock}
+
+${knowledgeBlock}
 
 ${priorContext}
 
@@ -508,9 +565,15 @@ export function buildCompetitiveLandscapePrompt(
     ...input.competitors.map((c) => c.company_name),
   ];
 
-  const user = `# Client: ${input.client.company_name}
-Industry: ${input.context.industry_description}
+  const knowledgeBlock = formatKnowledgeBase(input);
+  const industryLine = input.context?.industry_description
+    ? `\nIndustry: ${input.context.industry_description}`
+    : "";
+
+  const user = `# Client: ${input.client.company_name}${industryLine}
 Companies analyzed: ${companyNames.join(", ")}
+${input.instructions ? `\n## Strategist Instructions\n${input.instructions}\n` : ""}
+${knowledgeBlock}
 
 ${priorContext}
 

@@ -127,10 +127,12 @@ export const generateResearch = task({
       input.client,
       input.competitors,
       gatherConfig,
-      {
-        industry: input.context.industry_description,
-        solutionCategory: input.context.solution_category,
-      }
+      input.context?.industry_description
+        ? {
+            industry: input.context.industry_description,
+            solutionCategory: input.context.solution_category,
+          }
+        : undefined
     );
 
     // Count data source successes/failures
@@ -274,7 +276,7 @@ export const generateResearch = task({
     metadata.set("phase", "assembly");
     metadata.set("progress", "Assembling final document...");
 
-    const title = `Marketing Research: ${input.client.company_name}`;
+    const title = input.title || `Marketing Research: ${input.client.company_name}`;
     const fullDocument = assembleFullDocument(title, sections);
     const totalWordCount = sections.reduce(
       (sum, s) => sum + s.word_count,
