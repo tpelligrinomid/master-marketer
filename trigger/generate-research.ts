@@ -19,8 +19,9 @@ import {
 } from "../src/prompts/research";
 import { extractJson } from "../src/lib/json-utils";
 
+
 const MODEL = "claude-opus-4-20250514";
-const MAX_TOKENS = 16384;
+const MAX_TOKENS = 32000;
 
 async function callClaude(
   client: Anthropic,
@@ -89,6 +90,7 @@ function assembleFullDocument(
 
 export const generateResearch = task({
   id: "generate-research",
+  maxDuration: 2700, // 45 minutes — needed for deep prompt targets
   retry: {
     maxAttempts: 1,
   },

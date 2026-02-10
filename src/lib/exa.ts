@@ -48,6 +48,7 @@ export async function searchWebResearch(
         },
       });
 
+      const added = [];
       for (const result of response.results) {
         if (result.text && result.url && result.title) {
           results.push({
@@ -56,12 +57,15 @@ export async function searchWebResearch(
             content: result.text.slice(0, 2000),
             query,
           });
+          added.push(result.title);
         }
       }
-    } catch (err) {
+      console.log(`[Exa] Query "${query.slice(0, 60)}..." → ${added.length} results`);
+    } catch (err: any) {
+      const msg = err instanceof Error ? err.message : String(err);
+      const status = err?.status || err?.response?.status || "unknown";
       console.warn(
-        `[Exa] Search failed for query "${query}":`,
-        err instanceof Error ? err.message : err
+        `[Exa] Search failed for query "${query}": status=${status} message=${msg}`
       );
     }
   });
