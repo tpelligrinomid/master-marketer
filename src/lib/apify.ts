@@ -63,6 +63,8 @@ export async function scrapeLinkedInCompany(
     item.employeeCount ??
     item.employees ??
     item.staffCount ??
+    item.company_size_on_linkedin ??
+    item.companySizeOnLinkedin ??
     item.employeesOnLinkedIn ??
     item.staffCountRange;
   const employee_count = rawEmployees != null ? String(rawEmployees) : undefined;
@@ -82,8 +84,8 @@ export async function scrapeLinkedInCompany(
   }
 
   return {
-    name: (item.name as string) || (item.companyName as string) || linkedinHandle,
-    description: (item.description as string) || (item.about as string) || undefined,
+    name: (item.name as string) || (item.companyName as string) || (item.company_name as string) || linkedinHandle,
+    description: (item.description as string) || (item.about as string) || (item.tagline as string) || undefined,
     followers,
     employee_count,
     specialties: item.specialties as string[] | undefined,
