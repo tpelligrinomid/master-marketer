@@ -1,6 +1,7 @@
 import { task, metadata } from "@trigger.dev/sdk/v3";
 import Anthropic from "@anthropic-ai/sdk";
 import { ResearchInput, ResearchInputSchema } from "../src/types/research-input";
+import { TaskCallback, deliverTaskResult } from "../src/lib/task-callback";
 import { IntelligencePackage } from "../src/types/research-intelligence";
 import {
   ResearchOutput,
@@ -94,9 +95,11 @@ export const generateResearch = task({
   retry: {
     maxAttempts: 1,
   },
-  run: async (payload: ResearchInput): Promise<ResearchOutput> => {
+  run: async (payload: ResearchInput & { _callback?: TaskCallback; _jobId?: string }): Promise<ResearchOutput> => {
+    const { _callback, _jobId, ...rawInput } = payload;
+
     // Validate input
-    const input = ResearchInputSchema.parse(payload);
+    const input = ResearchInputSchema.parse(rawInput);
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
@@ -308,6 +311,14 @@ export const generateResearch = task({
         },
       },
     };
+
+    // ═══════════════════════════════════════════════
+    // Phase 4: Webhook Callback Delivery
+    // ═══════════════════════════════════════════════
+    if (_callback) {
+      metadata.set("progress", "Delivering results via callback...");
+      await deliverTaskResult(_callback, _jobId || "unknown", "completed", output);
+    }
 
     metadata.set("progress", "Complete");
     return output;

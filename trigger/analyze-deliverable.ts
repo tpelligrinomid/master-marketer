@@ -7,6 +7,7 @@ import {
 } from "../src/types/deliverable-intake";
 import { buildDeliverablePrompt } from "../src/prompts/deliverable-intake";
 import { extractJson } from "../src/lib/json-utils";
+import { TaskCallback, deliverTaskResult } from "../src/lib/task-callback";
 
 const MODEL = "claude-opus-4-20250514";
 const MAX_TOKENS = 8192;
@@ -19,9 +20,11 @@ export const analyzeDeliverable = task({
     maxTimeoutInMs: 30000,
     factor: 2,
   },
-  run: async (payload: DeliverableIntakeInput): Promise<DeliverableOutput> => {
+  run: async (payload: DeliverableIntakeInput & { _callback?: TaskCallback; _jobId?: string }): Promise<DeliverableOutput> => {
+    const { _callback, _jobId, ...rawInput } = payload;
+
     // Validate input
-    const input = DeliverableIntakeInputSchema.parse(payload);
+    const input = DeliverableIntakeInputSchema.parse(rawInput);
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
@@ -59,6 +62,11 @@ export const analyzeDeliverable = task({
         generated_at: new Date().toISOString(),
       },
     } as DeliverableOutput;
+
+    // Deliver via callback if provided
+    if (_callback) {
+      await deliverTaskResult(_callback, _jobId || "unknown", "completed", output);
+    }
 
     return output;
   },

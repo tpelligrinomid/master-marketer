@@ -5,7 +5,6 @@ import { MeetingNotesInputSchema } from "../types/meeting-notes";
 import { DeliverableIntakeInputSchema, DeliverableType } from "../types/deliverable-intake";
 import { ResearchInputSchema } from "../types/research-input";
 import { jobStore } from "../lib/job-store";
-import { watchRunAndDeliver, CallbackMetadata } from "../lib/webhook-delivery";
 import { getEnv } from "../config/env";
 
 const router = Router();
@@ -16,7 +15,7 @@ const router = Router();
  */
 function extractWebhookFields(body: Record<string, unknown>): {
   callbackUrl?: string;
-  callbackMetadata?: CallbackMetadata;
+  callbackMetadata?: Record<string, unknown>;
 } {
   const callbackUrl =
     typeof body.callback_url === "string" && body.callback_url.startsWith("http")
@@ -25,7 +24,7 @@ function extractWebhookFields(body: Record<string, unknown>): {
 
   const callbackMetadata =
     body.metadata && typeof body.metadata === "object" && !Array.isArray(body.metadata)
-      ? (body.metadata as CallbackMetadata)
+      ? (body.metadata as Record<string, unknown>)
       : undefined;
 
   return { callbackUrl, callbackMetadata };
@@ -37,6 +36,19 @@ function extractWebhookFields(body: Record<string, unknown>): {
 function stripWebhookFields(body: Record<string, unknown>): Record<string, unknown> {
   const { callback_url: _, metadata: __, ...rest } = body;
   return rest;
+}
+
+/**
+ * Build _callback object to pass through to the Trigger.dev task payload.
+ * The task itself will POST results to this URL when it completes.
+ */
+function buildCallbackPayload(callbackUrl?: string, callbackMetadata?: Record<string, unknown>) {
+  if (!callbackUrl) return undefined;
+  return {
+    url: callbackUrl,
+    api_key: getEnv().API_KEY,
+    metadata: callbackMetadata,
+  };
 }
 
 // Factory for deliverable intake routes (roadmap, plan, brief)
@@ -58,22 +70,15 @@ function createIntakeRoute(type: DeliverableType) {
       const input = parseResult.data;
       const jobId = uuidv4();
 
-      // Trigger the async task
-      const handle = await tasks.trigger("analyze-deliverable", input);
+      // Pass callback info through to the Trigger.dev task — IT will deliver results
+      const triggerPayload = {
+        ...input,
+        _callback: buildCallbackPayload(callbackUrl, callbackMetadata),
+        _jobId: jobId,
+      };
 
-      // Store job with trigger run ID
+      const handle = await tasks.trigger("analyze-deliverable", triggerPayload);
       jobStore.create(jobId, handle.id);
-
-      // Start background webhook delivery if callback provided
-      if (callbackUrl) {
-        watchRunAndDeliver({
-          triggerRunId: handle.id,
-          callbackUrl,
-          jobId,
-          callbackMetadata,
-          apiKey: getEnv().API_KEY,
-        });
-      }
 
       res.status(202).json({
         jobId,
@@ -107,18 +112,14 @@ router.post(
       const input = parseResult.data;
       const jobId = uuidv4();
 
-      const handle = await tasks.trigger("analyze-meeting-notes", input);
-      jobStore.create(jobId, handle.id);
+      const triggerPayload = {
+        ...input,
+        _callback: buildCallbackPayload(callbackUrl, callbackMetadata),
+        _jobId: jobId,
+      };
 
-      if (callbackUrl) {
-        watchRunAndDeliver({
-          triggerRunId: handle.id,
-          callbackUrl,
-          jobId,
-          callbackMetadata,
-          apiKey: getEnv().API_KEY,
-        });
-      }
+      const handle = await tasks.trigger("analyze-meeting-notes", triggerPayload);
+      jobStore.create(jobId, handle.id);
 
       res.status(202).json({
         jobId,
@@ -152,18 +153,14 @@ router.post(
       const input = parseResult.data;
       const jobId = uuidv4();
 
-      const handle = await tasks.trigger("generate-research", input);
-      jobStore.create(jobId, handle.id);
+      const triggerPayload = {
+        ...input,
+        _callback: buildCallbackPayload(callbackUrl, callbackMetadata),
+        _jobId: jobId,
+      };
 
-      if (callbackUrl) {
-        watchRunAndDeliver({
-          triggerRunId: handle.id,
-          callbackUrl,
-          jobId,
-          callbackMetadata,
-          apiKey: getEnv().API_KEY,
-        });
-      }
+      const handle = await tasks.trigger("generate-research", triggerPayload);
+      jobStore.create(jobId, handle.id);
 
       res.status(202).json({
         jobId,

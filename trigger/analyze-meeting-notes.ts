@@ -10,6 +10,7 @@ import {
   buildMeetingNotesPrompt,
 } from "../src/prompts/meeting-notes";
 import { extractJson } from "../src/lib/json-utils";
+import { TaskCallback, deliverTaskResult } from "../src/lib/task-callback";
 
 const MODEL = "claude-opus-4-20250514";
 const MAX_TOKENS = 4096;
@@ -22,9 +23,11 @@ export const analyzeMeetingNotes = task({
     maxTimeoutInMs: 30000,
     factor: 2,
   },
-  run: async (payload: MeetingNotesInput): Promise<MeetingNotesOutput> => {
+  run: async (payload: MeetingNotesInput & { _callback?: TaskCallback; _jobId?: string }): Promise<MeetingNotesOutput> => {
+    const { _callback, _jobId, ...rawInput } = payload;
+
     // Validate input
-    const input = MeetingNotesInputSchema.parse(payload);
+    const input = MeetingNotesInputSchema.parse(rawInput);
 
     // Get API key from environment
     const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -84,6 +87,11 @@ export const analyzeMeetingNotes = task({
         generated_at: new Date().toISOString(),
       },
     };
+
+    // Deliver via callback if provided
+    if (_callback) {
+      await deliverTaskResult(_callback, _jobId || "unknown", "completed", output);
+    }
 
     return output;
   },
