@@ -5,6 +5,52 @@ import { JobResponse } from "../types/meeting-notes";
 
 const router = Router();
 
+// GET /jobs/by-run/:triggerRunId
+// Direct lookup by Trigger.dev run ID — bypasses the in-memory job store entirely.
+// This is a fallback for when the job store has lost state (e.g. after Render restart).
+// MiD App gets the triggerRunId from the initial 202 response and can use it to recover.
+// NOTE: Must be registered BEFORE /:jobId to avoid Express matching "by-run" as a jobId.
+router.get("/by-run/:triggerRunId", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { triggerRunId } = req.params;
+
+    const run = await runs.retrieve(triggerRunId);
+
+    if (run.status === "COMPLETED") {
+      res.json({
+        triggerRunId,
+        status: "complete",
+        output: run.output,
+        completedAt: run.finishedAt,
+      });
+      return;
+    }
+
+    if (run.status === "FAILED" || run.status === "CANCELED") {
+      res.json({
+        triggerRunId,
+        status: "failed",
+        error: run.error?.message || `Run ended with status: ${run.status}`,
+      });
+      return;
+    }
+
+    // Still running
+    res.json({
+      triggerRunId,
+      status: "processing",
+      runStatus: run.status,
+    });
+  } catch (error: unknown) {
+    // If the run doesn't exist on Trigger.dev
+    if (error instanceof Error && error.message?.includes("not found")) {
+      res.status(404).json({ error: "Trigger.dev run not found" });
+      return;
+    }
+    next(error);
+  }
+});
+
 // GET /jobs/:jobId
 // Returns current status of an async job
 router.get("/:jobId", async (req: Request, res: Response, next: NextFunction) => {

@@ -5,15 +5,46 @@ import { MeetingNotesInputSchema } from "../types/meeting-notes";
 import { DeliverableIntakeInputSchema, DeliverableType } from "../types/deliverable-intake";
 import { ResearchInputSchema } from "../types/research-input";
 import { jobStore } from "../lib/job-store";
+import { watchRunAndDeliver, CallbackMetadata } from "../lib/webhook-delivery";
+import { getEnv } from "../config/env";
 
 const router = Router();
+
+/**
+ * Extract webhook-related fields from request body.
+ * These are stripped before Zod validation so they don't interfere with schemas.
+ */
+function extractWebhookFields(body: Record<string, unknown>): {
+  callbackUrl?: string;
+  callbackMetadata?: CallbackMetadata;
+} {
+  const callbackUrl =
+    typeof body.callback_url === "string" && body.callback_url.startsWith("http")
+      ? body.callback_url
+      : undefined;
+
+  const callbackMetadata =
+    body.metadata && typeof body.metadata === "object" && !Array.isArray(body.metadata)
+      ? (body.metadata as CallbackMetadata)
+      : undefined;
+
+  return { callbackUrl, callbackMetadata };
+}
+
+/**
+ * Strip webhook fields from the body before passing to Zod validation.
+ */
+function stripWebhookFields(body: Record<string, unknown>): Record<string, unknown> {
+  const { callback_url: _, metadata: __, ...rest } = body;
+  return rest;
+}
 
 // Factory for deliverable intake routes (roadmap, plan, brief)
 function createIntakeRoute(type: DeliverableType) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // Inject deliverable_type from the URL
-      const body = { ...req.body, deliverable_type: type };
+      const { callbackUrl, callbackMetadata } = extractWebhookFields(req.body);
+      const body = { ...stripWebhookFields(req.body), deliverable_type: type };
 
       const parseResult = DeliverableIntakeInputSchema.safeParse(body);
       if (!parseResult.success) {
@@ -33,8 +64,20 @@ function createIntakeRoute(type: DeliverableType) {
       // Store job with trigger run ID
       jobStore.create(jobId, handle.id);
 
+      // Start background webhook delivery if callback provided
+      if (callbackUrl) {
+        watchRunAndDeliver({
+          triggerRunId: handle.id,
+          callbackUrl,
+          jobId,
+          callbackMetadata,
+          apiKey: getEnv().API_KEY,
+        });
+      }
+
       res.status(202).json({
         jobId,
+        triggerRunId: handle.id,
         status: "accepted",
         message: `${type} analysis started. Poll GET /api/jobs/:jobId for status.`,
       });
@@ -45,13 +88,14 @@ function createIntakeRoute(type: DeliverableType) {
 }
 
 // POST /intake/meeting-notes
-// Accepts meeting transcript, triggers async analysis, returns jobId
 router.post(
   "/meeting-notes",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // Validate input
-      const parseResult = MeetingNotesInputSchema.safeParse(req.body);
+      const { callbackUrl, callbackMetadata } = extractWebhookFields(req.body);
+      const body = stripWebhookFields(req.body);
+
+      const parseResult = MeetingNotesInputSchema.safeParse(body);
       if (!parseResult.success) {
         res.status(400).json({
           error: "Invalid input",
@@ -63,14 +107,22 @@ router.post(
       const input = parseResult.data;
       const jobId = uuidv4();
 
-      // Trigger the async task
       const handle = await tasks.trigger("analyze-meeting-notes", input);
-
-      // Store job with trigger run ID
       jobStore.create(jobId, handle.id);
+
+      if (callbackUrl) {
+        watchRunAndDeliver({
+          triggerRunId: handle.id,
+          callbackUrl,
+          jobId,
+          callbackMetadata,
+          apiKey: getEnv().API_KEY,
+        });
+      }
 
       res.status(202).json({
         jobId,
+        triggerRunId: handle.id,
         status: "accepted",
         message: "Meeting notes analysis started. Poll GET /api/jobs/:jobId for status.",
       });
@@ -81,12 +133,14 @@ router.post(
 );
 
 // POST /intake/research
-// Custom handler — different schema and task ID than deliverable routes
 router.post(
   "/research",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const parseResult = ResearchInputSchema.safeParse(req.body);
+      const { callbackUrl, callbackMetadata } = extractWebhookFields(req.body);
+      const body = stripWebhookFields(req.body);
+
+      const parseResult = ResearchInputSchema.safeParse(body);
       if (!parseResult.success) {
         res.status(400).json({
           error: "Invalid input",
@@ -98,17 +152,25 @@ router.post(
       const input = parseResult.data;
       const jobId = uuidv4();
 
-      // Trigger the research generation task
       const handle = await tasks.trigger("generate-research", input);
-
-      // Store job with trigger run ID
       jobStore.create(jobId, handle.id);
+
+      if (callbackUrl) {
+        watchRunAndDeliver({
+          triggerRunId: handle.id,
+          callbackUrl,
+          jobId,
+          callbackMetadata,
+          apiKey: getEnv().API_KEY,
+        });
+      }
 
       res.status(202).json({
         jobId,
+        triggerRunId: handle.id,
         status: "accepted",
         message:
-          "Research generation started. Poll GET /api/jobs/:jobId for status. Estimated duration: 5-8 minutes.",
+          "Research generation started. Results will be delivered to callback_url when complete. You can also poll GET /api/jobs/:jobId for status.",
       });
     } catch (error) {
       next(error);
