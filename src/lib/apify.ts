@@ -32,6 +32,41 @@ export async function scrapeLinkedInCompany(
     return { name: linkedinHandle };
   }
 
+  // Log raw response keys for debugging data extraction
+  console.log(`[apify] LinkedIn response keys for ${linkedinHandle}:`, Object.keys(item));
+
+  // Extract follower count — Apify actors use inconsistent field names
+  const rawFollowers =
+    item.followersCount ??
+    item.followers ??
+    item.followerCount ??
+    item.follower_count ??
+    item.follower_count_num ??
+    item.numFollowers ??
+    item.numberOfFollowers;
+  const followers = typeof rawFollowers === "number"
+    ? rawFollowers
+    : typeof rawFollowers === "string"
+      ? parseInt(rawFollowers.replace(/[^0-9]/g, ""), 10) || undefined
+      : undefined;
+
+  if (!followers) {
+    console.warn(`[apify] No follower count found for ${linkedinHandle}. Follower-related fields:`,
+      Object.entries(item)
+        .filter(([k]) => k.toLowerCase().includes("follow"))
+        .map(([k, v]) => `${k}=${v}`)
+    );
+  }
+
+  // Extract employee count — also inconsistent naming
+  const rawEmployees =
+    item.employeeCount ??
+    item.employees ??
+    item.staffCount ??
+    item.employeesOnLinkedIn ??
+    item.staffCountRange;
+  const employee_count = rawEmployees != null ? String(rawEmployees) : undefined;
+
   const recentPosts: LinkedInPost[] = [];
   if (Array.isArray(item.posts)) {
     for (const post of item.posts.slice(0, 10)) {
@@ -49,8 +84,8 @@ export async function scrapeLinkedInCompany(
   return {
     name: (item.name as string) || (item.companyName as string) || linkedinHandle,
     description: (item.description as string) || (item.about as string) || undefined,
-    followers: (item.followersCount as number) || (item.followers as number) || undefined,
-    employee_count: (item.employeeCount as string) || (item.employees as string) || (item.staffCount as string) || undefined,
+    followers,
+    employee_count,
     specialties: item.specialties as string[] | undefined,
     headquarters: item.headquarters as string | undefined,
     industry: item.industry as string | undefined,
