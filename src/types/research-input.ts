@@ -14,7 +14,7 @@ export type CompanyInfo = z.infer<typeof CompanySchema>;
 // --- Research Context (optional — MM can infer from knowledge_base) ---
 
 const ResearchContextSchema = z.object({
-  industry_description: z.string().min(1),
+  industry_description: z.string().optional(),
   solution_category: z.string().optional(),
   target_verticals: z.array(z.string()).optional(),
 });
