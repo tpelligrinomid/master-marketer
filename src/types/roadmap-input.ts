@@ -42,6 +42,9 @@ export const RoadmapInputSchema = z.object({
   instructions: z.string().optional(),
 
   title: z.string().optional(),
+
+  /** Previous quarter's roadmap output (GeneratedRoadmapOutput shape) for quarter-over-quarter iteration */
+  previous_roadmap: z.object({}).passthrough().optional(),
 });
 
 export type RoadmapInput = z.infer<typeof RoadmapInputSchema>;

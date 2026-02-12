@@ -63,6 +63,32 @@ function summarizePriorResults(accumulated: Record<string, unknown>): string {
   return parts.join("\n");
 }
 
+function formatPreviousRoadmap(
+  previousRoadmap: Record<string, unknown> | undefined,
+  sectionKeys: string[],
+  guidance: string
+): string {
+  if (!previousRoadmap) return "";
+
+  const parts = [
+    "# Previous Quarter's Roadmap (for continuity)\n",
+    "You are building a QUARTERLY UPDATE to an existing roadmap. The previous version's relevant sections are below. Evolve it — don't regenerate from scratch. Maintain continuity where appropriate, and make fresh strategic choices where indicated.\n",
+  ];
+
+  for (const key of sectionKeys) {
+    const value = previousRoadmap[key];
+    if (value === undefined) continue;
+    const json = JSON.stringify(value, null, 2);
+    const truncated =
+      json.length > 3000 ? json.slice(0, 3000) + "\n... (truncated)" : json;
+    parts.push(`## Previous ${key}\n\`\`\`json\n${truncated}\n\`\`\`\n`);
+  }
+
+  parts.push(`## Evolution Guidance\n${guidance}\n`);
+
+  return parts.join("\n");
+}
+
 // --- Prompt Builders ---
 
 /**
@@ -74,10 +100,17 @@ export function buildTargetMarketAndBrandStoryPrompt(
 ): { system: string; user: string } {
   const context = buildContextBlock(input);
   const transcripts = formatTranscripts(input.transcripts);
+  const previousContext = formatPreviousRoadmap(
+    input.previous_roadmap as Record<string, unknown> | undefined,
+    ["target_market", "brand_story"],
+    "Refine and evolve these — don't start from scratch. Keep ICPs stable unless research/meetings indicate a shift. Update the brand story only if positioning has changed."
+  );
 
   const user = `${context}
 
 ${transcripts}
+
+${previousContext}
 
 # Research Document
 ${input.research.full_document_markdown.slice(0, 40000)}
@@ -149,6 +182,11 @@ export function buildProductsAndCompetitionPrompt(
   const context = buildContextBlock(input);
   const transcripts = formatTranscripts(input.transcripts);
   const priorResults = summarizePriorResults(accumulated);
+  const previousContext = formatPreviousRoadmap(
+    input.previous_roadmap as Record<string, unknown> | undefined,
+    ["products_and_solutions", "competition"],
+    "Update the product matrix if offerings have changed. Refresh competitor observations with new data. Maintain consistency with prior positioning unless the market has shifted."
+  );
 
   // Extract competitor names from research scores
   const competitorNames = Object.keys(input.research.competitive_scores);
@@ -158,6 +196,8 @@ export function buildProductsAndCompetitionPrompt(
 ${transcripts}
 
 ${priorResults}
+
+${previousContext}
 
 # Research Document
 ${input.research.full_document_markdown.slice(0, 40000)}
@@ -221,12 +261,19 @@ export function buildGoalsAndStrategyPrompt(
   const context = buildContextBlock(input);
   const transcripts = formatTranscripts(input.transcripts);
   const priorResults = summarizePriorResults(accumulated);
+  const previousContext = formatPreviousRoadmap(
+    input.previous_roadmap as Record<string, unknown> | undefined,
+    ["goals", "roadmap_phases", "quarterly_initiatives"],
+    "Update goal benchmarks based on progress. Generate FRESH roadmap phases and OKRs for the new quarter — these should not repeat the previous quarter. Build on momentum from prior phases."
+  );
 
   const user = `${context}
 
 ${transcripts}
 
 ${priorResults}
+
+${previousContext}
 
 # Research Document
 ${input.research.full_document_markdown.slice(0, 25000)}
@@ -305,6 +352,11 @@ export function buildAnnualAndPointsPlanPrompt(
 ): { system: string; user: string } {
   const context = buildContextBlock(input);
   const priorResults = summarizePriorResults(accumulated);
+  const previousContext = formatPreviousRoadmap(
+    input.previous_roadmap as Record<string, unknown> | undefined,
+    ["annual_plan", "points_plan"],
+    "Shift the annual plan timeline forward. Adjust initiatives based on what worked and what didn't. Generate a FRESH points allocation for the new quarter."
+  );
 
   // Format process library as a menu for Claude to select from
   const processMenu = input.process_library
@@ -317,6 +369,8 @@ export function buildAnnualAndPointsPlanPrompt(
   const user = `${context}
 
 ${priorResults}
+
+${previousContext}
 
 # Process Library (available deliverables to select from)
 ${processMenu}
