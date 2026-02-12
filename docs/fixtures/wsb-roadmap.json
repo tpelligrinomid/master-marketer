@@ -1,0 +1,861 @@
+{
+  "type": "roadmap",
+  "title": "Marketing Roadmap: Washington Speakers Bureau",
+  "summary": "This marketing roadmap for Washington Speakers Bureau outlines a strategic 90-day execution plan focused on increasing marketing-attributed pipeline and reactivating dormant accounts. Built on comprehensive marketing research and client discovery sessions, it defines target customer profiles, competitive positioning, quarterly objectives, and a detailed deliverables plan to drive measurable results.",
+
+  "overview": {
+    "section_description": "In this initial section, we lay the groundwork for a successful partnership, setting the stage for a marketing roadmap that is both dynamic and results-driven. We outline the critical components that will shape our journey towards achieving your business objectives. Here are the core components:\n\nDelivering Results through a Six-Phase Process: At the heart of our roadmap is a meticulously crafted six-phase process that Marketers in Demand utilizes to guarantee tangible results. This process, honed through years of experience, serves as a roadmap, guiding us through the various stages of market analysis, roadmap formulation, and execution. It is a blueprint that ensures every step we undertake is grounded in data and aligned with your overarching business goals.\n\nBalancing Long-Term and Short-Term Objectives: Crafting a roadmap that focuses on both long-term and short-term objectives is a constant balancing act. And that's why we take deliberate steps to monitor short-term success while building with a big picture in mind. With a series of goals, structured meetings, and real-time reporting and analytics, your team has the unique opportunity to deliver in the short and long term.\n\nYour Marketing \"Machine\": Central to our approach is the marketing \"machine\" - a dedicated team designed to not only provide strategic direction, but deliver on the plan as well. The team includes three primary roles: 1) Strategists, 2) Specialists, and 3) Production.\n\nWith these key ingredients, we plan to work alongside your company to deliver on the long-term/annual goals while delivering on specific priorities for the quarter.",
+    "process_timeline": [
+      {
+        "step": 1,
+        "title": "Research",
+        "cadence": "",
+        "bullets": [
+          "Quantitative and qualitative research (brand, content and website assessment)",
+          "Channel analysis (paid, SEO, social)",
+          "Tech stack analysis"
+        ]
+      },
+      {
+        "step": 2,
+        "title": "Alignment",
+        "cadence": "",
+        "bullets": [
+          "Discussions around desired goals and business outcomes",
+          "Success metric definition",
+          "Insights from research and existing benchmarks",
+          "Pinpoint priorities"
+        ]
+      },
+      {
+        "step": 3,
+        "title": "Roadmap",
+        "cadence": "Quarterly",
+        "bullets": [
+          "Document current marketing strategy",
+          "Competition",
+          "Performance reporting",
+          "Develop goals",
+          "Establish quarterly initiatives",
+          "Confirm budget"
+        ]
+      },
+      {
+        "step": 4,
+        "title": "Foundation",
+        "cadence": "",
+        "bullets": [
+          "Plans for designated channels",
+          "Updates to brand, web, and content plans",
+          "Performance reporting enhancements"
+        ]
+      },
+      {
+        "step": 5,
+        "title": "Execution",
+        "cadence": "Monthly",
+        "bullets": [
+          "Set up, produce, launch and manage channels",
+          "Produce assets to support owned experiences and campaigns",
+          "Real-time view into progress"
+        ]
+      },
+      {
+        "step": 6,
+        "title": "Analysis",
+        "cadence": "",
+        "bullets": [
+          "Review results and compare to goals",
+          "Discuss results in Board & Analytics meetings",
+          "Determine next steps for growth"
+        ]
+      }
+    ],
+    "research_description": "Multi-Model Research Approach: Utilized multiple Large Language Models (LLMs) for deep, comprehensive industry insights, forecasts, and strategic recommendations.\n\nExtensive Data Scraping: Analyzed competitors' websites, organic search rankings, domain authority, and paid media ads from Google, LinkedIn, and YouTube. Used n8n to automate the data extraction process and consolidate information for the research report.\n\nCustomer Insights Development: Identified key customer behaviors, decision-making criteria, pain points, and price sensitivity to inform targeted marketing strategies. Key activities included analyzing industry publications and major industry websites.\n\nActionable Strategic Insights: Conducted qualitative analysis and evaluated your organization against the competition."
+  },
+
+  "target_market": {
+    "section_description": "In the initial phase of the strategic process, we zero in on the cornerstone of any successful marketing roadmap: the target market. This section is dedicated to dissecting and understanding the profile of your ideal customer. It's a deep dive into the psyche, behaviors, and preferences of the individuals or businesses that constitute your potential customers. Here, we unravel the layers that define your audience, setting the stage for a marketing roadmap that resonates with the exact people you want to attract. The components of this section are as follows:\n\nUnderstanding the Customers: We need to understand who we want to connect with before we craft any message or launch a campaign. One of the key building blocks of understanding your target market is pinpointing the types of accounts/people that make the most sense. In this section of the roadmap, we identify the ideal types of customers you want to attract. We pinpoint specific demographics and other key criteria to help us narrow in on the individuals we want to engage.\n\nDocumenting Specific Customers: Identifying the types of people to target is just a piece of the puzzle. In this section, we take it a step further and drilldown to individual prospects. This involves a comprehensive analysis of psychographic and behavioral traits. It's about painting a vivid picture of your audience, understanding their needs, preferences, and what success means to them.\n\nEvery marketing roadmap starts with the customer. Once we build a solid understanding of the customer, we can create owned experiences and amplify messages across a variety of channels.",
+    "profiles": [
+      {
+        "target_account": {
+          "name": "Enterprise Companies with Centralized Event Teams",
+          "description": "Fortune 500 corporations with dedicated event organizations host 20+ annual engagements. They manage diverse speaker budgets from $15K to $250K+ and need bureau partners who understand their culture, deliver strategic recommendations, and support complex event portfolios across multiple business units.",
+          "location": "North America",
+          "industry": "Multi-industry (Financial Services, Technology, Consumer Goods, Professional Services)",
+          "revenue": "$5B - $50B+",
+          "number_of_employees": "10,000 - 100,000+",
+          "technologies": ["Salesforce", "Cvent", "HubSpot", "Workday", "SAP Concur"],
+          "key_characteristics": [
+            "Dedicated event organizations managing 20+ annual engagements",
+            "Speaker budgets ranging from $15K to $250K+ per engagement",
+            "Multiple business units with competing event priorities",
+            "Require bureau partners who understand organizational culture",
+            "Value proactive recommendations over transactional bookings"
+          ]
+        },
+        "empathy_map": {
+          "fictional_name": "Michelle Torres",
+          "fictional_job_title": "VP of Corporate Meetings & Events @ MasterCard",
+          "thinks": "She needs speakers who anchor major initiatives and drive real impact. Her team's success depends on matching the right speaker to each audience. She worries about maintaining relationships with proven speakers while discovering fresh voices.",
+          "feels": "Michelle feels pressure to deliver memorable experiences across 25+ events annually. She feels confident when her bureau partner knows her business. She feels frustrated when vendors treat each booking as transactional.",
+          "says": "\"I need a partner who understands our culture and strategic priorities.\" \"Can you show me speakers who've worked with financial services audiences?\" \"We anchor our leadership summit around one keynote—it has to be perfect.\"",
+          "does": "Michelle plans events 8-10 months ahead. She builds relationships with bureau partners who deliver consistently. She evaluates speakers based on audience fit and past performance.",
+          "sees": "She sees dozens of speaker proposals monthly. She sees her peers at other Fortune 500s facing similar challenges. She sees internal stakeholders with competing priorities. She sees budget pressure despite high-profile events.",
+          "hears": "\"We need someone who can speak to our transformation journey.\" \"Marketing wants a big name; L&D wants practical content.\" \"Our budget got cut but expectations stayed the same.\"",
+          "pains": "Michelle struggles to maintain personalized relationships when managing 25+ annual events. She faces disconnected communication with bureaus between bookings. She deals with last-minute speaker changes and availability issues.",
+          "goals": "Michelle aims to build strategic partnerships with bureaus who know her business. She wants consistent communication and proactive recommendations."
+        }
+      },
+      {
+        "target_account": {
+          "name": "Financial Services Learning & Development Organizations",
+          "description": "Banks and investment firms investing heavily in leadership development, client experiences, and corporate training. They require speakers who understand financial services dynamics and deliver content that transforms teams and engages high-value clients.",
+          "location": "North America (Major Financial Centers: New York, Chicago, San Francisco, Charlotte, Boston)",
+          "industry": "Financial Services (Banking, Investment Management, Insurance, Wealth Management)",
+          "revenue": "$2B - $100B+",
+          "number_of_employees": "5,000 - 50,000+",
+          "technologies": ["Salesforce Financial Services Cloud", "Workday", "SAP SuccessFactors", "Cornerstone OnDemand", "Zoom Events"],
+          "key_characteristics": [
+            "Heavy investment in leadership development and client experiences",
+            "Require speakers with financial services industry credibility",
+            "Complex approval processes and contract negotiations",
+            "Strict compliance and legal requirements around content and recordings",
+            "Budget allocated across multiple business units"
+          ]
+        },
+        "empathy_map": {
+          "fictional_name": "David Chen",
+          "fictional_job_title": "Director of Leadership Development @ Fidelity Investments",
+          "thinks": "David knows great speakers drive culture change and leadership excellence. He believes content must connect to real financial services challenges. He considers how speakers will handle sophisticated, skeptical audiences.",
+          "feels": "David feels accountable for developing next-generation leaders. He feels cautious about speakers who lack financial industry credibility. He feels energized when speakers deliver actionable frameworks.",
+          "says": "\"Our executives won't engage with generic leadership content.\" \"We need someone who understands regulatory pressures and market volatility.\" \"Can we capture video for our learning management system?\"",
+          "does": "David books speakers 6-12 months in advance for flagship programs. He vets speakers through reference calls with similar firms. He negotiates contract terms carefully, especially video and recording rights.",
+          "sees": "He sees competitors investing heavily in thought leadership and client experiences. He sees internal compliance teams scrutinizing content and contracts. He sees budgets allocated across multiple business units.",
+          "hears": "\"We need speakers who've advised financial institutions, not just spoken to them.\" \"Legal redlined the recording clause again.\" \"Our top clients expect world-class speakers at our summit.\"",
+          "pains": "Navigates complex approval processes and contract negotiations. He manages strict compliance and legal requirements around content and recordings. He balances the need for industry-specific expertise with engaging presentation skills.",
+          "goals": "David wants to partner with bureaus who understand financial services culture and constraints. He seeks speakers who blend industry expertise with compelling delivery."
+        }
+      },
+      {
+        "target_account": {
+          "name": "Professional Association Annual Conference Planners",
+          "description": "Membership organizations hosting industry conferences and regional events that educate, inspire, and connect professionals. They value speakers who understand their community, deliver relevant insights, and create memorable experiences that drive member engagement and satisfaction.",
+          "location": "United States",
+          "industry": "Professional Associations (Healthcare, HR, Industry Trade Groups, Executive Networks)",
+          "revenue": "$10M - $250M",
+          "number_of_employees": "50 - 500",
+          "technologies": ["Nonprofit", "Wild Apricot", "Higher Logic", "Cvent", "Personify"],
+          "key_characteristics": [
+            "Host annual conferences and regional events for member engagement",
+            "Fixed budget parameters funded by member dues",
+            "Executive committee approval required for speaker selection",
+            "Post-event surveys directly impact performance reviews",
+            "Value speakers who understand their specific professional community"
+          ]
+        },
+        "empathy_map": {
+          "fictional_name": "Jennifer Martinez",
+          "fictional_job_title": "Director of Conferences & Events @ SHRM (Society for Human Resource Management)",
+          "thinks": "Jennifer knows the keynote speaker sets the tone for the entire conference. She considers how to balance big-name appeal with budget constraints. She evaluates which speakers will resonate with diverse member demographics.",
+          "feels": "Jennifer feels pride in delivering value to members who invest time and money to attend. She feels pressure to match or exceed previous years' speaker quality. She feels responsible for using member dues wisely.",
+          "says": "\"Our members expect speakers who understand HR challenges firsthand.\" \"We need someone who can engage 2,000 people in a ballroom.\" \"Last year's speaker scored 4.8 out of 5; we need to maintain that standard.\"",
+          "does": "Jennifer plans the annual conference 12-18 months in advance. She presents speaker options to executive committees for approval. She negotiates within fixed budget parameters. She collects member feedback and session ratings.",
+          "sees": "She sees members comparing her conference to competitors' events. She sees budget spreadsheets with limited flexibility. She sees volunteer board members with strong opinions. She sees post-event surveys that directly impact her performance review.",
+          "hears": "\"Can we get someone who's been featured on major podcasts or TED?\" \"The board wants a name that will drive registrations.\" \"Members loved the interactive format last year.\" \"We need diversity in our speaker lineup.\"",
+          "pains": "Jennifer faces pressure to drive conference registrations through speaker announcements. She struggles to find speakers who deliver both credibility and engagement at her price point.",
+          "goals": "Jennifer aims to deliver exceptional speaker experiences that drive member satisfaction scores. She wants bureau partners who respect her budget and understand her audience."
+        }
+      },
+      {
+        "target_account": {
+          "name": "Corporate Marketing Event Strategy Teams",
+          "description": "Marketing departments orchestrating customer conferences, sales kickoffs, and brand experiences that drive business results. They seek speakers who elevate brand positioning, engage audiences authentically, and deliver content that aligns with corporate messaging and revenue goals.",
+          "location": "North America",
+          "industry": "Technology, Professional Services, Manufacturing, Healthcare, B2B Services",
+          "revenue": "$500M - $10B",
+          "number_of_employees": "2,000 - 20,000",
+          "technologies": ["HubSpot", "Marketo", "Salesforce Marketing Cloud", "6sense", "ON24", "Splash"],
+          "key_characteristics": [
+            "Orchestrate customer conferences, sales kickoffs, and brand experiences",
+            "Speakers must reinforce brand themes and strategic messaging",
+            "Internal pressure to demonstrate marketing ROI from events",
+            "Collaborate with sales leadership on speaker selection",
+            "Content must resonate on social media and in follow-up campaigns"
+          ]
+        },
+        "empathy_map": {
+          "fictional_name": "Sarah Williams",
+          "fictional_job_title": "VP of Marketing Events & Experiences @ Deloitte",
+          "thinks": "Sarah knows speakers must reinforce brand themes and strategic messaging. She considers how speaker content will resonate on social media and in follow-up campaigns. She evaluates speakers' ability to engage C-level audiences and prospects.",
+          "feels": "Sarah feels accountable for creating experiences that drive pipeline and revenue. She feels confident when speakers understand her business objectives. She feels anxious when speakers seem scripted or disconnected.",
+          "says": "\"Our customer conference needs a speaker who embodies innovation and transformation.\" \"Can you show me speakers who've worked with B2B audiences?\"",
+          "does": "Sarah books speakers 6-9 months before major events. She collaborates with sales leadership on kickoff speaker selection. She creates detailed briefs outlining audience profiles and business objectives.",
+          "sees": "She sees competitors creating compelling customer experiences. She sees internal pressure to demonstrate marketing ROI. She sees sales teams looking to marketing for inspiration and momentum.",
+          "hears": "\"We need someone who can fire up the sales team before a critical quarter.\" \"Our customers want forward-thinking perspectives, not sales pitches.\" \"Can the speaker mention our new platform without making it feel promotional?\"",
+          "pains": "Sarah struggles to find speakers who understand B2B dynamics and corporate contexts. She navigates competing stakeholder opinions on speaker selection. She faces pressure to demonstrate clear ROI from event investments.",
+          "goals": "Sarah aims to create event experiences that drive measurable business outcomes. She wants speakers who enhance brand positioning and thought leadership."
+        }
+      }
+    ]
+  },
+
+  "brand_story": {
+    "section_description": "Your ideal customers have a lot of choices in the market. So establishing a distinct and resonant brand story is more than just a task; it's a crucial part of everything we develop down the road. This section is where we craft the narrative of your brand, a story that not only distinguishes you in the marketplace but deeply resonates with your target audience. We leverage the Storybrand framework and use it to carve out a unique space for your brand in the minds of your customers. Here's what this section encompasses:\n\nUnderstanding the Character: At the heart of your brand's story is the primary character (or \"hero\"). The hero is your ideal customer.\n\nCrafting the Story: Once the character is outlined, we use techniques to establish your brand as the guide on their journey. We uncover how your brand plays a role in transforming your customer from what state to another. Ultimately, your brand's story helps:\n- Provide a human connection\n- Highlight differences between your brand and competitors (or alternatives)\n- Build trust and loyalty\n- Establish a foundation for all communication (owned experiences and messages amplified in channels such as ABM, Paid, Social, and SEO)",
+    "character": {
+      "want": "Event leaders want the perfect speaker who delivers memorable experiences, aligns with their strategic objectives, and resonates deeply with their specific audience."
+    },
+    "problem": {
+      "villain": "The transactional approach to speaker booking that treats every engagement as one-and-done rather than building strategic relationships.",
+      "external": "Finding speakers who truly fit their audience, coordinating across multiple stakeholders, managing diverse budgets and event types.",
+      "internal": "Fear of selecting a speaker who doesn't connect with their audience, feeling abandoned between bookings.",
+      "philosophical": "Every event represents an investment in people and culture. Audiences deserve speakers who understand their challenges and deliver content that creates lasting impact."
+    },
+    "guide": {
+      "empathy": "Washington Speakers Bureau understands the pressure of delivering flawless events across diverse portfolios. We know you're coordinating multiple stakeholders, managing tight timelines, and seeking partners who proactively support your success, not just respond to requests.",
+      "authority": "With 45+ years of experience, 200 exclusive speakers, and trusted relationships with Fortune 500 companies and leading associations, WSB has placed more than 100k speakers in 67 countries around the world."
+    },
+    "plan": {
+      "process": "WSB provides strategic consultation to understand your audience and objectives, delivers curated speaker recommendations based on proven fit, handles all logistics seamlessly, and maintains proactive communication throughout your event calendar—not just during bookings.",
+      "agreement": "We commit to relationship-focused partnerships that grow with your needs. You'll receive strategic recommendations tailored to your organization, ongoing communication between events, and dedicated support that treats every booking as part of your larger story."
+    },
+    "call_to_action": {
+      "direct": "Partner with Washington Speakers Bureau for your next speaking engagement. Get a custom proposal.",
+      "transitional": "Explore our exclusive speaker roster or sign up for our newsletter."
+    },
+    "success": [
+      "Perfect speaker-audience alignment that drives engagement and business results",
+      "Strategic partnership that understands your culture and anticipates your needs",
+      "Access to world-class speakers who anchor corporate initiatives and create lasting impact",
+      "Proactive recommendations that introduce you to speakers before you ask, keeping you ahead of event trends and talent availability"
+    ],
+    "failure": [
+      "Continued transactional relationships that waste budget on mismatched speakers and create inconsistent event experiences",
+      "Falling behind organizations that invest in strategic speaker partnerships, losing opportunities to anchor key initiatives around transformative content",
+      "Managing complex speaker logistics alone, risking contract disputes, last-minute cancellations, and day-of-event chaos"
+    ],
+    "transformation": {
+      "from": "Managing speaker bookings transactionally with uncertainty about selection, feeling unsupported between events, and lacking a partner who truly understands their organizational needs.",
+      "to": "Strategic partnership with confidence in every booking decision, proactive support throughout the year, and a trusted guide who knows their culture and delivers consistent excellence."
+    }
+  },
+
+  "products_and_solutions": {
+    "section_description": "It's important to document how you help your ideal customers overcome their challenges. This section delineates the array of products and solutions your brand offers, casting a spotlight on their potential to transform the customer from a negative to a positive state. Central to this section is the comprehensive Products & Solutions Matrix, a tool designed to offer a clear, concise overview of each product's role in the customer's journey. This matrix is structured to provide insights into:\n\nProduct: A detailed description of each product, highlighting its unique features and capabilities.\n\nSpecific Challenges the Product Helps Overcome: This attribute identifies the major pain points customers face and why the product exists.\n\nHow the Product Provides a Picture of Success: Here, we paint a vivid picture of the potential success that customers can achieve through the utilization of the product, fostering a positive and aspirational outlook.\n\nHow the Product Helps Avoid Failure: This segment focuses on the preventative aspects of the product, illustrating how it can help users sidestep common pitfalls and failures, thereby securing a smoother path to their goals.\n\nBy taking the time to document products in this way, we set up a foundation for messaging in ABM, Paid Media, SEO, and Social channels.",
+    "products": [
+      {
+        "product": "Strategic Speaker Partnership",
+        "helps_overcome": "Event leaders struggle with transactional bureau relationships that leave them unsupported between bookings. They lack partners who understand their organizational culture, anticipate their needs across 20+ annual events, and provide proactive recommendations. They coordinate multiple stakeholders while managing diverse budgets and objectives without strategic guidance throughout their event calendar.",
+        "picture_of_success": "Your bureau partner knows your business, proactively recommends speakers before you even ask, and maintains consistent communication year-round. You receive strategic consultation that aligns speakers with corporate initiatives, builds on past successes, and introduces you to emerging talent that fits your specific culture and audience needs.",
+        "helps_avoid_failure": "Avoid last-minute scrambling for speakers, missed opportunities to anchor corporate initiatives around compelling content, and transactional relationships that treat every booking as a one-off transaction. Prevent the frustration of explaining your organization's needs repeatedly to partners who never truly understand your business."
+      },
+      {
+        "product": "Exclusive Speaker Access",
+        "helps_overcome": "Organizations face limited access to world-class thought leaders and proven speakers who can anchor major initiatives. They compete for availability of top-tier talent, struggle to discover speakers before they become oversaturated, and lack direct relationships with speakers who can customize content for their specific needs and deliver consistent excellence.",
+        "picture_of_success": "You gain priority access to 200 exclusive speakers—including bestselling authors, Fortune 500 executives, and renowned thought leaders—who work closely with WSB to customize content. You book speakers who align perfectly with your objectives, deliver exceptional audience engagement, and create lasting impact that drives your strategic initiatives forward across all events.",
+        "helps_avoid_failure": "Avoid settling for second-choice speakers due to availability constraints, booking speakers who deliver generic content that fails to resonate, and missing opportunities to secure emerging thought leaders before they become inaccessible or prohibitively expensive for your budget range."
+      },
+      {
+        "product": "Custom Speaker Curation & Topic Expertise",
+        "helps_overcome": "Event planners struggle to find speakers who address specific themes, industry challenges, or audience demographics beyond big-name celebrities. They waste time researching hundreds of options, lack confidence in speaker quality for specialized topics, and need guidance matching speakers to diverse audience types across their event portfolio with varying budgets and objectives.",
+        "picture_of_success": "You receive curated speaker recommendations tailored to your specific topic, audience, and budget—whether you need AI experts for healthcare audiences, leadership speakers for financial services, or motivational voices for sales kickoffs. Every recommendation comes with insights on why this speaker fits your needs, backed by proven performance with similar audiences.",
+        "helps_avoid_failure": "Avoid booking speakers who miss the mark on content relevance, wasting budget on mismatched talent that doesn't connect with your specific audience, and the disappointment of generic presentations that could have been delivered to any industry or demographic without customization or impact."
+      },
+      {
+        "product": "Full-Service Speaker Event Logistics & Coordination",
+        "helps_overcome": "Organizations manage complex speaker logistics across multiple events, coordinate travel and contracts, navigate legal and compliance requirements, and handle last-minute changes without dedicated support. They lack streamlined processes for video rights, speaker briefings, and post-event coordination while managing internal stakeholder expectations and competing priorities throughout the planning cycle.",
+        "picture_of_success": "You experience seamless execution from initial consultation through post-event follow-up. WSB handles all contracts, travel logistics, speaker briefings, and coordination with your internal teams. Your speakers arrive prepared, deliver exceptional presentations, and you receive support managing any last-minute adjustments—all while maintaining clear communication with your stakeholders.",
+        "helps_avoid_failure": "Avoid contract disputes and compliance issues, last-minute speaker cancellations without backup options, logistics failures that create day-of-event chaos, and the frustration of coordinating complex requirements alone across multiple business units and stakeholder groups with competing demands."
+      }
+    ]
+  },
+
+  "competition": {
+    "section_description": "A well-rounded marketing roadmap is built not only on the strengths and offerings of your own organization but also on a profound understanding of the movements and positions of competitors in the market. Even though the competition won't drive decisions we make, it can inform how we construct specific campaigns or implement various tactics. This section is dedicated to offering a succinct yet insightful glimpse into the key players who share the market space with your brand, providing a vantage point to craft strategies that are both informed and adaptive. While this section doesn't delve deep into a comprehensive competitive analysis, it serves as a vital tool to identify and monitor significant competitors in the market. By keeping a close eye on these entities, we can glean valuable insights into market trends, customer preferences, and potential areas of collaboration or differentiation. In this section, we present how each competitor tracks along five distinct dimensions, including:\n- Organic search & SEO\n- Content\n- Paid media\n- Social media\n- Brand positioning & messaging",
+    "competitors": [
+      {
+        "company_name": "All American Speakers",
+        "positioning_description": "All American Speakers leads specialized speaker bureaus in SEO authority with Domain Authority of 58 and 9,030 linking root domains—nearly double WSB's portfolio. The full-service bureau competes directly in corporate speaking with 55 employees. However, significantly smaller social media presence and limited content marketing investment create vulnerabilities despite superior organic search performance and extensive backlink profile.",
+        "scores": {
+          "organic_seo": 6.5,
+          "social_media": 3.5,
+          "content_strategy": 3.4,
+          "paid_media": 4.0,
+          "brand_positioning": 5.0,
+          "overall": 4.8
+        },
+        "key_observations": [
+          "Domain Authority 58/100 highest among specialized bureaus, edges WSB's 57/100",
+          "9,030 linking root domains nearly 2x WSB's 4,558, superior link acquisition",
+          "LinkedIn following 6,605 vs WSB 11,203, indicating weaker social strategy",
+          "YouTube presence limited: 286 subscribers, 95 videos vs WSB's 2,330/607",
+          "Overall competitive score 4.8/10, strongest in Organic SEO (6.5/10), weakest Content (3.4/10)"
+        ]
+      },
+      {
+        "company_name": "Big Speak",
+        "positioning_description": "Big Speak dominates content marketing with industry's largest video library: 62,500 YouTube subscribers and 2,983 videos, creating massive SEO advantages and organic discovery opportunities. The 34-employee bureau achieved highest overall competitive score (7.0/10) through content-first strategy. Despite content leadership, Domain Authority of 54 trails WSB (57) and All American Speakers (58), suggesting content volume doesn't fully translate to technical authority.",
+        "scores": {
+          "organic_seo": 5.5,
+          "social_media": 7.5,
+          "content_strategy": 9.5,
+          "paid_media": 4.5,
+          "brand_positioning": 6.0,
+          "overall": 7.0
+        },
+        "key_observations": [
+          "YouTube dominance: 62,500 subscribers and 2,983 videos, 27x larger than WSB",
+          "LinkedIn following 16,802 exceeds WSB's 11,203, 50% larger professional network",
+          "Content Strategy scored 9.5/10, highest across all competitors and dimensions",
+          "Domain Authority 54/100 trails WSB despite massive content investment volume",
+          "Represents HIGH threat through content marketing but quality-over-quantity opportunity for WSB"
+        ]
+      },
+      {
+        "company_name": "Creative Artists Agency (CAA)",
+        "positioning_description": "CAA operates speaker representation as one division within diversified entertainment portfolio of 1,815 employees. Achieves highest Domain Authority (65/100) and LinkedIn following (353,499) in competitive landscape, reflecting decades of entertainment industry presence. However, speaker division captures only fraction of this authority. Limited content marketing investment (75 videos, 319 YouTube subscribers) and broad entertainment focus versus corporate speaking specialization create competitive opportunities for focused bureaus.",
+        "scores": {
+          "organic_seo": 7.0,
+          "social_media": 6.0,
+          "content_strategy": 3.0,
+          "paid_media": 5.0,
+          "brand_positioning": 8.6,
+          "overall": 5.8
+        },
+        "key_observations": [
+          "Domain Authority 65/100 highest in competitive set, 2.6x more domains than WSB",
+          "LinkedIn followers 353,499 dwarf all competitors, 32x larger than WSB's 11,203",
+          "Brand Positioning scored 8.6/10, reflecting entertainment industry authority and broad recognition",
+          "YouTube presence minimal: 319 subscribers, 75 videos despite overall brand strength",
+          "MEDIUM threat—entertainment focus dilutes corporate speaking specialization, creating specialist positioning opportunity"
+        ]
+      },
+      {
+        "company_name": "The Harry Walker Agency",
+        "positioning_description": "Harry Walker Agency achieves highest Domain Authority (59/100) among specialized speaker bureaus, representing premium segment with exclusive high-profile talent roster. The 50-employee agency competes directly with WSB in premium corporate speaking through quality-over-volume link acquisition strategy (4,404 domains). Moderate social media presence (5,952 LinkedIn followers, 809 YouTube subscribers) and balanced content approach position HWA as consistent premium competitor.",
+        "scores": {
+          "organic_seo": 6.0,
+          "social_media": 4.0,
+          "content_strategy": 5.0,
+          "paid_media": 5.5,
+          "brand_positioning": 6.0,
+          "overall": 5.2
+        },
+        "key_observations": [
+          "Domain Authority 59/100 highest among specialized bureaus, edges All American (58)",
+          "LinkedIn following 5,952 significantly below WSB's 11,203, weaker social engagement",
+          "YouTube presence moderate: 809 subscribers, 399 videos between WSB and Big Speak",
+          "Overall score 5.2/10, consistent across dimensions without dominant strengths or weaknesses",
+          "MEDIUM-HIGH threat in premium segment, opportunity in broader market coverage"
+        ]
+      },
+      {
+        "company_name": "United Talent Agency (UTA)",
+        "positioning_description": "UTA Speakers operates as division of entertainment agency with 40 employees, exhibiting significant digital marketing deficits across all dimensions. Lowest Domain Authority (48/100), smallest backlink portfolio (1,424 domains), elevated spam score (13%), and minimal content presence (1 YouTube video, 64 subscribers) create substantial competitive gaps. Entertainment industry relationships provide some advantage not reflected in digital metrics, but current presence suggests limited corporate speaking focus.",
+        "scores": {
+          "organic_seo": 3.0,
+          "social_media": 2.5,
+          "content_strategy": 1.5,
+          "paid_media": 4.0,
+          "brand_positioning": 4.5,
+          "overall": 3.2
+        },
+        "key_observations": [
+          "Domain Authority 48/100 lowest in competitive set, only 1,424 linking domains",
+          "LinkedIn followers 2,857 smallest among competitors, weakest professional network presence",
+          "YouTube essentially non-existent: 64 subscribers, 1 video, no content strategy",
+          "Overall score 3.2/10 lowest across all competitors in every dimension",
+          "LOW threat—digital marketing deficits create validation for WSB's content investment strategy"
+        ]
+      },
+      {
+        "company_name": "Washington Speakers Bureau",
+        "positioning_description": "Washington Speakers Bureau positions as the world's largest talent agency specializing exclusively in corporate speaking events with 45+ years of industry leadership and 127 employees. Achieves balanced competitive performance across dimensions with Domain Authority 57/100, 4,558 linking domains, and substantial content investment (607 YouTube videos, 2,330 subscribers). Strongest performance in Brand Positioning (6.1/10) and Paid Media Strategy (6.0/10) reflects established market presence, though content marketing and social media present growth opportunities versus aggressive competitors.",
+        "scores": {
+          "organic_seo": 5.5,
+          "social_media": 5.4,
+          "content_strategy": 5.5,
+          "paid_media": 6.0,
+          "brand_positioning": 6.1,
+          "overall": 5.7
+        },
+        "key_observations": [
+          "Domain Authority 57/100 strong mid-tier, trailing Harry Walker (59) and CAA (65)",
+          "LinkedIn following 11,203 second highest among specialized bureaus, behind Big Speak's 16,802",
+          "YouTube content library substantial: 607 videos, 2,330 subscribers, 631,891 total views",
+          "Paid Media Strategy scored 6.0/10, highest among competitors with available data",
+          "Overall score 5.7/10 balanced across dimensions, greatest opportunity in Content (5.5) and Social (5.4)"
+        ]
+      }
+    ]
+  },
+
+  "goals": {
+    "section_description": "At Marketers in Demand, we use OKRs, or Objectives and Key Results as a vehicle to set and achieve goals. It's a clear, straightforward approach used by teams and individuals to set ambitious goals and track measurable results. OKRs create alignment, boost engagement, and ensure progress towards significant outcomes.\n\nObjectives: An Objective is what you aim to achieve. It's significant, concrete, and action-oriented. It's the clear goal post you're aiming for, providing direction and inspiration. Objectives cut through ambiguity, offering a defined path towards achievement.\n\nKey Results: Key Results are the measurable steps you take to reach your objective. They are specific, time-bound, and realistic, leaving no room for doubt. You either meet them or you don't. They provide a clear measure of progress, ensuring you're on the right path towards achieving your Objective.\n\nHow We Write OKRs: We try to make OKRs as simple as possible to understand. We start with your Objective, and then list 1-2 Key Results that will help you achieve it. Or, frame it as a statement: \"I will (Objective) as measured by (Key Results).\" This clear, concise format ensures everyone knows what needs to be done and how success will be measured.\n\nOKRs are a powerful tool for setting clear goals, tracking progress, and ensuring success throughout each quarter. They provide a solid framework for achievement, ensuring everyone is aligned, engaged, and working towards meaningful outcomes.",
+    "outcomes": [
+      {
+        "business_outcome": "Increase Marketing-Attributed Pipeline",
+        "metric": "Marketing-Attributed Opportunities Created",
+        "description": "Total opportunities/deals created that have a trackable digital source (Paid Search, Organic Search, Direct Traffic, Referrals, Email Marketing) in HubSpot. Excludes \"Offline Sources\" and \"Other\" which represent traditional referrals and agent-sourced leads with no digital touchpoint.",
+        "benchmark": "TTM 2025: ~2,580 opportunities from trackable digital sources (Direct 853 + Organic Search 852 + Paid Search 591 + Referrals 259 + Email Marketing 25 + Organic Social minimal). This represents 30% of total pipeline; 68% currently shows \"Offline Sources\" due to attribution gaps.",
+        "annual_goal": "25% increase in marketing-attributed opportunities (Target: ~3,225 opportunities from trackable digital sources)",
+        "data_source": "HubSpot: Deal records filtered by \"Original Traffic Source\" excluding \"Offline Sources\"; Salesforce: Opportunity-level reporting synced to HubSpot"
+      },
+      {
+        "business_outcome": "Reactivate Dormant Accounts",
+        "metric": "Opportunities from Reactivated Accounts",
+        "description": "New opportunities created from accounts that haven't had a closed-won deal in 12+ months. These reactivated opportunities count toward the primary goal above, making this a key lever for achieving the 25% increase.",
+        "benchmark": "Current: 7,269 companies in HubSpot with most recent deal close date over 12 months ago. Minimal systematic reactivation efforts currently in place.",
+        "annual_goal": "250+ new opportunities from reactivated accounts (accounts with no closed-won deal in prior 12 months)",
+        "data_source": "HubSpot: New opportunities where associated company's last closed-won deal date is 12+ months prior; requires company-level \"Recent deal close date\" field or deal history analysis"
+      }
+    ],
+    "rationale": [
+      "Stage-Appropriate for Current State: WSB is transitioning from a purely relationship-driven, inbound-dependent business model (80% referral-based per leadership) to one requiring proactive marketing infrastructure. With minimal digital marketing investment today, there's substantial room to capture net-new demand through both acquisition and reactivation channels.",
+      "Pipeline/Revenue Alignment: Based on CRM analysis, WSB generated $23.4M in TTM revenue from 3,353 closed-won deals at an average deal size of ~$10,700 and a 38.5% close rate. A 25% increase in marketing-attributed opportunities (~645 additional opportunities) could translate to ~248 additional closed deals and ~$2.7M incremental revenue assuming current conversion rates hold.",
+      "Two Pathways to Achievement: The 25% target can be reached through a combination of net-new acquisition (accounts that have never booked with WSB) and dormant account reactivation (the supporting goal below). This dual approach de-risks the target by not relying solely on new customer acquisition.",
+      "Massive Dormant Account Pool: HubSpot data shows 7,269 companies with no closed deal in the past 12 months. Even a modest 3.4% reactivation rate on this pool would achieve the 250-opportunity target—well below the industry benchmark of 5-10% for winback campaigns with proper nurture programs.",
+      "Lower Acquisition Cost, Higher Intent: Dormant accounts already know WSB, have engaged before, and don't require top-of-funnel education. Reactivating a dormant account typically costs 5-7x less than acquiring a net-new customer, and these contacts are already in the database ready for nurture campaigns."
+    ]
+  },
+
+  "roadmap_phases": {
+    "section_description": "In this section, we outline a clear, structured method for setting and achieving your organization's primary long-term goals. This approach is crucial for the marketing roadmap because it fosters alignment, ensures measurable progress, and drives meaningful outcomes by linking strategic marketing initiatives directly to specific, ambitious, and actionable goals.",
+    "phases": [
+      {
+        "name": "Month 1: Foundation & Strategic Planning",
+        "timeframe": "January 2026",
+        "theme": "Build the strategic foundation with comprehensive plans across ABM, content, SEO/AEO, paid media, marketing operations, and performance reporting.",
+        "deliverables": [
+          "Develop ABM Plan (New Accounts) Document",
+          "Develop ABM Plan (Re-engagement Accounts) Document",
+          "Develop Marketing Operations Implementation Plan",
+          "Develop Performance Reporting Plan Document",
+          "Develop SEO / AEO Plan Document",
+          "Develop Content Plan Document",
+          "Develop Paid Media Plan Document"
+        ],
+        "milestone": "All strategic plans documented and approved, providing a clear blueprint for Q1 execution across every channel."
+      },
+      {
+        "name": "Month 2: Execution & Launch",
+        "timeframe": "February 2026",
+        "theme": "Activate campaigns, launch content programs, set up ABM infrastructure, and begin paid media management across channels.",
+        "deliverables": [
+          "HubSpot Email Sequences & Workflows",
+          "Set up content & create graphics package",
+          "Develop campaign package",
+          "Set up ABM",
+          "Manage Paid Media",
+          "Listbuilding and Enrichment",
+          "Tech Stack setup"
+        ],
+        "milestone": "All major campaigns live and generating initial engagement data across ABM, content, and paid channels."
+      },
+      {
+        "name": "Month 3: Optimization & Scale",
+        "timeframe": "March 2026",
+        "theme": "Scale content production, optimize active campaigns, launch additional creative assets, and begin performance analysis cycle.",
+        "deliverables": [
+          "Develop episode for video series",
+          "Create SEO blog post",
+          "Develop campaign package (second wave)",
+          "Develop slide deck or presentation",
+          "Manage ABM, Paid Media, SEO/AEO, and Content",
+          "Facilitate client meetings and reporting"
+        ],
+        "milestone": "Full marketing engine running with measurable results across all channels, ready for Q2 planning and optimization."
+      }
+    ]
+  },
+
+  "quarterly_initiatives": {
+    "section_description": "Quarterly marketing initiatives are structured as Objectives and Key Results (OKRs). Each objective is an ambitious but achievable goal for the quarter, supported by measurable key results. These initiatives address competitive gaps, target your specific ICPs, and build the infrastructure needed for long-term growth.",
+    "objectives": [
+      {
+        "objective": "Establish Marketing Operations Infrastructure",
+        "key_results": [
+          "Audit and adjust/enhance HubSpot-Salesforce sync if needed by end of January; create custom fields to support additional reporting (\"custom_source\")",
+          "Launch marketing attribution dashboard tracking opportunities by source, with segmentation for \"net new accounts\" vs. \"reactivated accounts\" (no closed-won deal in 12+ months)—enabling measurement of both primary and supporting goals",
+          "Implement RB2B, Factors.ai or similar de-anonymization tool to capture account-level website visitor data"
+        ]
+      },
+      {
+        "objective": "Launch Thought Leadership Content Engine",
+        "key_results": [
+          "Publish monthly \"State of the Speaking Industry\" pillar content piece (blog + email + LinkedIn distribution) with internal interviews, generating organic and paid social engagement activity",
+          "Launch bi-weekly email newsletter to existing database (goal: 25% open rate, 3% CTR) featuring speaker insights, event trends, and curated recommendations—serving as primary reactivation touchpoint for dormant contacts",
+          "Create 3 evergreen content pieces for Webflow site migration: \"Why Work With a Speaker Bureau,\" \"How to Choose the Right Keynote Speaker,\" and \"2026 Event Trends\" guide"
+        ]
+      },
+      {
+        "objective": "Activate Sales Enablement & Agent Support",
+        "key_results": [
+          "Deploy customizable HubSpot email sequence templates (new contact outreach, dormant account re-engagement, speaker recommendation, event follow-up, budget objection handling) with 50%+ agent adoption by end of Q1",
+          "Create speaker one-pagers featuring current positioning aligned to market demand (AI/leadership/motivation topics) in new template format",
+          "Segment the 7,269 dormant accounts by recency and value; create prioritized winback target list of top 1,000 accounts (12-36 months dormant with prior booking history) for Q2 campaign launch"
+        ]
+      },
+      {
+        "objective": "Pilot Account-Based Marketing Program",
+        "key_results": [
+          "Build target account list from agent nominations (top 5 x 13 agents + WSB-owned priority accounts) uploaded to HubSpot and synced to LinkedIn—flagged as \"active,\" \"prospect,\" or \"dormant\" status",
+          "Launch pilot LinkedIn campaign targeting Financial Services ICP segment (and one other cohort of \"new logos\") with custom ad creatives; achieve 0.5% engagement rate and 10+ identified accounts showing engagement signals",
+          "Deliver monthly \"ABM Signals Report\" to WSB showing which target accounts (both prospects and dormant) are engaging with ads, visiting website, and opening emails—enabling proactive outreach with context"
+        ]
+      },
+      {
+        "objective": "Launch Video Content Program to Drive Engagement and Differentiation",
+        "key_results": [
+          "Launch \"Speakers on Speaking\" (working title) interview series featuring 3 exclusive WSB speakers per month discussing industry trends, event planning insights, and behind-the-scenes perspectives; publish on YouTube, LinkedIn, and wsb.com with 1,000+ views per episode target",
+          "Resurrect and rebrand WSB's previous video podcast as a monthly thought leadership show; produce 3 episodes in Q1 featuring WSB leadership and/or top speakers discussing the state of the events industry, booking trends, and what makes events successful",
+          "Create internal thought leadership video series (\"WSB Insider\" or similar) with agents and staff sharing expertise—speaker selection tips, event planning best practices, topic trend analysis; produce short-form videos (2-3 min) for social distribution",
+          "Develop standardized speaker reel production process and create/update speaker or \"industry\" sizzle reels in new branded format; track reel engagement and correlation to booking inquiries",
+          "Establish video content calendar and distribution workflow ensuring all video assets are repurposed across YouTube, LinkedIn, email newsletter, website, and agent outreach materials"
+        ]
+      },
+      {
+        "objective": "Launch Paid Advertising Program for Broader Market Reach",
+        "key_results": [
+          "Launch or maintain Google Ads campaign targeting high-intent keywords (e.g., \"keynote speaker for corporate event,\" \"motivational speaker booking,\" \"leadership speaker for conference\") with $3-5K/month ongoing budget",
+          "Deploy LinkedIn Sponsored Content campaign targeting broader ICP criteria (HR leaders, event planners, L&D professionals at companies 500+ employees) beyond ABM list; generate impressions and drive website visits to foster growth towards new logo opportunities (up to $10k in monthly spend across campaigns)",
+          "Implement retargeting program across Google Display Network and LinkedIn for website visitors who viewed speaker profiles but didn't convert",
+          "Support an \"always on\" custom audience in LinkedIn (perhaps other channels) that ensures WSB remains in front of active accounts",
+          "Establish paid media reporting dashboard tracking spend, impressions, clicks, leads, and opportunities by channel; deliver weekly performance updates with optimization recommendations"
+        ]
+      },
+      {
+        "objective": "Build SEO Foundation and Prepare for AI-Powered Search (AEO)",
+        "key_results": [
+          "Complete comprehensive SEO audit of wsb.com covering technical SEO (site speed, mobile experience, crawlability, indexation), on-page SEO (title tags, meta descriptions, header structure, internal linking), and content gaps; deliver prioritized recommendations report by end of January",
+          "Develop SEO content strategy targeting high-value keywords (e.g., \"keynote speakers for [industry],\" \"best motivational speakers,\" \"how to book a keynote speaker\"); identify 20 priority keywords with search volume and difficulty analysis; create content briefs for top 10 opportunities",
+          "Establish AEO baseline by auditing WSB's presence in AI answer engines (use specific AEO tools to identify relevant queries in ChatGPT, Perplexity, Google AI Overviews); document current citation frequency and identify content gaps where competitors are being cited instead",
+          "Perform standard SEO / AEO maintenance (internal linking updates, backlinking opportunities, keyword tracking, etc.) on a monthly basis and identify ongoing opportunities for optimization and new content initiatives"
+        ]
+      }
+    ]
+  },
+
+  "annual_plan": {
+    "section_description": "The annual high-level plan provides a 12-month view of major marketing initiatives organized by category. This timeline shows when each initiative is active, creating a clear picture of how marketing efforts build on each other throughout the year.",
+    "categories": [
+      {
+        "category": "Marketing Operations & Analytics",
+        "initiatives": [
+          {
+            "initiative": "HubSpot-Salesforce Integration & Attribution",
+            "description": "Audit and enhance CRM sync, implement custom fields, launch attribution dashboard for marketing-attributed pipeline tracking",
+            "months": [true, true, true, false, false, false, false, false, false, false, false, false]
+          },
+          {
+            "initiative": "Performance Reporting & Optimization",
+            "description": "Establish dashboards, reporting cadences, and analytics infrastructure to measure campaign performance across all channels",
+            "months": [true, true, true, true, true, true, true, true, true, true, true, true]
+          },
+          {
+            "initiative": "Tech Stack Management",
+            "description": "Manage and optimize marketing technology stack including RB2B, Factors.ai, n8n, SmartLead, HeyReach, Databox, and related tools",
+            "months": [false, true, true, true, true, true, true, true, true, true, true, true]
+          }
+        ]
+      },
+      {
+        "category": "Content & Thought Leadership",
+        "initiatives": [
+          {
+            "initiative": "State of the Speaking Industry Content Series",
+            "description": "Monthly pillar content piece with blog, email distribution, and LinkedIn promotion featuring internal interviews and industry insights",
+            "months": [false, true, true, true, true, true, true, true, true, true, true, true]
+          },
+          {
+            "initiative": "Video Content Program",
+            "description": "Speaker interview series, thought leadership show, and internal expertise videos across YouTube, LinkedIn, and wsb.com",
+            "months": [false, true, true, true, true, true, true, true, true, true, true, true]
+          },
+          {
+            "initiative": "Email Newsletter Program",
+            "description": "Bi-weekly newsletter to existing database featuring speaker insights, event trends, and curated recommendations for reactivation",
+            "months": [false, true, true, true, true, true, true, true, true, true, true, true]
+          },
+          {
+            "initiative": "Evergreen Content & Website Migration",
+            "description": "Create evergreen content pieces for Webflow site migration and ongoing SEO content production",
+            "months": [true, true, true, true, false, false, false, false, false, false, false, false]
+          }
+        ]
+      },
+      {
+        "category": "Demand Generation",
+        "initiatives": [
+          {
+            "initiative": "Account-Based Marketing (New Accounts)",
+            "description": "Target account identification, LinkedIn campaigns, cold email sequences, and multi-channel engagement for net-new prospect acquisition",
+            "months": [true, true, true, true, true, true, true, true, true, true, true, true]
+          },
+          {
+            "initiative": "Account-Based Marketing (Re-engagement)",
+            "description": "Dormant account segmentation, winback campaigns, and nurture sequences for 7,269 companies with no recent closed-won deals",
+            "months": [true, true, true, true, true, true, true, true, true, true, true, true]
+          },
+          {
+            "initiative": "Paid Media Program",
+            "description": "Google Ads, LinkedIn Sponsored Content, retargeting campaigns, and always-on custom audiences across channels",
+            "months": [true, true, true, true, true, true, true, true, true, true, true, true]
+          }
+        ]
+      },
+      {
+        "category": "Sales Enablement",
+        "initiatives": [
+          {
+            "initiative": "Agent Email Sequences & Templates",
+            "description": "HubSpot email sequence templates for outreach, re-engagement, speaker recommendation, event follow-up, and objection handling",
+            "months": [true, true, true, true, false, false, false, false, false, false, false, false]
+          },
+          {
+            "initiative": "Speaker Collateral & One-Pagers",
+            "description": "Speaker one-pagers, sizzle reels, and sales presentation materials in new branded format aligned to market demand",
+            "months": [false, true, true, true, true, true, false, false, false, false, false, false]
+          },
+          {
+            "initiative": "Dormant Account Segmentation & Winback Lists",
+            "description": "Prioritized winback target lists segmented by recency and value for systematic reactivation campaigns",
+            "months": [true, true, true, true, true, true, false, false, false, false, false, false]
+          }
+        ]
+      },
+      {
+        "category": "SEO & Answer Engine Optimization",
+        "initiatives": [
+          {
+            "initiative": "SEO Audit & Foundation",
+            "description": "Comprehensive technical and on-page SEO audit, content gap analysis, and keyword strategy development",
+            "months": [true, true, true, false, false, false, false, false, false, false, false, false]
+          },
+          {
+            "initiative": "AEO Baseline & Optimization",
+            "description": "Audit WSB's presence in AI answer engines, document citation frequency, and optimize content for ChatGPT, Perplexity, and Google AI Overviews",
+            "months": [false, true, true, true, true, true, false, false, false, false, false, false]
+          },
+          {
+            "initiative": "Ongoing SEO/AEO Maintenance",
+            "description": "Monthly internal linking updates, backlinking opportunities, keyword tracking, and content optimization",
+            "months": [false, false, true, true, true, true, true, true, true, true, true, true]
+          }
+        ]
+      }
+    ]
+  },
+
+  "points_plan": {
+    "section_description": "With one monthly price, you get access to a team who can develop a strategy and execute it. Our flexible points model allows you to balance short and long-term goals. And we get to double-down on what works and pivot when we need to. The points model gives your team complete visibility into the value of every single task. Don't worry about how many hours our team spends on a task — you will only get charged for the amount of points listed for each line item. To set the stage for the engagement, we have outlined a list of tasks we will complete in the first three months.",
+    "total_points": 730,
+    "months": [
+      {
+        "month": "Month 1",
+        "tasks": [
+          {
+            "task": "Develop ABM Plan (New Accounts) Document",
+            "description": "Design a targeted approach to B2B marketing with a plan that identifies key accounts and outlines personalized engagement strategies. The plan identifies key offers and the associated channels for promotion. This document ensures that your ABM initiatives are cohesive, targeted, and effective. Includes the technical architecture to meet the needs across email, LinkedIn, paid channels.",
+            "stage": "Foundation",
+            "points": 35
+          },
+          {
+            "task": "Develop ABM Plan (Re-engagement Accounts) Document",
+            "description": "Design a targeted approach to B2B marketing with a plan that identifies key accounts and outlines personalized engagement strategies. The plan identifies key offers and the associated channels for promotion. This document ensures that your ABM initiatives are cohesive, targeted, and effective. Includes the technical architecture to meet the needs across email, LinkedIn, paid channels.",
+            "stage": "Foundation",
+            "points": 35
+          },
+          {
+            "task": "Develop Marketing Operations Implementation Plan",
+            "description": "Identify key adjustments to Hubspot/Salesforce sync, confirm custom fields and document workflows needed to support reporting requirements.",
+            "stage": "Foundation",
+            "points": 20
+          },
+          {
+            "task": "Develop Performance Reporting Plan Document",
+            "description": "Identify the key data points that we will track for the various campaigns we are running, where this data comes from, and how we can get access to that data to report on. This document ensures that we have a plan for tracking campaign performance across relevant channels. Build requirements for specific dashboards in Hubspot to support reporting requirements.",
+            "stage": "Foundation",
+            "points": 20
+          },
+          {
+            "task": "Develop SEO / AEO Plan Document",
+            "description": "Elevate your online presence with a strategic SEO / AEO plan that outlines keyword research, on-page optimization, and link-building opportunities. During this process, we conduct an audit of your existing traffic, identify priorities for optimization and pinpoint new opportunities for content creation. This document ensures your website ranks higher on search engines, answer engines, and attracts quality traffic to boost your brand's visibility.",
+            "stage": "Foundation",
+            "points": 30
+          },
+          {
+            "task": "Develop Content Plan Document",
+            "description": "Strategize your content initiatives with a plan that outlines topics, formats, and distribution channels. This document ensures that your content resonates with your target audience, establishes authority, and drives engagement. Includes creation of video series and other pillar content to support thought leadership programs.",
+            "stage": "Foundation",
+            "points": 60
+          },
+          {
+            "task": "Develop Paid Media Plan Document",
+            "description": "Optimize your advertising efforts with a plan that details budget allocation, platform selection, and targeting criteria. This document serves as a guide to ensure your paid media campaigns achieve maximum ROI and effectively reach your target audience. Up to 3 channels and $10k in ad spend. Additional channels and/or spend will have a custom points value.",
+            "stage": "Execution",
+            "points": 40
+          },
+          {
+            "task": "Facilitate Client Meetings",
+            "description": "Align on progress and pave the way for future successes. This collaborative session involves reviewing the status of current tasks and strategizing for the month ahead, fostering a cohesive and proactive approach to achieving your business objectives and maintaining a steady trajectory of growth.",
+            "stage": "Analysis",
+            "points": 10
+          }
+        ],
+        "month_total": 250
+      },
+      {
+        "month": "Month 2",
+        "tasks": [
+          {
+            "task": "Hubspot Email Sequences & Workflows",
+            "description": "Develop a set of email sequences and workflows in Hubspot to support reengagement campaigns. Sequences include email templates, workflow design and testing.",
+            "stage": "Execution",
+            "points": 25
+          },
+          {
+            "task": "Set up content & create graphics package",
+            "description": "Launch a specific content program, by publishing and promoting content that resonates with your target audience. Includes development of animations, lower thirds and the visual elements to support each episode's post-production.",
+            "stage": "Execution",
+            "points": 30
+          },
+          {
+            "task": "Develop campaign package",
+            "description": "Develop a set of two one-pagers (either downloadable PDFs or designed webpages) to support key topics or themes relevant to the winback target list or industry list. Optionally, create a detailed blog post based on an interview. In addition, craft two short video \"sizzle\" pieces to promote in an email or on a landing page. Content package supports up to six emails in a sequence. Craft email copy to fulfill the six emails.",
+            "stage": "Execution",
+            "points": 75
+          },
+          {
+            "task": "Develop image ad creative package",
+            "description": "Create a package of visually compelling image ads designed to capture attention and drive engagement, ensuring your brand stands out in advertising spaces.",
+            "stage": "Execution",
+            "points": 10
+          },
+          {
+            "task": "Set up ABM",
+            "description": "Lay the foundation for targeted ABM campaigns by identifying key accounts, setting up the infrastructure and crafting personalized engagement strategies. Continuously monitor and refine your ABM initiatives, ensuring they remain effective, relevant, and aligned with the evolving needs of your target accounts.",
+            "stage": "Execution",
+            "points": 40
+          },
+          {
+            "task": "Manage Paid Media",
+            "description": "Oversee and optimize your advertising campaigns, making real-time adjustments based on performance data to ensure maximum reach, engagement, and ROI. Starts with 2 channels and minimum of $2k in ad spend.",
+            "stage": "Execution",
+            "points": 20
+          },
+          {
+            "task": "Manage SEO / AEO",
+            "description": "Continuously monitor and refine your SEO strategies, making adjustments based on performance data to ensure sustained organic visibility and traffic growth.",
+            "stage": "Execution",
+            "points": 5
+          },
+          {
+            "task": "Manage Content",
+            "description": "Manage and execute a content program by generating ideas, creating blogs, videos, and podcasts, or other pieces of content. Continuously review performance to refine and improve results.",
+            "stage": "Execution",
+            "points": 10
+          },
+          {
+            "task": "Tech Stack",
+            "description": "Tech stack to support reporting, platforms for campaigns. Includes RB2B, n8n, Factors, SmartLead, HeyReach, Riverside, Databox, etc.",
+            "stage": "Execution",
+            "points": 15
+          },
+          {
+            "task": "Listbuilding and Enrichment",
+            "description": "Develop a list of targeted contacts aligned with the ICPs in the ABM campaign; includes up to 2,500 enriched \"new\" contacts (email, title validation, and other custom fields)",
+            "stage": "Execution",
+            "points": 25
+          },
+          {
+            "task": "Facilitate Client Meetings",
+            "description": "Align on progress and pave the way for future successes. This collaborative session involves reviewing the status of current tasks and strategizing for the month ahead, fostering a cohesive and proactive approach to achieving your business objectives and maintaining a steady trajectory of growth.",
+            "stage": "Analysis",
+            "points": 10
+          }
+        ],
+        "month_total": 265
+      },
+      {
+        "month": "Month 3",
+        "tasks": [
+          {
+            "task": "Develop episode for a series",
+            "description": "Based on a live episode recording, craft an engaging podcast or video series episode that delves into relevant topics, offering listeners valuable insights and expert opinions, fostering a community of loyal followers. Episode content suite typically includes promo/clip videos, full-length video, audio, and short form written content.",
+            "stage": "Execution",
+            "points": 20
+          },
+          {
+            "task": "Develop image ad creative package",
+            "description": "Create a package of visually compelling image ads designed to capture attention and drive engagement, ensuring your brand stands out in advertising spaces.",
+            "stage": "Execution",
+            "points": 10
+          },
+          {
+            "task": "Create SEO blog post inspired by transcript",
+            "description": "Write an insightful, 1,500-1,800 word blog post based on the provided transcript. The piece should be strategically crafted and fully optimized to achieve a specific SEO objective defined by the organization.",
+            "stage": "Execution",
+            "points": 20
+          },
+          {
+            "task": "Develop slide deck or presentation",
+            "description": "Create a comprehensive slide deck to support your sales team. Includes outline, copy and custom design elements.",
+            "stage": "Execution",
+            "points": 15
+          },
+          {
+            "task": "Develop campaign package",
+            "description": "Develop a set of two one-pagers (either downloadable PDFs or designed webpages) to support key topics or themes relevant to the winback target list or industry list. Optionally, create a detailed blog post based on an interview. In addition, craft two short video \"sizzle\" pieces to promote in an email or on a landing page. Content package supports up to six emails in a sequence. Craft email copy to fulfill the six emails.",
+            "stage": "Execution",
+            "points": 75
+          },
+          {
+            "task": "Manage Paid Media",
+            "description": "Oversee and optimize your advertising campaigns, making real-time adjustments based on performance data to ensure maximum reach, engagement, and ROI. Starts with 2 channels and minimum of $2k in ad spend.",
+            "stage": "Execution",
+            "points": 20
+          },
+          {
+            "task": "Manage SEO / AEO",
+            "description": "Continuously monitor and refine your SEO strategies, making adjustments based on performance data to ensure sustained organic visibility and traffic growth.",
+            "stage": "Execution",
+            "points": 5
+          },
+          {
+            "task": "Manage Content",
+            "description": "Manage and execute a content program by generating ideas, creating blogs, videos, and podcasts, or other pieces of content. Continuously review performance to refine and improve results.",
+            "stage": "Execution",
+            "points": 10
+          },
+          {
+            "task": "Manage ABM",
+            "description": "Multi-channel engagement tracking across email, LinkedIn, and website touchpoints with AI-powered lead qualification, real-time sales notifications, account-level analytics, and weekly performance reporting.",
+            "stage": "Execution",
+            "points": 15
+          },
+          {
+            "task": "Facilitate Client Meetings",
+            "description": "Align on progress and pave the way for future successes. This collaborative session involves reviewing the status of current tasks and strategizing for the month ahead, fostering a cohesive and proactive approach to achieving your business objectives and maintaining a steady trajectory of growth.",
+            "stage": "Analysis",
+            "points": 10
+          },
+          {
+            "task": "Tech Stack",
+            "description": "Tech stack to support reporting, platforms for campaigns. Includes RB2B, n8n, Factors, SmartLead, HeyReach, Riverside, Databox, etc.",
+            "stage": "Execution",
+            "points": 15
+          }
+        ],
+        "month_total": 215
+      }
+    ]
+  },
+
+  "metadata": {
+    "model": "manual-conversion",
+    "version": 1,
+    "generated_at": "2025-12-16T00:00:00.000Z",
+    "research_document_title": "Marketing Research: Washington Speakers Bureau"
+  }
+}
