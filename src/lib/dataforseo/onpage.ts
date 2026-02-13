@@ -62,9 +62,10 @@ export async function pollCrawlReady(
       [{ id: taskId }]
     );
 
-    // Fail fast if DataForSEO says the task doesn't exist or errored
+    // Fail fast on actual errors (not found, invalid, etc.)
+    // 20000 = OK (results ready), 40602 = Task in Queue (still processing)
     const taskStatus = response.tasks?.[0]?.status_code;
-    if (taskStatus && taskStatus !== 20000) {
+    if (taskStatus && taskStatus !== 20000 && taskStatus !== 40602) {
       throw new Error(
         `OnPage crawl task error (${taskStatus}): ${response.tasks?.[0]?.status_message}`
       );
