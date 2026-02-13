@@ -25,17 +25,21 @@ export async function submitCrawlTask(
       max_crawl_pages: maxPages,
       validate_micromarkup: true,
       enable_browser_rendering: true,
+      enable_javascript: true,
       load_resources: true,
       store_raw_html: false,
     },
   ]);
 
-  const taskId = response.tasks?.[0]?.id;
-  if (!taskId) {
+  const task = response.tasks?.[0];
+  if (!task?.id) {
     throw new Error("No task ID returned from OnPage crawl submission");
   }
+  if (task.status_code !== 20100 && task.status_code !== 20000) {
+    throw new Error(`OnPage task_post failed (${task.status_code}): ${task.status_message}`);
+  }
 
-  return taskId;
+  return task.id;
 }
 
 /**
@@ -57,6 +61,14 @@ export async function pollCrawlReady(
       "on_page/summary",
       [{ id: taskId }]
     );
+
+    // Fail fast if DataForSEO says the task doesn't exist or errored
+    const taskStatus = response.tasks?.[0]?.status_code;
+    if (taskStatus && taskStatus !== 20000) {
+      throw new Error(
+        `OnPage crawl task error (${taskStatus}): ${response.tasks?.[0]?.status_message}`
+      );
+    }
 
     const result = client.extractFirstResult(response);
     const progress = result?.crawl_progress;
