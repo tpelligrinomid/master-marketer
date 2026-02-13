@@ -15,6 +15,10 @@ const envSchema = z.object({
   SPYFU_API_KEY: z.string().optional(),
   SPYFU_PROXY_URL: z.string().optional(),
   EXA_API_KEY: z.string().optional(),
+  // SEO Audit pipeline data sources
+  DATAFORSEO_LOGIN: z.string().optional(),
+  DATAFORSEO_PASSWORD: z.string().optional(),
+  GOOGLE_PAGESPEED_API_KEY: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

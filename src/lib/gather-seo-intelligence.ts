@@ -1,0 +1,547 @@
+import { SeoAuditInput } from "../types/seo-audit-input";
+import {
+  CompanySeoIntelligence,
+  SeoIntelligencePackage,
+  SerpResult,
+  LlmMention,
+  LlmResponse,
+  PageSpeedResult,
+  BacklinkGapItem,
+  OnPageCrawlSummary,
+  OnPagePageData,
+  DuplicateTagItem,
+  RedirectChainItem,
+  NonIndexableItem,
+  MicrodataItem,
+  LighthouseResult,
+} from "../types/seo-audit-intelligence";
+import {
+  DataForSeoClient,
+  submitCrawlTask,
+  pollCrawlReady,
+  getCrawlSummary,
+  getCrawlPages,
+  getDuplicateTags,
+  getRedirectChains,
+  getNonIndexable,
+  getMicrodata,
+  getLighthouseResults,
+  getRankedKeywords,
+  getDomainIntersection,
+  getCompetitorDomains,
+  getBacklinkSummary,
+  getBacklinks,
+  getAnchors,
+  getReferringDomains,
+  getBacklinkIntersection,
+  getSerpResults,
+  getLlmMentions,
+  getChatGptResponses,
+  getPerplexityResponses,
+} from "./dataforseo";
+import { getPageSpeedResults } from "./pagespeed";
+import { getDomainMetrics } from "./moz";
+
+export interface GatherSeoConfig {
+  dataforseoLogin?: string;
+  dataforseoPassword?: string;
+  mozApiKey?: string;
+  pageSpeedApiKey?: string;
+}
+
+// --- Stream Gatherers ---
+
+async function gatherKeywordsStream(
+  dfsClient: DataForSeoClient,
+  clientDomain: string,
+  competitorDomains: string[],
+  errors: string[]
+): Promise<{
+  clientKeywords: CompanySeoIntelligence;
+  competitorKeywords: Map<string, CompanySeoIntelligence>;
+}> {
+  const clientKeywords: CompanySeoIntelligence = {
+    company_name: "",
+    domain: clientDomain,
+    errors: [],
+  };
+  const competitorKeywords = new Map<string, CompanySeoIntelligence>();
+
+  // Initialize competitor entries
+  for (const domain of competitorDomains) {
+    competitorKeywords.set(domain, {
+      company_name: "",
+      domain,
+      errors: [],
+    });
+  }
+
+  const promises: Promise<void>[] = [];
+
+  // Client ranked keywords
+  promises.push(
+    getRankedKeywords(dfsClient, clientDomain)
+      .then((data) => {
+        clientKeywords.ranked_keywords = data;
+        console.log(`[SEO] Ranked keywords for client: ${data.length}`);
+      })
+      .catch((err) => {
+        const msg = `Ranked keywords failed for ${clientDomain}: ${err.message}`;
+        console.warn(`[SEO] ${msg}`);
+        errors.push(msg);
+      })
+  );
+
+  // Competitor ranked keywords
+  for (const domain of competitorDomains) {
+    promises.push(
+      getRankedKeywords(dfsClient, domain)
+        .then((data) => {
+          competitorKeywords.get(domain)!.ranked_keywords = data;
+          console.log(`[SEO] Ranked keywords for ${domain}: ${data.length}`);
+        })
+        .catch((err) => {
+          const msg = `Ranked keywords failed for ${domain}: ${err.message}`;
+          console.warn(`[SEO] ${msg}`);
+          errors.push(msg);
+        })
+    );
+  }
+
+  // Content gap (domain intersection for each competitor)
+  for (const domain of competitorDomains) {
+    promises.push(
+      getDomainIntersection(dfsClient, clientDomain, domain)
+        .then((data) => {
+          clientKeywords.content_gap_keywords = [
+            ...(clientKeywords.content_gap_keywords || []),
+            ...data,
+          ];
+          console.log(`[SEO] Content gap vs ${domain}: ${data.length} keywords`);
+        })
+        .catch((err) => {
+          const msg = `Content gap failed for ${domain}: ${err.message}`;
+          console.warn(`[SEO] ${msg}`);
+          errors.push(msg);
+        })
+    );
+  }
+
+  // Competitor domains
+  promises.push(
+    getCompetitorDomains(dfsClient, clientDomain)
+      .then((data) => {
+        clientKeywords.competitor_domains = data;
+      })
+      .catch((err) => {
+        const msg = `Competitor domains failed: ${err.message}`;
+        console.warn(`[SEO] ${msg}`);
+        errors.push(msg);
+      })
+  );
+
+  await Promise.allSettled(promises);
+  return { clientKeywords, competitorKeywords };
+}
+
+async function gatherBacklinksStream(
+  dfsClient: DataForSeoClient,
+  clientDomain: string,
+  competitorDomains: string[],
+  errors: string[]
+): Promise<{
+  clientBacklinks: Partial<CompanySeoIntelligence>;
+  competitorBacklinks: Map<string, Partial<CompanySeoIntelligence>>;
+  backlinkGap: BacklinkGapItem[];
+}> {
+  const clientBacklinks: Partial<CompanySeoIntelligence> = {};
+  const competitorBacklinks = new Map<string, Partial<CompanySeoIntelligence>>();
+  let backlinkGap: BacklinkGapItem[] = [];
+
+  for (const domain of competitorDomains) {
+    competitorBacklinks.set(domain, {});
+  }
+
+  const promises: Promise<void>[] = [];
+
+  // Client backlinks
+  promises.push(
+    getBacklinkSummary(dfsClient, clientDomain)
+      .then((data) => {
+        clientBacklinks.backlink_summary = data || undefined;
+      })
+      .catch((err) => {
+        const msg = `Backlink summary failed for ${clientDomain}: ${err.message}`;
+        console.warn(`[SEO] ${msg}`);
+        errors.push(msg);
+      })
+  );
+
+  promises.push(
+    getBacklinks(dfsClient, clientDomain)
+      .then((data) => {
+        clientBacklinks.backlinks = data;
+      })
+      .catch((err) => {
+        const msg = `Backlinks failed for ${clientDomain}: ${err.message}`;
+        console.warn(`[SEO] ${msg}`);
+        errors.push(msg);
+      })
+  );
+
+  promises.push(
+    getAnchors(dfsClient, clientDomain)
+      .then((data) => {
+        clientBacklinks.anchors = data;
+      })
+      .catch((err) => {
+        const msg = `Anchors failed for ${clientDomain}: ${err.message}`;
+        console.warn(`[SEO] ${msg}`);
+        errors.push(msg);
+      })
+  );
+
+  promises.push(
+    getReferringDomains(dfsClient, clientDomain)
+      .then((data) => {
+        clientBacklinks.referring_domains = data;
+      })
+      .catch((err) => {
+        const msg = `Referring domains failed for ${clientDomain}: ${err.message}`;
+        console.warn(`[SEO] ${msg}`);
+        errors.push(msg);
+      })
+  );
+
+  // Competitor backlink summaries
+  for (const domain of competitorDomains) {
+    promises.push(
+      getBacklinkSummary(dfsClient, domain)
+        .then((data) => {
+          competitorBacklinks.get(domain)!.backlink_summary = data || undefined;
+        })
+        .catch((err) => {
+          const msg = `Backlink summary failed for ${domain}: ${err.message}`;
+          console.warn(`[SEO] ${msg}`);
+          errors.push(msg);
+        })
+    );
+  }
+
+  // Backlink gap
+  promises.push(
+    getBacklinkIntersection(dfsClient, clientDomain, competitorDomains)
+      .then((data) => {
+        backlinkGap = data;
+      })
+      .catch((err) => {
+        const msg = `Backlink intersection failed: ${err.message}`;
+        console.warn(`[SEO] ${msg}`);
+        errors.push(msg);
+      })
+  );
+
+  await Promise.allSettled(promises);
+  return { clientBacklinks, competitorBacklinks, backlinkGap };
+}
+
+async function gatherSerpStream(
+  dfsClient: DataForSeoClient,
+  keywords: string[],
+  errors: string[]
+): Promise<SerpResult[]> {
+  try {
+    const results = await getSerpResults(dfsClient, keywords);
+    console.log(`[SEO] SERP results: ${results.length} keywords analyzed`);
+    return results;
+  } catch (err) {
+    const msg = `SERP analysis failed: ${err instanceof Error ? err.message : err}`;
+    console.warn(`[SEO] ${msg}`);
+    errors.push(msg);
+    return [];
+  }
+}
+
+async function gatherAeoStream(
+  dfsClient: DataForSeoClient,
+  brandName: string,
+  keywords: string[],
+  errors: string[]
+): Promise<{
+  llmMentions: LlmMention[];
+  llmResponses: LlmResponse[];
+}> {
+  let llmMentions: LlmMention[] = [];
+  let llmResponses: LlmResponse[] = [];
+
+  // Build AEO queries from keywords
+  const aeoQueries = keywords.slice(0, 10).map((kw) => `best ${kw} solutions`);
+
+  const promises: Promise<void>[] = [];
+
+  promises.push(
+    getLlmMentions(dfsClient, brandName, keywords.slice(0, 15))
+      .then((data) => {
+        llmMentions = data;
+        console.log(`[SEO] LLM mentions: ${data.length} checked`);
+      })
+      .catch((err) => {
+        const msg = `LLM mentions failed: ${err.message}`;
+        console.warn(`[SEO] ${msg}`);
+        errors.push(msg);
+      })
+  );
+
+  promises.push(
+    getChatGptResponses(dfsClient, aeoQueries)
+      .then((data) => {
+        llmResponses = [...llmResponses, ...data];
+        console.log(`[SEO] ChatGPT responses: ${data.length}`);
+      })
+      .catch((err) => {
+        const msg = `ChatGPT responses failed: ${err.message}`;
+        console.warn(`[SEO] ${msg}`);
+        errors.push(msg);
+      })
+  );
+
+  promises.push(
+    getPerplexityResponses(dfsClient, aeoQueries)
+      .then((data) => {
+        llmResponses = [...llmResponses, ...data];
+        console.log(`[SEO] Perplexity responses: ${data.length}`);
+      })
+      .catch((err) => {
+        const msg = `Perplexity responses failed: ${err.message}`;
+        console.warn(`[SEO] ${msg}`);
+        errors.push(msg);
+      })
+  );
+
+  await Promise.allSettled(promises);
+
+  // Mark brand mentions in LLM responses
+  const brandLower = brandName.toLowerCase();
+  for (const resp of llmResponses) {
+    if (resp.response_text?.toLowerCase().includes(brandLower)) {
+      resp.brand_mentioned = true;
+    }
+  }
+
+  return { llmMentions, llmResponses };
+}
+
+// --- Main Orchestrator ---
+
+/**
+ * Gather all SEO intelligence for an audit.
+ * Pattern mirrors gatherAllIntelligence from gather-intelligence.ts.
+ *
+ * Timing optimization:
+ *   1. Submit OnPage crawl (returns immediately)
+ *   2. Execute 4 live streams in parallel (keywords, backlinks, SERP, AEO) + Moz
+ *   3. Poll for OnPage completion + fetch results + PageSpeed
+ */
+export async function gatherAllSeoIntelligence(
+  input: SeoAuditInput,
+  config: GatherSeoConfig
+): Promise<SeoIntelligencePackage> {
+  const errors: string[] = [];
+
+  if (!config.dataforseoLogin || !config.dataforseoPassword) {
+    throw new Error("DATAFORSEO_LOGIN and DATAFORSEO_PASSWORD are required for SEO audits");
+  }
+
+  const dfsClient = new DataForSeoClient(config.dataforseoLogin, config.dataforseoPassword);
+  const clientDomain = input.client.domain;
+  const competitorDomains = input.competitors.map((c) => c.domain);
+
+  // Build keyword list for SERP + AEO analysis
+  const seedKeywords = input.seed_topics || [];
+
+  // ──────────────────────────────────────────
+  // Step 1: Submit OnPage crawl (returns immediately)
+  // ──────────────────────────────────────────
+  let crawlTaskId: string | undefined;
+  try {
+    crawlTaskId = await submitCrawlTask(dfsClient, clientDomain, input.max_crawl_pages);
+    console.log(`[SEO] OnPage crawl submitted: ${crawlTaskId}`);
+  } catch (err) {
+    const msg = `OnPage crawl submission failed: ${err instanceof Error ? err.message : err}`;
+    console.error(`[SEO] ${msg}`);
+    errors.push(msg);
+  }
+
+  // ──────────────────────────────────────────
+  // Step 2: Execute 4 live streams in parallel + Moz
+  // ──────────────────────────────────────────
+  const [keywordsResult, backlinksResult, mozResult] = await Promise.all([
+    gatherKeywordsStream(dfsClient, clientDomain, competitorDomains, errors),
+    gatherBacklinksStream(dfsClient, clientDomain, competitorDomains, errors),
+    // Moz metrics for client
+    config.mozApiKey
+      ? getDomainMetrics(clientDomain, config.mozApiKey).catch((err) => {
+          errors.push(`Moz metrics failed: ${err.message}`);
+          return undefined;
+        })
+      : Promise.resolve(undefined),
+  ]);
+
+  // Merge keyword data to get top keywords for SERP + AEO
+  const topKeywords = [
+    ...seedKeywords,
+    ...(keywordsResult.clientKeywords.ranked_keywords || [])
+      .slice(0, 20)
+      .map((k) => k.keyword),
+  ];
+  const uniqueKeywords = [...new Set(topKeywords)].slice(0, 30);
+
+  // Now run SERP + AEO with the keywords we have
+  const [serpResults, aeoResult] = await Promise.all([
+    gatherSerpStream(dfsClient, uniqueKeywords, errors),
+    gatherAeoStream(dfsClient, input.client.company_name, uniqueKeywords, errors),
+  ]);
+
+  // ──────────────────────────────────────────
+  // Step 3: Poll for OnPage completion + fetch results + PageSpeed
+  // ──────────────────────────────────────────
+  let onpageSummary: OnPageCrawlSummary | undefined;
+  let onpagePages: OnPagePageData[] | undefined;
+  let duplicateTags: DuplicateTagItem[] | undefined;
+  let redirectChains: RedirectChainItem[] | undefined;
+  let nonIndexable: NonIndexableItem[] | undefined;
+  let microdata: MicrodataItem[] | undefined;
+  let lighthouseResults: LighthouseResult[] | undefined;
+  let pagespeedResults: PageSpeedResult[] | undefined;
+
+  if (crawlTaskId) {
+    try {
+      await pollCrawlReady(dfsClient, crawlTaskId);
+      console.log(`[SEO] OnPage crawl ready: ${crawlTaskId}`);
+
+      // Fetch all OnPage data in parallel
+      const [summary, pages, dupes, redirects, nonIdx, micro] = await Promise.all([
+        getCrawlSummary(dfsClient, crawlTaskId).catch((err) => {
+          errors.push(`Crawl summary failed: ${err.message}`);
+          return undefined;
+        }),
+        getCrawlPages(dfsClient, crawlTaskId).catch((err) => {
+          errors.push(`Crawl pages failed: ${err.message}`);
+          return undefined;
+        }),
+        getDuplicateTags(dfsClient, crawlTaskId).catch((err) => {
+          errors.push(`Duplicate tags failed: ${err.message}`);
+          return undefined;
+        }),
+        getRedirectChains(dfsClient, crawlTaskId).catch((err) => {
+          errors.push(`Redirect chains failed: ${err.message}`);
+          return undefined;
+        }),
+        getNonIndexable(dfsClient, crawlTaskId).catch((err) => {
+          errors.push(`Non-indexable failed: ${err.message}`);
+          return undefined;
+        }),
+        getMicrodata(dfsClient, crawlTaskId).catch((err) => {
+          errors.push(`Microdata failed: ${err.message}`);
+          return undefined;
+        }),
+      ]);
+
+      onpageSummary = summary;
+      onpagePages = pages;
+      duplicateTags = dupes;
+      redirectChains = redirects;
+      nonIndexable = nonIdx;
+      microdata = micro;
+
+      // Run Lighthouse on key pages (homepage + top pages by worst score)
+      const keyUrls = [
+        `https://${clientDomain}`,
+        ...(pages || [])
+          .filter((p) => p.onpage_score !== undefined)
+          .sort((a, b) => (a.onpage_score || 100) - (b.onpage_score || 100))
+          .slice(0, 5)
+          .map((p) => p.url),
+      ];
+      const uniqueUrls = [...new Set(keyUrls)].slice(0, 6);
+
+      lighthouseResults = await getLighthouseResults(dfsClient, uniqueUrls).catch((err) => {
+        errors.push(`Lighthouse failed: ${err.message}`);
+        return undefined;
+      });
+    } catch (err) {
+      const msg = `OnPage crawl polling/fetch failed: ${err instanceof Error ? err.message : err}`;
+      console.error(`[SEO] ${msg}`);
+      errors.push(msg);
+    }
+  }
+
+  // PageSpeed Insights (supplements Lighthouse with field data)
+  const pageSpeedUrls = [
+    `https://${clientDomain}`,
+    ...(onpagePages || []).slice(0, 5).map((p) => p.url),
+  ];
+  const uniquePageSpeedUrls = [...new Set(pageSpeedUrls)].slice(0, 6);
+
+  try {
+    pagespeedResults = await getPageSpeedResults(uniquePageSpeedUrls, config.pageSpeedApiKey);
+    console.log(`[SEO] PageSpeed results: ${pagespeedResults.length} pages`);
+  } catch (err) {
+    const msg = `PageSpeed failed: ${err instanceof Error ? err.message : err}`;
+    console.warn(`[SEO] ${msg}`);
+    errors.push(msg);
+  }
+
+  // ──────────────────────────────────────────
+  // Assemble intelligence package
+  // ──────────────────────────────────────────
+
+  // Build client intelligence
+  const clientIntel: CompanySeoIntelligence = {
+    company_name: input.client.company_name,
+    domain: clientDomain,
+    ranked_keywords: keywordsResult.clientKeywords.ranked_keywords,
+    content_gap_keywords: keywordsResult.clientKeywords.content_gap_keywords,
+    competitor_domains: keywordsResult.clientKeywords.competitor_domains,
+    backlink_summary: backlinksResult.clientBacklinks.backlink_summary,
+    backlinks: backlinksResult.clientBacklinks.backlinks,
+    anchors: backlinksResult.clientBacklinks.anchors,
+    referring_domains: backlinksResult.clientBacklinks.referring_domains,
+    moz_metrics: mozResult || undefined,
+    errors: keywordsResult.clientKeywords.errors,
+  };
+
+  // Build competitor intelligence
+  const competitorIntel: CompanySeoIntelligence[] = input.competitors.map((comp) => {
+    const kwData = keywordsResult.competitorKeywords.get(comp.domain);
+    const blData = backlinksResult.competitorBacklinks.get(comp.domain);
+
+    return {
+      company_name: comp.company_name,
+      domain: comp.domain,
+      ranked_keywords: kwData?.ranked_keywords,
+      backlink_summary: blData?.backlink_summary,
+      moz_metrics: undefined,
+      errors: kwData?.errors || [],
+    };
+  });
+
+  return {
+    client: clientIntel,
+    competitors: competitorIntel,
+    onpage_summary: onpageSummary,
+    onpage_pages: onpagePages,
+    duplicate_tags: duplicateTags,
+    redirect_chains: redirectChains,
+    non_indexable: nonIndexable,
+    microdata: microdata,
+    lighthouse_results: lighthouseResults,
+    serp_results: serpResults,
+    llm_mentions: aeoResult.llmMentions,
+    llm_responses: aeoResult.llmResponses,
+    pagespeed_results: pagespeedResults,
+    backlink_gap: backlinksResult.backlinkGap,
+    gathered_at: new Date().toISOString(),
+    errors,
+  };
+}
