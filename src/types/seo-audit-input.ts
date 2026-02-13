@@ -33,8 +33,8 @@ export const SeoAuditInputSchema = z.object({
   /** Optional prior research output for richer context */
   research_context: ResearchContextSchema.optional(),
 
-  /** Max pages to crawl (default 500, max 2000) */
-  max_crawl_pages: z.number().min(1).max(2000).default(500),
+  /** Max pages to crawl (default 150 — browser rendering is ~10s/page) */
+  max_crawl_pages: z.number().min(1).max(2000).default(150),
 
   instructions: z.string().optional(),
 

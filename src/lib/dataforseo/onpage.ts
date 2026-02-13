@@ -15,7 +15,7 @@ import {
 export async function submitCrawlTask(
   client: DataForSeoClient,
   domain: string,
-  maxPages: number = 500
+  maxPages: number = 150
 ): Promise<string> {
   const cleanDomain = domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
@@ -51,7 +51,7 @@ export async function pollCrawlReady(
   client: DataForSeoClient,
   taskId: string,
   intervalMs: number = 30000,
-  timeoutMs: number = 600000
+  timeoutMs: number = 1800000
 ): Promise<void> {
   const startTime = Date.now();
 
