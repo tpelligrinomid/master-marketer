@@ -46,6 +46,8 @@ export interface TechnicalSeoSection {
 export interface KeywordCluster {
   cluster_name: string;
   intent: string;
+  business_relevance: "core" | "adjacent" | "vanity";
+  relevance_rationale: string;
   keywords: Array<{
     keyword: string;
     position: number;
@@ -63,6 +65,7 @@ export interface TopPerformer {
   search_volume: number;
   url: string;
   trend: "rising" | "stable" | "declining";
+  business_relevance: "core" | "adjacent" | "vanity";
 }
 
 export interface KeywordLandscapeSection {

@@ -11,6 +11,13 @@ Your approach combines TWO sources of insight:
 
 2. **Expert SEO Knowledge (your training)** — You are an expert with deep knowledge of technical SEO, content strategy, link building, SERP feature optimization, and AI/answer engine optimization (AEO). Go beyond what the data shows — provide expert interpretation, apply established SEO frameworks, reference industry benchmarks, and deliver strategic insight.
 
+Critical principle — BUSINESS RELEVANCE over vanity metrics:
+- Every keyword, opportunity, and recommendation must be evaluated for relevance to the client's actual business, services, and ideal customer profile (ICP)
+- A B2B marketing agency ranking #1 for "what are facebook followers" is vanity traffic, NOT a strength — it drives zero qualified pipeline
+- Distinguish between keywords that attract potential buyers vs. keywords that just generate pageviews
+- When reporting keyword clusters and top performers, explicitly flag business relevance: "core" (directly related to services/ICP), "adjacent" (related industry topics that build authority), or "vanity" (high traffic but no business value)
+- Prioritize commercial and transactional intent keywords that indicate buying behavior over informational keywords with no connection to the client's services
+
 Output rules:
 - Return ONLY valid JSON matching the specified schema
 - No markdown code blocks, no explanations, no meta-commentary — just raw JSON
@@ -436,6 +443,8 @@ Return a JSON object with two keys:
       {
         "cluster_name": "Thematic name",
         "intent": "informational|navigational|commercial|transactional",
+        "business_relevance": "core|adjacent|vanity",
+        "relevance_rationale": "One sentence explaining WHY this cluster is core, adjacent, or vanity relative to the client's services and ICP",
         "keywords": [
           { "keyword": "...", "position": <n>, "search_volume": <n>, "difficulty": <n>, "url": "..." }
         ],
@@ -449,7 +458,8 @@ Return a JSON object with two keys:
         "position": <n>,
         "search_volume": <n>,
         "url": "...",
-        "trend": "rising|stable|declining"
+        "trend": "rising|stable|declining",
+        "business_relevance": "core|adjacent|vanity"
       }
     ],
     "ranking_distribution_summary": "2-3 sentences about the ranking profile"
@@ -477,11 +487,17 @@ Return a JSON object with two keys:
 
 Guidelines:
 - Create 5-8 keyword clusters grouped by topic/theme
-- Include 5-10 top performers
-- high_value_gaps: 5-8 keywords with highest traffic potential
-- quick_wins: 5-8 keywords with low difficulty that client can rank for quickly
+- CRITICAL: Evaluate each cluster's business_relevance honestly:
+  - "core" = directly tied to the client's services, offerings, or buyer journey (e.g., "b2b marketing agency" for a B2B agency)
+  - "adjacent" = related industry topics that build topical authority and attract the right audience (e.g., "demand generation strategy" for a B2B agency)
+  - "vanity" = high traffic but irrelevant to the business — would never convert to a lead (e.g., "what are facebook followers" for a B2B agency)
+- opportunity_score should factor in business relevance — a vanity cluster with 10,000 monthly searches should score LOWER than a core cluster with 500 monthly searches
+- Include 5-10 top performers with business_relevance flag — be honest about which ones actually matter
+- high_value_gaps: 5-8 keywords with highest BUSINESS-RELEVANT traffic potential (not just raw volume)
+- quick_wins: 5-8 keywords with low difficulty that client can rank for quickly AND that serve the business
 - strategic_gaps: 5-8 keywords that are strategically important despite higher difficulty
 - Count actual keywords from the data for ranking distribution numbers
+- ranking_distribution_summary should call out the split between business-relevant and vanity keyword rankings
 
 Return ONLY the JSON object. No other text.`;
 
@@ -767,7 +783,9 @@ Guidelines:
 - medium_term: 5-7 recommendations (medium effort, 1-3 months)
 - long_term: 3-5 recommendations (high effort, 3-12 months)
 - Each recommendation must reference specific findings from the prior analyses
-- The executive_summary should highlight the 3-4 most impactful findings and frame the overall SEO/AEO opportunity
+- CRITICAL: Focus recommendations on business-relevant keywords and opportunities — do NOT recommend investing effort in vanity traffic keywords that will never convert to pipeline
+- If the client ranks well for irrelevant terms, that is NOT a strength to protect — it's wasted crawl budget and content resources
+- The executive_summary should highlight the 3-4 most impactful findings, frame the overall SEO/AEO opportunity, and honestly note any vanity traffic inflating the client's apparent organic performance
 - Recommendations should span all categories: technical fixes, content creation, link building, AEO optimization, and competitive positioning
 
 Return ONLY the JSON object. No other text.`;
