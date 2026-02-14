@@ -985,8 +985,8 @@ Return a JSON object:
 \`\`\`
 
 Guidelines:
-- CRITICAL — TRAFFIC AND KEYWORD ESTIMATES MUST BE DATA-SOURCED: For estimated_traffic and total_ranked_keywords, use Keywords Everywhere domain traffic data when available (it provides organic_keywords and estimated_monthly_traffic per domain). If KE data is not available, base estimates on the ranked keyword data we have, but explicitly note these are estimates from a capped API sample. Do NOT invent traffic numbers — if you don't have a reliable source, use the KE number or omit the field.
-- Remember that keyword counts are capped at 500 per domain by the API. Report "500+ (API sample)" rather than treating 500 as the total. Use KE organic_keywords for the actual total when available.
+- CRITICAL — TRAFFIC AND KEYWORD ESTIMATES MUST BE DATA-SOURCED: For estimated_traffic and total_ranked_keywords, use Keywords Everywhere domain traffic data when available (it provides organic_keywords and estimated_monthly_traffic per domain). If KE data is not available, use Google Search Console click data if available to derive estimates. As a last resort, provide a conservative estimate based on ranked keyword data with a note in strengths/weaknesses that the number is estimated. estimated_traffic MUST always be a number (use 0 if truly unknown) — never null or a string.
+- Remember that keyword counts are capped at 500 per domain by the API. total_ranked_keywords MUST always be a number (e.g. 500) — never a string. Use KE organic_keywords for the actual total when available. Note the API cap in strengths/weaknesses text if relevant, not in the numeric field.
 - Identify genuine strengths and weaknesses based on the data
 - Differentiation opportunities should be actionable and specific
 - Consider both content topics and technical advantages

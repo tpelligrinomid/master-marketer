@@ -176,6 +176,15 @@ export async function getDomainTraffic(
     domains.slice(0, 10).map((d) => getDomainTrafficSingle(client, d, country))
   );
 
+  for (let i = 0; i < results.length; i++) {
+    const r = results[i];
+    if (r.status === "rejected") {
+      console.warn(`[KE] Domain traffic failed for ${domains[i]}: ${r.reason}`);
+    } else if (r.value === null) {
+      console.warn(`[KE] Domain traffic returned no data for ${domains[i]}`);
+    }
+  }
+
   return results
     .filter(
       (r): r is PromiseFulfilledResult<KeDomainTraffic | null> =>
