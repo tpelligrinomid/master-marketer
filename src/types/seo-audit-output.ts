@@ -246,6 +246,21 @@ export interface StrategicRecommendationsSection {
   executive_summary: string;
 }
 
+// ─────────────────────────────────────────────
+// Data Source Attribution
+// ─────────────────────────────────────────────
+
+export interface DataSource {
+  /** Machine-readable key for logo/icon mapping in frontend */
+  key: "dataforseo" | "moz" | "keywords_everywhere" | "google_pagespeed" | "google_search_console";
+  /** Display name */
+  name: string;
+  /** What this source contributed to the audit */
+  description: string;
+  /** Whether this source returned data for this audit */
+  active: boolean;
+}
+
 // ═════════════════════════════════════════════
 // FULL OUTPUT SCHEMA
 // ═════════════════════════════════════════════
@@ -270,5 +285,9 @@ export interface GeneratedSeoAuditOutput {
     domain_audited: string;
     competitors_analyzed: string[];
     intelligence_errors: string[];
+    /** Data sources used in this audit — frontend renders logos/badges from these */
+    data_sources: DataSource[];
+    /** Pages crawled during OnPage analysis */
+    pages_crawled?: number;
   };
 }

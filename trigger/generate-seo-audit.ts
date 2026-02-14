@@ -1,7 +1,8 @@
 import { task, metadata } from "@trigger.dev/sdk/v3";
 import Anthropic from "@anthropic-ai/sdk";
 import { SeoAuditInput, SeoAuditInputSchema } from "../src/types/seo-audit-input";
-import { GeneratedSeoAuditOutput } from "../src/types/seo-audit-output";
+import { GeneratedSeoAuditOutput, DataSource } from "../src/types/seo-audit-output";
+import { SeoIntelligencePackage } from "../src/types/seo-audit-intelligence";
 import { TaskCallback, deliverTaskResult } from "../src/lib/task-callback";
 import { SEO_AUDIT_BOILERPLATE } from "../src/prompts/seo-audit-boilerplate";
 import {
@@ -17,6 +18,85 @@ import { extractJson } from "../src/lib/json-utils";
 
 const MODEL = "claude-opus-4-20250514";
 const MAX_TOKENS = 32000;
+
+function buildDataSources(intel: SeoIntelligencePackage): DataSource[] {
+  const sources: DataSource[] = [];
+
+  // DataForSEO — always attempted, active if we got crawl or keyword data
+  const hasOnPage = !!intel.onpage_summary;
+  const hasKeywords = (intel.client.ranked_keywords?.length ?? 0) > 0;
+  const hasBacklinks = !!intel.client.backlink_summary;
+  const hasSerp = (intel.serp_results?.length ?? 0) > 0;
+  const hasAeo = (intel.llm_mentions?.length ?? 0) > 0 || (intel.llm_responses?.length ?? 0) > 0;
+  const dfsParts: string[] = [];
+  if (hasOnPage) dfsParts.push("site crawl & technical analysis");
+  if (hasKeywords) dfsParts.push("keyword rankings & content gaps");
+  if (hasBacklinks) dfsParts.push("backlink profile & competitor link analysis");
+  if (hasSerp) dfsParts.push("SERP feature analysis");
+  if (hasAeo) dfsParts.push("AI engine visibility testing");
+  sources.push({
+    key: "dataforseo",
+    name: "DataForSEO",
+    description: dfsParts.length > 0
+      ? `Provided ${dfsParts.join(", ")}`
+      : "Site crawl, keyword rankings, backlink analysis, SERP features, AI visibility",
+    active: hasOnPage || hasKeywords || hasBacklinks,
+  });
+
+  // Moz
+  const hasMoz = !!intel.client.moz_metrics;
+  const hasMozTopPages = (intel.client.moz_top_pages?.length ?? 0) > 0;
+  const mozParts: string[] = [];
+  if (hasMoz) mozParts.push("Domain Authority, Spam Score & linking domain metrics");
+  if (hasMozTopPages) mozParts.push("top pages by page authority");
+  sources.push({
+    key: "moz",
+    name: "Moz",
+    description: mozParts.length > 0
+      ? `Provided ${mozParts.join(", ")} for client and competitors`
+      : "Domain Authority, Spam Score, linking domains, top pages by authority",
+    active: hasMoz,
+  });
+
+  // Keywords Everywhere
+  const hasKe = !!intel.keywords_everywhere;
+  const keParts: string[] = [];
+  if (hasKe) {
+    if (intel.keywords_everywhere!.keyword_metrics.length > 0) keParts.push("12-month search volume trends & CPC data");
+    if (intel.keywords_everywhere!.related_keywords.length > 0) keParts.push("related keyword discovery");
+    if (intel.keywords_everywhere!.pasf_keywords.length > 0) keParts.push("People Also Search For expansion");
+    if (intel.keywords_everywhere!.domain_traffic.length > 0) keParts.push("domain traffic estimates");
+  }
+  sources.push({
+    key: "keywords_everywhere",
+    name: "Keywords Everywhere",
+    description: keParts.length > 0
+      ? `Provided ${keParts.join(", ")}`
+      : "Search volume trends, CPC, related keywords, People Also Search For, domain traffic estimates",
+    active: hasKe,
+  });
+
+  // Google PageSpeed Insights
+  const hasPageSpeed = (intel.pagespeed_results?.length ?? 0) > 0;
+  sources.push({
+    key: "google_pagespeed",
+    name: "Google PageSpeed Insights",
+    description: hasPageSpeed
+      ? `Provided Core Web Vitals and performance scores for ${intel.pagespeed_results!.length} URL(s)`
+      : "Core Web Vitals field data and performance scoring",
+    active: hasPageSpeed,
+  });
+
+  // Google Search Console — always inactive for now, but shown as available
+  sources.push({
+    key: "google_search_console",
+    name: "Google Search Console",
+    description: "Real click/impression data, index coverage, and search query analytics. Available when client connects their GSC property.",
+    active: false,
+  });
+
+  return sources;
+}
 
 async function callClaude(
   client: Anthropic,
@@ -216,6 +296,8 @@ export const generateSeoAudit = task({
         domain_audited: input.client.domain,
         competitors_analyzed: input.competitors.map((c) => c.domain),
         intelligence_errors: intel.errors,
+        data_sources: buildDataSources(intel),
+        pages_crawled: intel.onpage_summary?.pages_crawled,
       },
     };
 
