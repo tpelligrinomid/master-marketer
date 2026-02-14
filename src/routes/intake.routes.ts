@@ -4,6 +4,7 @@ import { tasks } from "@trigger.dev/sdk/v3";
 import { MeetingNotesInputSchema } from "../types/meeting-notes";
 import { DeliverableIntakeInputSchema, DeliverableType } from "../types/deliverable-intake";
 import { ResearchInputSchema } from "../types/research-input";
+import { SeoAuditInputSchema } from "../types/seo-audit-input";
 import { jobStore } from "../lib/job-store";
 import { getEnv } from "../config/env";
 
@@ -183,5 +184,47 @@ router.post("/plan", createIntakeRoute("plan"));
 
 // POST /intake/brief
 router.post("/brief", createIntakeRoute("brief"));
+
+// POST /intake/seo-audit and /intake/seo_audit (underscore alias for Mid App compatibility)
+const seoAuditHandler = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { callbackUrl, callbackMetadata } = extractWebhookFields(req.body);
+      const body = stripWebhookFields(req.body);
+
+      const parseResult = SeoAuditInputSchema.safeParse(body);
+      if (!parseResult.success) {
+        res.status(400).json({
+          error: "Invalid input",
+          details: parseResult.error.flatten(),
+        });
+        return;
+      }
+
+      const input = parseResult.data;
+      const jobId = uuidv4();
+
+      const triggerPayload = {
+        ...input,
+        _callback: buildCallbackPayload(callbackUrl, callbackMetadata),
+        _jobId: jobId,
+      };
+
+      const handle = await tasks.trigger("generate-seo-audit", triggerPayload);
+      jobStore.create(jobId, handle.id);
+
+      res.status(202).json({
+        jobId,
+        triggerRunId: handle.id,
+        status: "accepted",
+        message:
+          "SEO/AEO audit generation started. Results will be delivered to callback_url when complete. You can also poll GET /api/jobs/:jobId for status.",
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+router.post("/seo-audit", seoAuditHandler);
+router.post("/seo_audit", seoAuditHandler);
 
 export default router;
