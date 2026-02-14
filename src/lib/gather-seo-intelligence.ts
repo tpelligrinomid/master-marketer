@@ -14,6 +14,7 @@ import {
   NonIndexableItem,
   MicrodataItem,
   LighthouseResult,
+  KeywordsEverywhereData,
 } from "../types/seo-audit-intelligence";
 import {
   DataForSeoClient,
@@ -41,12 +42,20 @@ import {
 } from "./dataforseo";
 import { getPageSpeedResults } from "./pagespeed";
 import { getDomainMetrics } from "./moz";
+import {
+  KeywordsEverywhereClient,
+  getKeywordMetrics,
+  getRelatedKeywords,
+  getPasfKeywords,
+  getDomainTraffic,
+} from "./keywords-everywhere";
 
 export interface GatherSeoConfig {
   dataforseoLogin?: string;
   dataforseoPassword?: string;
   mozApiKey?: string;
   pageSpeedApiKey?: string;
+  keywordsEverywhereApiKey?: string;
 }
 
 // --- Stream Gatherers ---
@@ -331,6 +340,109 @@ async function gatherAeoStream(
   return { llmMentions, llmResponses };
 }
 
+async function gatherKeywordsEverywhereStream(
+  keClient: KeywordsEverywhereClient,
+  keywords: string[],
+  clientDomain: string,
+  competitorDomains: string[],
+  errors: string[]
+): Promise<KeywordsEverywhereData> {
+  const result: KeywordsEverywhereData = {
+    keyword_metrics: [],
+    related_keywords: [],
+    pasf_keywords: [],
+    domain_traffic: [],
+  };
+
+  // Pick seed keywords for related/PASF expansion (top 8)
+  const seedsForExpansion = keywords.slice(0, 8);
+  // All domains for traffic comparison
+  const allDomains = [clientDomain, ...competitorDomains].slice(0, 5);
+
+  const promises: Promise<void>[] = [];
+
+  // 1. Keyword metrics for up to 100 keywords
+  promises.push(
+    getKeywordMetrics(keClient, keywords.slice(0, 100))
+      .then((data) => {
+        result.keyword_metrics = data;
+        console.log(`[SEO] KE keyword metrics: ${data.length} enriched`);
+      })
+      .catch((err) => {
+        const msg = `KE keyword metrics failed: ${err instanceof Error ? err.message : err}`;
+        console.warn(`[SEO] ${msg}`);
+        errors.push(msg);
+      })
+  );
+
+  // 2. Related keywords for each seed
+  for (const seed of seedsForExpansion) {
+    promises.push(
+      getRelatedKeywords(keClient, seed)
+        .then((data) => {
+          result.related_keywords.push(...data);
+        })
+        .catch((err) => {
+          const msg = `KE related keywords failed for "${seed}": ${err instanceof Error ? err.message : err}`;
+          console.warn(`[SEO] ${msg}`);
+          errors.push(msg);
+        })
+    );
+  }
+
+  // 3. PASF keywords for each seed
+  for (const seed of seedsForExpansion) {
+    promises.push(
+      getPasfKeywords(keClient, seed)
+        .then((data) => {
+          result.pasf_keywords.push(...data);
+        })
+        .catch((err) => {
+          const msg = `KE PASF keywords failed for "${seed}": ${err instanceof Error ? err.message : err}`;
+          console.warn(`[SEO] ${msg}`);
+          errors.push(msg);
+        })
+    );
+  }
+
+  // 4. Domain traffic for client + competitors
+  promises.push(
+    getDomainTraffic(keClient, allDomains)
+      .then((data) => {
+        result.domain_traffic = data;
+        console.log(`[SEO] KE domain traffic: ${data.length} domains`);
+      })
+      .catch((err) => {
+        const msg = `KE domain traffic failed: ${err instanceof Error ? err.message : err}`;
+        console.warn(`[SEO] ${msg}`);
+        errors.push(msg);
+      })
+  );
+
+  await Promise.allSettled(promises);
+
+  // Dedupe related + PASF keywords
+  result.related_keywords = dedupeByKeyword(result.related_keywords);
+  result.pasf_keywords = dedupeByKeyword(result.pasf_keywords);
+
+  console.log(
+    `[SEO] KE totals — metrics: ${result.keyword_metrics.length}, related: ${result.related_keywords.length}, PASF: ${result.pasf_keywords.length}, traffic: ${result.domain_traffic.length}`
+  );
+
+  return result;
+}
+
+function dedupeByKeyword<T extends { keyword: string }>(items: T[]): T[] {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    if (!item?.keyword) return false;
+    const key = item.keyword.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 // --- Main Orchestrator ---
 
 /**
@@ -396,10 +508,24 @@ export async function gatherAllSeoIntelligence(
   ];
   const uniqueKeywords = [...new Set(topKeywords)].slice(0, 30);
 
-  // Now run SERP + AEO with the keywords we have
-  const [serpResults, aeoResult] = await Promise.all([
+  // Build KE client if API key available
+  const keClient = config.keywordsEverywhereApiKey
+    ? new KeywordsEverywhereClient(config.keywordsEverywhereApiKey)
+    : undefined;
+
+  // Now run SERP + AEO + KE enrichment with the keywords we have (Phase 2b)
+  const [serpResults, aeoResult, keResult] = await Promise.all([
     gatherSerpStream(dfsClient, uniqueKeywords, errors),
     gatherAeoStream(dfsClient, input.client.company_name, uniqueKeywords, errors),
+    keClient
+      ? gatherKeywordsEverywhereStream(
+          keClient,
+          uniqueKeywords,
+          clientDomain,
+          competitorDomains,
+          errors
+        )
+      : Promise.resolve(undefined),
   ]);
 
   // ──────────────────────────────────────────
@@ -454,11 +580,11 @@ export async function gatherAllSeoIntelligence(
       nonIndexable = nonIdx;
       microdata = micro;
 
-      // Run Lighthouse on key pages (homepage + top pages by worst score)
+      // Run Lighthouse on key pages (homepage + live pages with worst score)
       const keyUrls = [
         `https://${clientDomain}`,
         ...(pages || [])
-          .filter((p) => p.onpage_score !== undefined)
+          .filter((p) => p.status_code >= 200 && p.status_code < 400 && !p.is_broken && !p.is_redirect)
           .sort((a, b) => (a.onpage_score || 100) - (b.onpage_score || 100))
           .slice(0, 5)
           .map((p) => p.url),
@@ -541,6 +667,7 @@ export async function gatherAllSeoIntelligence(
     llm_responses: aeoResult.llmResponses,
     pagespeed_results: pagespeedResults,
     backlink_gap: backlinksResult.backlinkGap,
+    keywords_everywhere: keResult || undefined,
     gathered_at: new Date().toISOString(),
     errors,
   };

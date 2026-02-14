@@ -8,14 +8,17 @@ export interface OnPageCrawlSummary {
   domain: string;
   pages_crawled: number;
   pages_with_issues: number;
-  broken_pages: number;
+  broken_resources: number;
+  broken_links_count: number;
   duplicate_title_count: number;
   duplicate_description_count: number;
-  broken_links_count: number;
   redirect_chains_count: number;
   non_indexable_count: number;
   pages_with_microdata: number;
+  onpage_score: number | null;
   crawl_status: string;
+  /** page_metrics.checks — maps check names to page counts */
+  checks: Record<string, number>;
 }
 
 export interface OnPagePageData {
@@ -241,6 +244,46 @@ export interface PageSpeedResult {
 }
 
 // ─────────────────────────────────────────────
+// Keywords Everywhere types
+// ─────────────────────────────────────────────
+
+export interface KeKeywordData {
+  keyword: string;
+  search_volume: number;
+  cpc: number;
+  competition: number;
+  trend: Array<{ month: string; year: number; value: number }>;
+}
+
+export interface KeRelatedKeyword {
+  keyword: string;
+  search_volume: number;
+  cpc: number;
+  competition: number;
+}
+
+export interface KePasfKeyword {
+  keyword: string;
+  search_volume: number;
+  cpc: number;
+  competition: number;
+}
+
+export interface KeDomainTraffic {
+  domain: string;
+  estimated_monthly_traffic: number;
+  organic_keywords: number;
+  organic_traffic_cost: number;
+}
+
+export interface KeywordsEverywhereData {
+  keyword_metrics: KeKeywordData[];
+  related_keywords: KeRelatedKeyword[];
+  pasf_keywords: KePasfKeyword[];
+  domain_traffic: KeDomainTraffic[];
+}
+
+// ─────────────────────────────────────────────
 // Combined intelligence per company
 // ─────────────────────────────────────────────
 
@@ -285,6 +328,9 @@ export interface SeoIntelligencePackage {
 
   // Backlink gap analysis (cross-company)
   backlink_gap?: BacklinkGapItem[];
+
+  // Keywords Everywhere enrichment
+  keywords_everywhere?: KeywordsEverywhereData;
 
   gathered_at: string;
   errors: string[];

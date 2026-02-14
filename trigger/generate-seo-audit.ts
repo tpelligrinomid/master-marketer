@@ -72,6 +72,7 @@ export const generateSeoAudit = task({
       dataforseoPassword: process.env.DATAFORSEO_PASSWORD,
       mozApiKey: process.env.MOZ_API_KEY,
       pageSpeedApiKey: process.env.GOOGLE_PAGESPEED_API_KEY,
+      keywordsEverywhereApiKey: process.env.KEYWORDS_EVERYWHERE_API_KEY,
     };
 
     const intel = await gatherAllSeoIntelligence(input, seoConfig);

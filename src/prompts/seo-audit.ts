@@ -1,5 +1,5 @@
 import { SeoAuditInput } from "../types/seo-audit-input";
-import { SeoIntelligencePackage, CompanySeoIntelligence } from "../types/seo-audit-intelligence";
+import { SeoIntelligencePackage, CompanySeoIntelligence, KeKeywordData } from "../types/seo-audit-intelligence";
 
 // --- System Prompt ---
 
@@ -36,18 +36,41 @@ function formatOnPageData(intel: SeoIntelligencePackage): string {
     parts.push(`## Crawl Summary`);
     parts.push(`- Domain: ${s.domain}`);
     parts.push(`- Pages Crawled: ${s.pages_crawled}`);
-    parts.push(`- Broken Pages: ${s.broken_pages}`);
+    parts.push(`- Overall OnPage Score: ${s.onpage_score ?? "N/A"}/100`);
+    parts.push(`- Broken Resources (images/JS/CSS, NOT pages): ${s.broken_resources}`);
+    parts.push(`- Broken Links: ${s.broken_links_count}`);
     parts.push(`- Duplicate Titles: ${s.duplicate_title_count}`);
     parts.push(`- Duplicate Descriptions: ${s.duplicate_description_count}`);
-    parts.push(`- Broken Links: ${s.broken_links_count}`);
     parts.push(`- Redirect Chains: ${s.redirect_chains_count}`);
     parts.push(`- Non-Indexable Pages: ${s.non_indexable_count}`);
     parts.push(`- Pages with Microdata: ${s.pages_with_microdata}`);
+
+    // Show the checks breakdown — these are the actual page-level issue counts
+    if (Object.keys(s.checks).length > 0) {
+      parts.push(`\n## Page-Level Checks (issue → page count)`);
+      const sortedChecks = Object.entries(s.checks)
+        .filter(([, count]) => count > 0)
+        .sort(([, a], [, b]) => b - a);
+      for (const [check, count] of sortedChecks) {
+        parts.push(`- ${check}: ${count}`);
+      }
+    }
   }
 
   if (intel.onpage_pages?.length) {
-    parts.push(`\n## Crawled Pages (top 50 by worst score)`);
-    for (const page of intel.onpage_pages.slice(0, 50)) {
+    // Show status code distribution from the actual page data
+    const statusCounts: Record<string, number> = {};
+    for (const page of intel.onpage_pages) {
+      const bucket = `${Math.floor(page.status_code / 100)}xx`;
+      statusCounts[bucket] = (statusCounts[bucket] || 0) + 1;
+    }
+    parts.push(`\n## HTTP Status Distribution (from ${intel.onpage_pages.length} sampled pages)`);
+    for (const [bucket, count] of Object.entries(statusCounts).sort()) {
+      parts.push(`- ${bucket}: ${count}`);
+    }
+
+    parts.push(`\n## Crawled Pages (balanced sample — worst and best scoring live pages)`);
+    for (const page of intel.onpage_pages.slice(0, 60)) {
       parts.push(
         `- ${page.url} | Score: ${page.onpage_score ?? "N/A"} | Status: ${page.status_code} | Words: ${page.content_word_count ?? "N/A"} | Timing: ${page.page_timing ?? "N/A"}ms`
       );
@@ -296,6 +319,103 @@ function formatCompetitorSeoData(intel: SeoIntelligencePackage): string {
   return parts.join("\n");
 }
 
+function formatKePasfForSerp(intel: SeoIntelligencePackage): string {
+  const ke = intel.keywords_everywhere;
+  if (!ke || ke.pasf_keywords.length === 0) return "";
+
+  const parts: string[] = ["# People Also Search For (Keywords Everywhere)\n"];
+  const sorted = [...ke.pasf_keywords].sort((a, b) => b.search_volume - a.search_volume);
+  parts.push(`${sorted.length} PASF keywords discovered — use these to complement PAA analysis and identify additional content opportunities.\n`);
+  for (const kw of sorted.slice(0, 30)) {
+    parts.push(`- "${kw.keyword}" | Vol: ${kw.search_volume} | CPC: $${kw.cpc.toFixed(2)}`);
+  }
+  return parts.join("\n");
+}
+
+function formatKeDomainTrafficForCompetitive(intel: SeoIntelligencePackage): string {
+  const ke = intel.keywords_everywhere;
+  if (!ke || ke.domain_traffic.length === 0) return "";
+
+  const parts: string[] = ["# Domain Traffic Estimates (Keywords Everywhere)\n"];
+  for (const dt of ke.domain_traffic) {
+    parts.push(
+      `- ${dt.domain} | Est. Monthly Traffic: ${dt.estimated_monthly_traffic.toLocaleString()} | Organic Keywords: ${dt.organic_keywords.toLocaleString()} | Traffic Value: $${dt.organic_traffic_cost.toLocaleString()}/mo`
+    );
+  }
+  return parts.join("\n");
+}
+
+function determineTrend(trend: Array<{ month: string; year: number; value: number }>): string {
+  if (!trend || trend.length < 6) return "insufficient_data";
+  // Compare recent 3 months avg vs prior 3 months avg
+  const recent = trend.slice(-3);
+  const prior = trend.slice(-6, -3);
+  const recentAvg = recent.reduce((sum, t) => sum + t.value, 0) / recent.length;
+  const priorAvg = prior.reduce((sum, t) => sum + t.value, 0) / prior.length;
+
+  if (priorAvg === 0) return recentAvg > 0 ? "rising" : "stable";
+  const change = (recentAvg - priorAvg) / priorAvg;
+  if (change > 0.15) return "rising";
+  if (change < -0.15) return "declining";
+  return "stable";
+}
+
+function formatKeywordsEverywhereData(intel: SeoIntelligencePackage): string {
+  const ke = intel.keywords_everywhere;
+  if (!ke) return "";
+
+  const parts: string[] = ["# Keywords Everywhere Enrichment\n"];
+
+  // Keyword trend + CPC table
+  if (ke.keyword_metrics.length > 0) {
+    parts.push(`## Keyword Trends & CPC (${ke.keyword_metrics.length} keywords)`);
+    // Sort by search volume descending
+    const sorted = [...ke.keyword_metrics].sort((a, b) => b.search_volume - a.search_volume);
+    for (const kw of sorted.slice(0, 50)) {
+      const trend = determineTrend(kw.trend);
+      // Show last 6 months of trend values for context
+      const trendValues = kw.trend.slice(-6).map((t) => t.value).join(" → ");
+      parts.push(
+        `- "${kw.keyword}" | Vol: ${kw.search_volume} | CPC: $${kw.cpc.toFixed(2)} | Competition: ${kw.competition.toFixed(2)} | Trend: ${trend} (${trendValues})`
+      );
+    }
+  }
+
+  // Related keywords
+  if (ke.related_keywords.length > 0) {
+    const sorted = [...ke.related_keywords].sort((a, b) => b.search_volume - a.search_volume);
+    parts.push(`\n## Related Keywords (${sorted.length} discovered)`);
+    for (const kw of sorted.slice(0, 40)) {
+      parts.push(
+        `- "${kw.keyword}" | Vol: ${kw.search_volume} | CPC: $${kw.cpc.toFixed(2)} | Competition: ${kw.competition.toFixed(2)}`
+      );
+    }
+  }
+
+  // PASF keywords
+  if (ke.pasf_keywords.length > 0) {
+    const sorted = [...ke.pasf_keywords].sort((a, b) => b.search_volume - a.search_volume);
+    parts.push(`\n## People Also Search For (${sorted.length} keywords)`);
+    for (const kw of sorted.slice(0, 40)) {
+      parts.push(
+        `- "${kw.keyword}" | Vol: ${kw.search_volume} | CPC: $${kw.cpc.toFixed(2)}`
+      );
+    }
+  }
+
+  // Domain traffic comparison
+  if (ke.domain_traffic.length > 0) {
+    parts.push(`\n## Domain Traffic Comparison`);
+    for (const dt of ke.domain_traffic) {
+      parts.push(
+        `- ${dt.domain} | Est. Monthly Traffic: ${dt.estimated_monthly_traffic.toLocaleString()} | Organic Keywords: ${dt.organic_keywords.toLocaleString()} | Traffic Cost: $${dt.organic_traffic_cost.toLocaleString()}`
+      );
+    }
+  }
+
+  return parts.join("\n");
+}
+
 // --- Shared Helpers ---
 
 function buildContextBlock(input: SeoAuditInput): string {
@@ -351,7 +471,11 @@ ${onpageData}
 
 # Task: Generate Technical SEO Assessment
 
-Analyze the OnPage crawl data, Lighthouse results, and PageSpeed data to produce a comprehensive technical SEO assessment.
+IMPORTANT CONTEXT: This is a diagnostic scan based on a representative crawl of up to 150 pages — it is NOT a full site audit. The purpose is to identify systemic technical patterns and make a directional decision: **should the client invest in a dedicated technical remediation project before content work, or is the foundation solid enough to proceed with content strategy?**
+
+A full page-by-page technical audit (via Ahrefs Site Audit or Screaming Frog) would follow separately if critical issues are found here.
+
+Analyze the OnPage crawl data, Lighthouse results, and PageSpeed data to produce a technical SEO diagnostic.
 
 Return a JSON object matching this structure:
 \`\`\`
@@ -389,17 +513,34 @@ Return a JSON object matching this structure:
     ],
     "crawlability_summary": "2-3 sentence assessment of crawl health",
     "indexability_summary": "2-3 sentence assessment of indexation status",
-    "mobile_readiness_summary": "2-3 sentence assessment of mobile readiness"
+    "mobile_readiness_summary": "2-3 sentence assessment of mobile readiness",
+    "technical_verdict": {
+      "recommendation": "proceed_to_content|technical_audit_first|parallel_workstreams",
+      "rationale": "2-4 sentence explanation of the directional recommendation — why content can proceed, or why technical issues must be addressed first, or why both can happen in parallel",
+      "deep_audit_areas": ["only if recommendation is NOT proceed_to_content — list specific areas requiring deeper investigation, e.g. 'redirect mapping', 'Core Web Vitals optimization', 'crawl budget analysis'"]
+    }
   }
 }
 \`\`\`
 
 Guidelines:
-- health_score should reflect overall technical SEO health (0-100)
+- health_score should reflect overall technical SEO health (0-100) — use the OnPage Score from the summary as a strong baseline
+- CRITICAL — BROKEN RESOURCES vs BROKEN PAGES: "Broken Resources" counts broken images, CSS, and JS files — NOT broken HTML pages. This is a COSMETIC issue (missing images, unloaded stylesheets), NOT a site health emergency. Do NOT:
+  - Report broken resources as broken pages
+  - Use phrases like "93% of pages are broken" or "site requires immediate remediation" because of broken resources
+  - Assign severity "critical" or "high" to broken resources — cap at "medium" maximum, typically "low"
+  - Lead the executive summary or technical_verdict with broken resources
+  To assess actual page health, look at the Page-Level Checks (is_4xx_code, is_broken, etc.) and the HTTP Status Distribution. If all pages return 200 status codes, the site is healthy regardless of broken resource count.
+- This is a DIAGNOSTIC SCAN, not a comprehensive crawl. Frame findings as patterns identified in a representative sample. Do not make sweeping claims about the entire site based on 150 pages.
+- section_description should explicitly note this is a representative crawl and that a full technical audit is recommended if critical issues are found
 - Identify 5-10 critical issues sorted by severity
 - Include at least 5 schema types in inventory (implemented or missing)
 - Include CWV for each tested URL
 - All summaries should reference specific data points
+- technical_verdict is the KEY output — it answers the question: "Do we need to fix the foundation before building on it, or can we move forward with content?"
+  - "proceed_to_content": Technical foundation is solid. Minor issues can be fixed alongside content work.
+  - "technical_audit_first": Serious systemic issues (e.g., widespread indexability problems, site-breaking CWV, major crawl errors) that would undermine any content investment. Fix these first.
+  - "parallel_workstreams": Some issues need attention but aren't blocking. Run a technical remediation project in parallel with content strategy.
 
 Return ONLY the JSON object. No other text.`;
 
@@ -416,6 +557,7 @@ export function buildKeywordStrategyPrompt(
 ): { system: string; user: string } {
   const context = buildContextBlock(input);
   const keywordData = formatKeywordData(intel);
+  const keData = formatKeywordsEverywhereData(intel);
   const priorResults = summarizePriorResults(accumulated);
 
   const user = `${context}
@@ -423,6 +565,8 @@ export function buildKeywordStrategyPrompt(
 ${priorResults}
 
 ${keywordData}
+
+${keData}
 
 ---
 
@@ -498,6 +642,8 @@ Guidelines:
 - strategic_gaps: 5-8 keywords that are strategically important despite higher difficulty
 - Count actual keywords from the data for ranking distribution numbers
 - ranking_distribution_summary should call out the split between business-relevant and vanity keyword rankings
+- If Keywords Everywhere data is available, use REAL trend data (rising/stable/declining backed by actual 6-month volume curves) instead of guessing trends. Use CPC values to estimate traffic value. Incorporate related keywords and PASF keywords into gap analysis when they reveal untapped opportunities.
+- For top_performers, use the trend field from KE data when available to accurately set rising/stable/declining
 
 Return ONLY the JSON object. No other text.`;
 
@@ -515,6 +661,7 @@ export function buildSerpAeoPrompt(
   const context = buildContextBlock(input);
   const serpData = formatSerpData(intel);
   const aeoData = formatAeoData(intel);
+  const kePasfData = formatKePasfForSerp(intel);
   const priorResults = summarizePriorResults(accumulated);
 
   const user = `${context}
@@ -524,6 +671,8 @@ ${priorResults}
 ${serpData}
 
 ${aeoData}
+
+${kePasfData}
 
 ---
 
@@ -676,6 +825,7 @@ export function buildCompetitiveSearchPrompt(
 ): { system: string; user: string } {
   const context = buildContextBlock(input);
   const competitorData = formatCompetitorSeoData(intel);
+  const keDomainTraffic = formatKeDomainTrafficForCompetitive(intel);
   const priorResults = summarizePriorResults(accumulated);
 
   const user = `${context}
@@ -683,6 +833,8 @@ export function buildCompetitiveSearchPrompt(
 ${priorResults}
 
 ${competitorData}
+
+${keDomainTraffic}
 
 ---
 
@@ -729,6 +881,7 @@ Guidelines:
 - Identify genuine strengths and weaknesses based on the data
 - Differentiation opportunities should be actionable and specific
 - Consider both content topics and technical advantages
+- If Keywords Everywhere domain traffic data is available, use it to validate and enrich traffic estimates and competitive positioning
 
 Return ONLY the JSON object. No other text.`;
 
@@ -783,9 +936,18 @@ Guidelines:
 - medium_term: 5-7 recommendations (medium effort, 1-3 months)
 - long_term: 3-5 recommendations (high effort, 3-12 months)
 - Each recommendation must reference specific findings from the prior analyses
+- CRITICAL: Respect the technical_verdict from the Technical SEO section:
+  - If "technical_audit_first": Lead with a recommendation for a dedicated technical audit and remediation project. Content recommendations should be contingent on resolving technical issues.
+  - If "parallel_workstreams": Include both technical remediation and content recommendations, noting they can run concurrently.
+  - If "proceed_to_content": Technical fixes can be minor quick_wins. Focus the roadmap on content, backlinks, and AEO.
 - CRITICAL: Focus recommendations on business-relevant keywords and opportunities — do NOT recommend investing effort in vanity traffic keywords that will never convert to pipeline
 - If the client ranks well for irrelevant terms, that is NOT a strength to protect — it's wasted crawl budget and content resources
-- The executive_summary should highlight the 3-4 most impactful findings, frame the overall SEO/AEO opportunity, and honestly note any vanity traffic inflating the client's apparent organic performance
+- CRITICAL: Do NOT lead the executive summary with broken resources (images/CSS/JS). Broken resources are cosmetic issues, not site health emergencies. If the prior technical_seo section shows all pages returning 200 status codes, do not describe the site as "requiring immediate remediation" due to broken resources.
+- The executive_summary should:
+  1. State the technical verdict clearly (can we build on this foundation or do we need to fix it first?)
+  2. Highlight the 3-4 most impactful findings (keyword gaps, competitive positioning, content opportunities — not broken images)
+  3. Frame the overall SEO/AEO opportunity
+  4. Honestly note any vanity traffic inflating the client's apparent organic performance
 - Recommendations should span all categories: technical fixes, content creation, link building, AEO optimization, and competitive positioning
 
 Return ONLY the JSON object. No other text.`;

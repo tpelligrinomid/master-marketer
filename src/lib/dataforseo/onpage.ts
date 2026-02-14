@@ -130,19 +130,28 @@ export async function getCrawlSummary(
   const result = client.extractFirstResult(response);
   const metrics = result?.page_metrics;
   const crawlStatus = result?.crawl_status;
+  const checks = metrics?.checks || {};
+
+  // Derive pages_with_issues from check counts (pages with any issue)
+  const pagesWithIssues = Object.values(checks).reduce(
+    (max, v) => Math.max(max, v),
+    0
+  );
 
   return {
     domain: result?.domain_info?.name || "",
     pages_crawled: crawlStatus?.pages_crawled || 0,
-    pages_with_issues: 0, // Derived from checks
-    broken_pages: metrics?.broken_resources || 0,
+    pages_with_issues: pagesWithIssues,
+    broken_resources: metrics?.broken_resources || 0,
+    broken_links_count: metrics?.broken_links || 0,
     duplicate_title_count: metrics?.duplicate_title || 0,
     duplicate_description_count: metrics?.duplicate_description || 0,
-    broken_links_count: metrics?.broken_links || 0,
     redirect_chains_count: metrics?.redirect_chains || 0,
     non_indexable_count: metrics?.non_indexable || 0,
     pages_with_microdata: metrics?.pages_with_microdata || 0,
+    onpage_score: metrics?.onpage_score ?? null,
     crawl_status: result?.crawl_progress || "unknown",
+    checks,
   };
 }
 
@@ -175,24 +184,8 @@ interface OnPagePageResult {
   external_links_count?: number;
 }
 
-/**
- * Get crawled pages data.
- */
-export async function getCrawlPages(
-  client: DataForSeoClient,
-  taskId: string,
-  limit: number = 100
-): Promise<OnPagePageData[]> {
-  const response = await client.request<{ items?: OnPagePageResult[] }>(
-    "POST",
-    "on_page/pages",
-    [{ id: taskId, limit, order_by: ["onpage_score,asc"] }]
-  );
-
-  const result = client.extractFirstResult(response);
-  const items = result?.items || [];
-
-  return items.map((item) => ({
+function mapPageItem(item: OnPagePageResult): OnPagePageData {
+  return {
     url: item.url || "",
     status_code: item.status_code || 0,
     title: item.meta?.title,
@@ -211,7 +204,60 @@ export async function getCrawlPages(
     images_without_alt: item.images_alt_count,
     internal_links_count: item.internal_links_count,
     external_links_count: item.external_links_count,
-  }));
+  };
+}
+
+/**
+ * Get crawled pages data.
+ * Returns a balanced sample: live pages (by score ascending for issues)
+ * plus a separate set of the healthiest pages. This prevents Claude from
+ * seeing only the worst pages and over-extrapolating error rates.
+ */
+export async function getCrawlPages(
+  client: DataForSeoClient,
+  taskId: string,
+  limit: number = 100
+): Promise<OnPagePageData[]> {
+  // Fetch live (status 200) pages sorted by worst score first for issue detection
+  const [worstResponse, bestResponse] = await Promise.all([
+    client.request<{ items?: OnPagePageResult[] }>(
+      "POST",
+      "on_page/pages",
+      [{
+        id: taskId,
+        limit: Math.ceil(limit * 0.6),
+        order_by: ["onpage_score,asc"],
+        filters: [["resource_type", "=", "html"], "and", ["status_code", "<", 400]],
+      }]
+    ),
+    client.request<{ items?: OnPagePageResult[] }>(
+      "POST",
+      "on_page/pages",
+      [{
+        id: taskId,
+        limit: Math.ceil(limit * 0.4),
+        order_by: ["onpage_score,desc"],
+        filters: [["resource_type", "=", "html"], "and", ["status_code", "<", 400]],
+      }]
+    ),
+  ]);
+
+  const worstItems = client.extractFirstResult(worstResponse)?.items || [];
+  const bestItems = client.extractFirstResult(bestResponse)?.items || [];
+
+  // Merge, dedup by URL
+  const seen = new Set<string>();
+  const pages: OnPagePageData[] = [];
+
+  for (const item of [...worstItems, ...bestItems]) {
+    const url = item.url || "";
+    if (!seen.has(url)) {
+      seen.add(url);
+      pages.push(mapPageItem(item));
+    }
+  }
+
+  return pages;
 }
 
 interface DuplicateTagResult {

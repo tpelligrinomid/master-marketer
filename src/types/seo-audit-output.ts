@@ -37,6 +37,13 @@ export interface TechnicalSeoSection {
   crawlability_summary: string;
   indexability_summary: string;
   mobile_readiness_summary: string;
+  /** The key directional decision: fix technical debt first, or proceed to content? */
+  technical_verdict: {
+    recommendation: "proceed_to_content" | "technical_audit_first" | "parallel_workstreams";
+    rationale: string;
+    /** If technical_audit_first or parallel, what specific areas need deeper investigation */
+    deep_audit_areas?: string[];
+  };
 }
 
 // ─────────────────────────────────────────────
