@@ -101,8 +101,25 @@ function formatOnPageData(intel: SeoIntelligencePackage): string {
   }
 
   if (intel.microdata?.length) {
-    parts.push(`\n## Microdata (Structured Data)`);
-    for (const item of intel.microdata.slice(0, 30)) {
+    // Aggregate schema types across the site so Claude can see breadth of implementation
+    const typePageCounts: Record<string, number> = {};
+    for (const item of intel.microdata) {
+      for (const t of item.types) {
+        typePageCounts[t] = (typePageCounts[t] || 0) + 1;
+      }
+    }
+    const sortedTypes = Object.entries(typePageCounts).sort(([, a], [, b]) => b - a);
+
+    parts.push(`\n## Structured Data (Schema Markup)`);
+    parts.push(`Total pages with structured data: ${intel.microdata.length}`);
+    parts.push(`\nSchema Type Distribution (type → pages implemented on):`);
+    for (const [schemaType, count] of sortedTypes) {
+      parts.push(`- ${schemaType}: ${count} pages`);
+    }
+    parts.push(`\nNOTE: The crawl detects which schema TYPES exist but not their individual properties. A "Person" schema could be bare-bones or richly detailed with additionalType, knowsAbout, hasOccupation, sameAs, and Wikidata links. Do NOT assume an implemented type is incomplete without evidence. When a type IS found, report it as "implemented" and suggest property enrichments rather than claiming it is missing.`);
+
+    parts.push(`\nSample URLs with structured data:`);
+    for (const item of intel.microdata.slice(0, 15)) {
       parts.push(`- ${item.url}: ${item.types.join(", ")} (${item.items_count} items)`);
     }
   }
@@ -534,7 +551,13 @@ Guidelines:
 - This is a DIAGNOSTIC SCAN, not a comprehensive crawl. Frame findings as patterns identified in a representative sample. Do not make sweeping claims about the entire site based on 150 pages.
 - section_description should explicitly note this is a representative crawl and that a full technical audit is recommended if critical issues are found
 - Identify 5-10 critical issues sorted by severity
-- Include at least 5 schema types in inventory (implemented or missing)
+- CRITICAL — SCHEMA INVENTORY ACCURACY: The crawl data shows which schema types exist on the site (Microdata section). You must CAREFULLY review what is ALREADY IMPLEMENTED before recommending anything as "missing."
+  - If the data shows "Person" schema on speaker/author/team profile pages, that IS the correct schema type — there is no "Speaker" type in Schema.org. Do NOT recommend adding a non-existent schema type. Instead, acknowledge the implementation and suggest enrichment properties (e.g., hasOccupation, Event schema for events, SpeakableSpecification for voice).
+  - Status should be "implemented" when the type exists in the crawl data, even if it could be enriched. Use "incomplete" only if required properties are clearly missing. Use "missing" only for types with ZERO presence in the crawl data that would genuinely benefit the site.
+  - The recommendation field for "implemented" schemas should acknowledge the existing implementation and suggest specific property enrichments — NOT imply the schema is absent.
+  - Do NOT invent Schema.org types that don't exist. Valid types include: Person, Organization, LocalBusiness, Product, Service, FAQ, HowTo, Article, BlogPosting, Event, BreadcrumbList, WebPage, ProfilePage, SpeakableSpecification, etc. If you're unsure a type exists, recommend the closest valid type.
+  - A site with rich schema (multiple types, Wikidata links, additionalType, knowsAbout) has made a significant investment — acknowledge it. Frame recommendations as incremental enrichments, not as gaps.
+- Include at least 5 schema types in inventory — but prioritize accuracy over quantity. It is BETTER to report 5 well-analyzed types than to pad the list with incorrectly "missing" types that are actually implemented
 - Include CWV for each tested URL
 - All summaries should reference specific data points
 - technical_verdict is the KEY output — it answers the question: "Do we need to fix the foundation before building on it, or can we move forward with content?"
