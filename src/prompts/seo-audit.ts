@@ -251,12 +251,23 @@ function formatBacklinkData(intel: SeoIntelligencePackage): string {
     }
   }
 
+  // Moz top pages (shows where link equity concentrates)
+  if (intel.client.moz_top_pages?.length) {
+    parts.push(`\n## Top Pages by Authority (Moz — top ${intel.client.moz_top_pages.length})`);
+    for (const page of intel.client.moz_top_pages.slice(0, 20)) {
+      parts.push(`- ${page.url} | PA: ${page.page_authority ?? "N/A"} | Linking Domains: ${page.external_links ?? "N/A"}${page.title ? ` | "${page.title}"` : ""}`);
+    }
+  }
+
   // Competitor backlink summaries
   for (const comp of intel.competitors) {
     if (comp.backlink_summary) {
       const bl = comp.backlink_summary;
       parts.push(`\n## ${comp.company_name} (${comp.domain}) Backlinks`);
       parts.push(`- Total: ${bl.total_backlinks} | Referring Domains: ${bl.referring_domains} | Rank: ${bl.domain_rank ?? "N/A"}`);
+      if (comp.moz_metrics) {
+        parts.push(`- Domain Authority (Moz): ${comp.moz_metrics.domain_authority ?? "N/A"} | Spam Score: ${comp.moz_metrics.spam_score ?? "N/A"}%`);
+      }
     }
   }
 
@@ -315,7 +326,11 @@ function formatCompetitorSeoData(intel: SeoIntelligencePackage): string {
   parts.push(`- Total Backlinks: ${clientBl?.total_backlinks ?? "N/A"}`);
   parts.push(`- Referring Domains: ${clientBl?.referring_domains ?? "N/A"}`);
   if (intel.client.moz_metrics) {
-    parts.push(`- Domain Authority (Moz): ${intel.client.moz_metrics.domain_authority ?? "N/A"}`);
+    const moz = intel.client.moz_metrics;
+    parts.push(`- Domain Authority (Moz): ${moz.domain_authority ?? "N/A"}`);
+    parts.push(`- Spam Score (Moz): ${moz.spam_score ?? "N/A"}%`);
+    parts.push(`- Linking Domains (Moz): ${moz.linking_domains ?? "N/A"}`);
+    parts.push(`- External Links (Moz): ${moz.external_links ?? "N/A"}`);
   }
 
   // Competitor overviews
@@ -327,6 +342,12 @@ function formatCompetitorSeoData(intel: SeoIntelligencePackage): string {
     parts.push(`- Top 10 Keywords: ${compKw?.filter((k) => k.position <= 10).length ?? 0}`);
     parts.push(`- Total Backlinks: ${compBl?.total_backlinks ?? "N/A"}`);
     parts.push(`- Referring Domains: ${compBl?.referring_domains ?? "N/A"}`);
+    if (comp.moz_metrics) {
+      const moz = comp.moz_metrics;
+      parts.push(`- Domain Authority (Moz): ${moz.domain_authority ?? "N/A"}`);
+      parts.push(`- Spam Score (Moz): ${moz.spam_score ?? "N/A"}%`);
+      parts.push(`- Linking Domains (Moz): ${moz.linking_domains ?? "N/A"}`);
+    }
   }
 
   if (intel.client.competitor_domains?.length) {

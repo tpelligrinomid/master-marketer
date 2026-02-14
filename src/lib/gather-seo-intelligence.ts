@@ -41,7 +41,8 @@ import {
   getPerplexityResponses,
 } from "./dataforseo";
 import { getPageSpeedResults } from "./pagespeed";
-import { getDomainMetrics } from "./moz";
+import { getDomainMetrics, getTopPages } from "./moz";
+import { MozDomainMetrics, MozTopPage } from "../types/research-intelligence";
 import {
   KeywordsEverywhereClient,
   getKeywordMetrics,
@@ -592,16 +593,60 @@ export async function gatherAllSeoIntelligence(
   // ──────────────────────────────────────────
   // Step 2: Execute 4 live streams in parallel + Moz
   // ──────────────────────────────────────────
+  // Gather Moz metrics for client + all competitors + client top pages
+  const gatherMozStream = async (): Promise<{
+    clientMoz?: MozDomainMetrics;
+    competitorMoz: Map<string, MozDomainMetrics>;
+    clientTopPages?: MozTopPage[];
+  }> => {
+    if (!config.mozApiKey) return { competitorMoz: new Map() };
+
+    const competitorMoz = new Map<string, MozDomainMetrics>();
+    const promises: Promise<void>[] = [];
+
+    let clientMoz: MozDomainMetrics | undefined;
+    let clientTopPages: MozTopPage[] | undefined;
+
+    // Client metrics
+    promises.push(
+      getDomainMetrics(clientDomain, config.mozApiKey!).then((data) => {
+        clientMoz = data;
+        console.log(`[SEO] Moz client DA: ${data.domain_authority ?? "N/A"}`);
+      }).catch((err) => {
+        errors.push(`Moz metrics failed for ${clientDomain}: ${err.message}`);
+      })
+    );
+
+    // Client top pages
+    promises.push(
+      getTopPages(clientDomain, config.mozApiKey!, 30).then((data) => {
+        clientTopPages = data;
+        console.log(`[SEO] Moz client top pages: ${data.length}`);
+      }).catch((err) => {
+        errors.push(`Moz top pages failed: ${err.message}`);
+      })
+    );
+
+    // Competitor metrics
+    for (const domain of competitorDomains) {
+      promises.push(
+        getDomainMetrics(domain, config.mozApiKey!).then((data) => {
+          competitorMoz.set(domain, data);
+          console.log(`[SEO] Moz ${domain} DA: ${data.domain_authority ?? "N/A"}`);
+        }).catch((err) => {
+          errors.push(`Moz metrics failed for ${domain}: ${err.message}`);
+        })
+      );
+    }
+
+    await Promise.allSettled(promises);
+    return { clientMoz, competitorMoz, clientTopPages };
+  };
+
   const [keywordsResult, backlinksResult, mozResult] = await Promise.all([
     gatherKeywordsStream(dfsClient, clientDomain, competitorDomains, errors),
     gatherBacklinksStream(dfsClient, clientDomain, competitorDomains, errors),
-    // Moz metrics for client
-    config.mozApiKey
-      ? getDomainMetrics(clientDomain, config.mozApiKey).catch((err) => {
-          errors.push(`Moz metrics failed: ${err.message}`);
-          return undefined;
-        })
-      : Promise.resolve(undefined),
+    gatherMozStream(),
   ]);
 
   // Merge keyword data to get top keywords for SERP + AEO
@@ -740,7 +785,8 @@ export async function gatherAllSeoIntelligence(
     backlinks: backlinksResult.clientBacklinks.backlinks,
     anchors: backlinksResult.clientBacklinks.anchors,
     referring_domains: backlinksResult.clientBacklinks.referring_domains,
-    moz_metrics: mozResult || undefined,
+    moz_metrics: mozResult.clientMoz,
+    moz_top_pages: mozResult.clientTopPages,
     errors: keywordsResult.clientKeywords.errors,
   };
 
@@ -754,7 +800,7 @@ export async function gatherAllSeoIntelligence(
       domain: comp.domain,
       ranked_keywords: kwData?.ranked_keywords,
       backlink_summary: blData?.backlink_summary,
-      moz_metrics: undefined,
+      moz_metrics: mozResult.competitorMoz.get(comp.domain),
       errors: kwData?.errors || [],
     };
   });

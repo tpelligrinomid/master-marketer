@@ -1,4 +1,4 @@
-import { MozDomainMetrics } from "./research-intelligence";
+import { MozDomainMetrics, MozTopPage } from "./research-intelligence";
 
 // ─────────────────────────────────────────────
 // OnPage API types
@@ -298,6 +298,7 @@ export interface CompanySeoIntelligence {
   anchors?: AnchorTextItem[];
   referring_domains?: ReferringDomainItem[];
   moz_metrics?: MozDomainMetrics;
+  moz_top_pages?: MozTopPage[];
   errors: string[];
 }
 
