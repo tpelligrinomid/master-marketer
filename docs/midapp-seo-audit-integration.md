@@ -5,7 +5,7 @@
 The Mid App sits between the **Lovable frontend** and the **Master Marketer HTTP API**. For the SEO Audit feature, the Mid App needs to:
 
 1. **Receive** a form submission from Lovable
-2. **Call** the Master Marketer API at `POST /api/generate/seo-audit`
+2. **Call** the Master Marketer API at `POST /api/intake/seo_audit`
 3. **Track** the job status via polling or callback
 4. **Receive** the completed audit result via webhook callback from Master Marketer
 5. **Store** the result and make it available to Lovable for rendering
@@ -21,7 +21,7 @@ Lovable (Frontend)
     │
     ├─── POST /api/seo-audit ──────────► Mid App
     │                                      │
-    │                                      ├─── POST /api/generate/seo-audit
+    │                                      ├─── POST /api/intake/seo_audit
     │                                      │         ──────────► Master Marketer API
     │                                      │                        │
     │                                      │                  (internally triggers
@@ -77,7 +77,7 @@ The Mid App forwards the request to Master Marketer's HTTP API, adding `callback
 **Request to Master Marketer:**
 
 ```
-POST https://<master-marketer-host>/api/generate/seo-audit
+POST https://<master-marketer-host>/api/intake/seo_audit
 Headers:
   Content-Type: application/json
   X-API-Key: <master-marketer-api-key>
@@ -286,7 +286,7 @@ The `data` field is the `output.content_structured` from the callback, passed th
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
-| `/api/generate/seo-audit` | POST | Trigger a new audit (requires `X-API-Key`) |
+| `/api/intake/seo_audit` | POST | Trigger a new audit (requires `X-API-Key`) |
 | `/api/jobs/:jobId` | GET | Poll job status (optional, requires `X-API-Key`) |
 | `/api/jobs/by-run/:triggerRunId` | GET | Fallback status lookup (requires `X-API-Key`) |
 

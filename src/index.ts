@@ -10,7 +10,7 @@ import routes from "./routes";
 const env = getEnv();
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 app.use(getCorsMiddleware());
 
 // Health check is public (no API key required)
