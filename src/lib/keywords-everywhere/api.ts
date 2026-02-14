@@ -46,15 +46,17 @@ interface KePasfResponse {
   time: number;
 }
 
-interface KeDomainTrafficResponse {
+interface KeDomainKeywordsResponse {
   data: Array<{
-    domain: string;
+    keyword: string;
+    vol: number;
+    cpc: { currency: string; value: string };
+    competition: number;
     estimated_monthly_traffic: number;
-    organic_keywords: number;
-    organic_traffic_cost: number;
+    serp_position: number;
   }>;
-  credits: number;
-  time: number;
+  credits_consumed: number;
+  time_taken: number;
 }
 
 // ─────────────────────────────────────────────
@@ -141,26 +143,39 @@ export async function getPasfKeywords(
 }
 
 /**
- * Get domain traffic estimate for a single domain.
+ * Get domain traffic estimate for a single domain using get_domain_keywords.
+ * Aggregates per-keyword traffic data into a domain-level summary.
+ * (get_domain_traffic is Gold+ only; get_domain_keywords works on Silver)
  */
 async function getDomainTrafficSingle(
   client: KeywordsEverywhereClient,
   domain: string,
   country: string = "us"
 ): Promise<KeDomainTraffic | null> {
-  const response = await client.postJson<KeDomainTrafficResponse>(
-    "get_domain_traffic",
-    { domain, country }
+  const response = await client.postJson<KeDomainKeywordsResponse>(
+    "get_domain_keywords",
+    { domain, country, currency: "USD", num: 500 }
   );
 
-  const item = response.data?.[0];
-  if (!item) return null;
+  const keywords = response.data;
+  if (!keywords || keywords.length === 0) return null;
+
+  let totalTraffic = 0;
+  let totalTrafficCost = 0;
+  for (const kw of keywords) {
+    const traffic = kw.estimated_monthly_traffic ?? 0;
+    const cpc = parseFloat(kw.cpc?.value) || 0;
+    totalTraffic += traffic;
+    totalTrafficCost += traffic * cpc;
+  }
+
+  console.log(`[KE] Domain keywords for ${domain}: ${keywords.length} keywords, ~${totalTraffic.toLocaleString()} monthly traffic`);
 
   return {
-    domain: item.domain,
-    estimated_monthly_traffic: item.estimated_monthly_traffic,
-    organic_keywords: item.organic_keywords,
-    organic_traffic_cost: item.organic_traffic_cost,
+    domain,
+    estimated_monthly_traffic: totalTraffic,
+    organic_keywords: keywords.length,
+    organic_traffic_cost: Math.round(totalTrafficCost),
   };
 }
 
