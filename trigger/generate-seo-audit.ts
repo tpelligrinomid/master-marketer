@@ -87,12 +87,22 @@ function buildDataSources(intel: SeoIntelligencePackage): DataSource[] {
     active: hasPageSpeed,
   });
 
-  // Google Search Console — always inactive for now, but shown as available
+  // Google Search Console
+  const hasGsc = !!intel.google_search_console;
+  const gscParts: string[] = [];
+  if (hasGsc) {
+    const gsc = intel.google_search_console!;
+    if (gsc.top_queries.length > 0) gscParts.push(`${gsc.top_queries.length} search queries with real click data`);
+    if (gsc.top_pages.length > 0) gscParts.push(`${gsc.top_pages.length} top pages by clicks`);
+    if (gsc.sitemaps.length > 0) gscParts.push(`${gsc.sitemaps.length} sitemaps`);
+  }
   sources.push({
     key: "google_search_console",
     name: "Google Search Console",
-    description: "Real click/impression data, index coverage, and search query analytics. Available when client connects their GSC property.",
-    active: false,
+    description: hasGsc && gscParts.length > 0
+      ? `Provided ${gscParts.join(", ")} (${intel.google_search_console!.date_range_start} to ${intel.google_search_console!.date_range_end})`
+      : "Real click/impression data, index coverage, and search query analytics. Available when client connects their GSC property.",
+    active: hasGsc,
   });
 
   return sources;
@@ -153,6 +163,9 @@ export const generateSeoAudit = task({
       mozApiKey: process.env.MOZ_API_KEY,
       pageSpeedApiKey: process.env.GOOGLE_PAGESPEED_API_KEY,
       keywordsEverywhereApiKey: process.env.KEYWORDS_EVERYWHERE_API_KEY,
+      googleClientId: process.env.GOOGLE_CLIENT_ID,
+      googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      googleGscRefreshToken: process.env.GOOGLE_GSC_REFRESH_TOKEN,
     };
 
     const intel = await gatherAllSeoIntelligence(input, seoConfig);

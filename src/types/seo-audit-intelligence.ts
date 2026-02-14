@@ -284,6 +284,43 @@ export interface KeywordsEverywhereData {
 }
 
 // ─────────────────────────────────────────────
+// Google Search Console types
+// ─────────────────────────────────────────────
+
+export interface GscSearchQuery {
+  query: string;
+  clicks: number;
+  impressions: number;
+  ctr: number;       // 0-1
+  position: number;  // average position
+}
+
+export interface GscTopPage {
+  page: string;
+  clicks: number;
+  impressions: number;
+  ctr: number;
+  position: number;
+}
+
+export interface GscSitemap {
+  path: string;
+  is_sitemap_index: boolean;
+  last_submitted?: string;
+  last_downloaded?: string;
+  warnings?: number;
+  errors?: number;
+}
+
+export interface GoogleSearchConsoleData {
+  top_queries: GscSearchQuery[];
+  top_pages: GscTopPage[];
+  sitemaps: GscSitemap[];
+  date_range_start: string;
+  date_range_end: string;
+}
+
+// ─────────────────────────────────────────────
 // Combined intelligence per company
 // ─────────────────────────────────────────────
 
@@ -332,6 +369,9 @@ export interface SeoIntelligencePackage {
 
   // Keywords Everywhere enrichment
   keywords_everywhere?: KeywordsEverywhereData;
+
+  // Google Search Console (real click/impression data)
+  google_search_console?: GoogleSearchConsoleData;
 
   gathered_at: string;
   errors: string[];

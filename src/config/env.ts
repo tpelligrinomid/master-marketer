@@ -20,6 +20,10 @@ const envSchema = z.object({
   DATAFORSEO_PASSWORD: z.string().optional(),
   GOOGLE_PAGESPEED_API_KEY: z.string().optional(),
   KEYWORDS_EVERYWHERE_API_KEY: z.string().optional(),
+  // Google Search Console (optional, for real click/impression data)
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  GOOGLE_GSC_REFRESH_TOKEN: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

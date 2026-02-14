@@ -50,6 +50,15 @@ import {
   getPasfKeywords,
   getDomainTraffic,
 } from "./keywords-everywhere";
+import {
+  GoogleSearchConsoleClient,
+  checkSiteAccess,
+  getTopQueries,
+  getTopPages as getGscTopPages,
+  getSitemaps,
+  buildDateRange,
+} from "./google-search-console";
+import { GoogleSearchConsoleData } from "../types/seo-audit-intelligence";
 
 export interface GatherSeoConfig {
   dataforseoLogin?: string;
@@ -57,6 +66,9 @@ export interface GatherSeoConfig {
   mozApiKey?: string;
   pageSpeedApiKey?: string;
   keywordsEverywhereApiKey?: string;
+  googleClientId?: string;
+  googleClientSecret?: string;
+  googleGscRefreshToken?: string;
 }
 
 // --- Stream Gatherers ---
@@ -433,6 +445,81 @@ async function gatherKeywordsEverywhereStream(
   return result;
 }
 
+async function gatherGscStream(
+  config: GatherSeoConfig,
+  clientDomain: string,
+  errors: string[]
+): Promise<GoogleSearchConsoleData | undefined> {
+  if (!config.googleClientId || !config.googleClientSecret || !config.googleGscRefreshToken) {
+    return undefined;
+  }
+
+  try {
+    const gscClient = new GoogleSearchConsoleClient(
+      config.googleClientId,
+      config.googleClientSecret,
+      config.googleGscRefreshToken
+    );
+
+    // Check if our team account has access to this domain
+    const siteUrl = await checkSiteAccess(gscClient, clientDomain);
+    if (!siteUrl) {
+      console.log(`[SEO] GSC: No access to ${clientDomain} — skipping GSC data`);
+      return undefined;
+    }
+    console.log(`[SEO] GSC access confirmed for: ${siteUrl}`);
+
+    const { startDate, endDate } = buildDateRange();
+
+    // Run all 3 API calls in parallel
+    const [queriesResult, pagesResult, sitemapsResult] = await Promise.allSettled([
+      getTopQueries(gscClient, siteUrl, startDate, endDate),
+      getGscTopPages(gscClient, siteUrl, startDate, endDate),
+      getSitemaps(gscClient, siteUrl),
+    ]);
+
+    const topQueries =
+      queriesResult.status === "fulfilled" ? queriesResult.value : [];
+    const topPages =
+      pagesResult.status === "fulfilled" ? pagesResult.value : [];
+    const sitemaps =
+      sitemapsResult.status === "fulfilled" ? sitemapsResult.value : [];
+
+    if (queriesResult.status === "rejected") {
+      const msg = `GSC top queries failed: ${queriesResult.reason}`;
+      console.warn(`[SEO] ${msg}`);
+      errors.push(msg);
+    }
+    if (pagesResult.status === "rejected") {
+      const msg = `GSC top pages failed: ${pagesResult.reason}`;
+      console.warn(`[SEO] ${msg}`);
+      errors.push(msg);
+    }
+    if (sitemapsResult.status === "rejected") {
+      const msg = `GSC sitemaps failed: ${sitemapsResult.reason}`;
+      console.warn(`[SEO] ${msg}`);
+      errors.push(msg);
+    }
+
+    console.log(
+      `[SEO] GSC top queries: ${topQueries.length}, top pages: ${topPages.length}, sitemaps: ${sitemaps.length}`
+    );
+
+    return {
+      top_queries: topQueries,
+      top_pages: topPages,
+      sitemaps,
+      date_range_start: startDate,
+      date_range_end: endDate,
+    };
+  } catch (err) {
+    const msg = `GSC data gathering failed: ${err instanceof Error ? err.message : err}`;
+    console.warn(`[SEO] ${msg}`);
+    errors.push(msg);
+    return undefined;
+  }
+}
+
 /**
  * Fetch a URL and extract JSON-LD schema types.
  * Supplements DataForSEO microdata which may miss JSON-LD script tags.
@@ -663,8 +750,8 @@ export async function gatherAllSeoIntelligence(
     ? new KeywordsEverywhereClient(config.keywordsEverywhereApiKey)
     : undefined;
 
-  // Now run SERP + AEO + KE enrichment with the keywords we have (Phase 2b)
-  const [serpResults, aeoResult, keResult] = await Promise.all([
+  // Now run SERP + AEO + KE + GSC enrichment with the keywords we have (Phase 2b)
+  const [serpResults, aeoResult, keResult, gscResult] = await Promise.all([
     gatherSerpStream(dfsClient, uniqueKeywords, errors),
     gatherAeoStream(dfsClient, input.client.company_name, uniqueKeywords, errors),
     keClient
@@ -676,6 +763,7 @@ export async function gatherAllSeoIntelligence(
           errors
         )
       : Promise.resolve(undefined),
+    gatherGscStream(config, clientDomain, errors),
   ]);
 
   // ──────────────────────────────────────────
@@ -821,6 +909,7 @@ export async function gatherAllSeoIntelligence(
     pagespeed_results: pagespeedResults,
     backlink_gap: backlinksResult.backlinkGap,
     keywords_everywhere: keResult || undefined,
+    google_search_console: gscResult || undefined,
     gathered_at: new Date().toISOString(),
     errors,
   };

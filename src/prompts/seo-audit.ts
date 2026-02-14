@@ -457,6 +457,56 @@ function formatKeywordsEverywhereData(intel: SeoIntelligencePackage): string {
   return parts.join("\n");
 }
 
+function formatGscData(intel: SeoIntelligencePackage): string {
+  const gsc = intel.google_search_console;
+  if (!gsc) return "";
+
+  const parts: string[] = [
+    "# Google Search Console Data (GROUND TRUTH)\n",
+    "NOTE: This is REAL click and impression data from Google Search Console for the last 90 days. " +
+      "This is the single most authoritative data source in this audit — actual user search behavior, not third-party estimates. " +
+      "When GSC data conflicts with DataForSEO or Keywords Everywhere estimates, GSC data takes precedence.\n",
+    `Date range: ${gsc.date_range_start} to ${gsc.date_range_end}\n`,
+  ];
+
+  if (gsc.top_queries.length > 0) {
+    parts.push(`## Top Search Queries (${gsc.top_queries.length} queries by clicks)`);
+    parts.push("Query | Clicks | Impressions | CTR% | Avg Position");
+    parts.push("---|---|---|---|---");
+    for (const q of gsc.top_queries.slice(0, 50)) {
+      parts.push(
+        `${q.query} | ${q.clicks} | ${q.impressions} | ${(q.ctr * 100).toFixed(1)}% | ${q.position.toFixed(1)}`
+      );
+    }
+  }
+
+  if (gsc.top_pages.length > 0) {
+    parts.push(`\n## Top Pages (${gsc.top_pages.length} pages by clicks)`);
+    parts.push("URL | Clicks | Impressions | CTR% | Avg Position");
+    parts.push("---|---|---|---|---");
+    for (const p of gsc.top_pages.slice(0, 30)) {
+      parts.push(
+        `${p.page} | ${p.clicks} | ${p.impressions} | ${(p.ctr * 100).toFixed(1)}% | ${p.position.toFixed(1)}`
+      );
+    }
+  }
+
+  if (gsc.sitemaps.length > 0) {
+    parts.push(`\n## Sitemaps (${gsc.sitemaps.length})`);
+    for (const s of gsc.sitemaps) {
+      const type = s.is_sitemap_index ? "Sitemap Index" : "Sitemap";
+      const issues: string[] = [];
+      if (s.errors && s.errors > 0) issues.push(`${s.errors} errors`);
+      if (s.warnings && s.warnings > 0) issues.push(`${s.warnings} warnings`);
+      parts.push(
+        `- ${s.path} (${type})${s.last_submitted ? ` | Submitted: ${s.last_submitted}` : ""}${issues.length > 0 ? ` | Issues: ${issues.join(", ")}` : ""}`
+      );
+    }
+  }
+
+  return parts.join("\n");
+}
+
 // --- Shared Helpers ---
 
 function buildContextBlock(input: SeoAuditInput): string {
@@ -503,10 +553,13 @@ export function buildTechnicalSeoPrompt(
 ): { system: string; user: string } {
   const context = buildContextBlock(input);
   const onpageData = formatOnPageData(intel);
+  const gscData = formatGscData(intel);
 
   const user = `${context}
 
 ${onpageData}
+
+${gscData}
 
 ---
 
@@ -605,6 +658,7 @@ export function buildKeywordStrategyPrompt(
   const context = buildContextBlock(input);
   const keywordData = formatKeywordData(intel);
   const keData = formatKeywordsEverywhereData(intel);
+  const gscData = formatGscData(intel);
   const priorResults = summarizePriorResults(accumulated);
 
   const user = `${context}
@@ -614,6 +668,8 @@ ${priorResults}
 ${keywordData}
 
 ${keData}
+
+${gscData}
 
 ---
 
@@ -875,6 +931,7 @@ export function buildCompetitiveSearchPrompt(
   const context = buildContextBlock(input);
   const competitorData = formatCompetitorSeoData(intel);
   const keDomainTraffic = formatKeDomainTrafficForCompetitive(intel);
+  const gscData = formatGscData(intel);
   const priorResults = summarizePriorResults(accumulated);
 
   const user = `${context}
@@ -884,6 +941,8 @@ ${priorResults}
 ${competitorData}
 
 ${keDomainTraffic}
+
+${gscData}
 
 ---
 
