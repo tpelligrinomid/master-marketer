@@ -26,30 +26,45 @@ export class DataForSeoClient {
     body?: unknown
   ): Promise<DataForSeoResponse<T>> {
     const url = `${DATAFORSEO_API_BASE}/${endpoint}`;
+    const maxAttempts = 3;
 
-    const response = await fetch(url, {
-      method,
-      headers: {
-        Authorization: this.authHeader,
-        "Content-Type": "application/json",
-      },
-      body: body ? JSON.stringify(body) : undefined,
-    });
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      const response = await fetch(url, {
+        method,
+        headers: {
+          Authorization: this.authHeader,
+          "Content-Type": "application/json",
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      });
 
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`DataForSEO API error (${response.status}): ${text.slice(0, 500)}`);
+      if (!response.ok) {
+        const text = await response.text();
+        // Retry on 500/502/503/504 (transient server errors)
+        if (response.status >= 500 && attempt < maxAttempts) {
+          const delay = attempt * 2000;
+          console.warn(
+            `[DataForSEO] ${method} ${endpoint} returned ${response.status}, retrying in ${delay}ms (attempt ${attempt}/${maxAttempts})`
+          );
+          await new Promise((r) => setTimeout(r, delay));
+          continue;
+        }
+        throw new Error(`DataForSEO API error (${response.status}): ${text.slice(0, 500)}`);
+      }
+
+      const data = (await response.json()) as DataForSeoResponse<T>;
+
+      if (data.status_code !== 20000) {
+        throw new Error(
+          `DataForSEO response error (${data.status_code}): ${data.status_message}`
+        );
+      }
+
+      return data;
     }
 
-    const data = (await response.json()) as DataForSeoResponse<T>;
-
-    if (data.status_code !== 20000) {
-      throw new Error(
-        `DataForSEO response error (${data.status_code}): ${data.status_message}`
-      );
-    }
-
-    return data;
+    // Should never reach here, but TypeScript needs it
+    throw new Error(`DataForSEO request failed after ${maxAttempts} attempts`);
   }
 
   /**
