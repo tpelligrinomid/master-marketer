@@ -432,6 +432,111 @@ async function gatherKeywordsEverywhereStream(
   return result;
 }
 
+/**
+ * Fetch a URL and extract JSON-LD schema types.
+ * Supplements DataForSEO microdata which may miss JSON-LD script tags.
+ */
+async function detectJsonLdSchemaTypes(url: string): Promise<{ url: string; types: string[]; items_count: number } | null> {
+  try {
+    const resp = await fetch(url, {
+      headers: { "User-Agent": "MasterMarketer-SEO-Audit/1.0" },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!resp.ok) return null;
+    const html = await resp.text();
+
+    // Extract all <script type="application/ld+json"> blocks
+    const jsonLdRegex = /<script[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+    const types = new Set<string>();
+    let match: RegExpExecArray | null;
+    let itemCount = 0;
+
+    while ((match = jsonLdRegex.exec(html)) !== null) {
+      try {
+        const data = JSON.parse(match[1]);
+        const items = Array.isArray(data) ? data : data["@graph"] ? data["@graph"] : [data];
+        for (const item of items) {
+          if (item["@type"]) {
+            const itemTypes = Array.isArray(item["@type"]) ? item["@type"] : [item["@type"]];
+            for (const t of itemTypes) types.add(t);
+            itemCount++;
+          }
+        }
+      } catch {
+        // Invalid JSON-LD block, skip
+      }
+    }
+
+    if (types.size === 0) return null;
+    return { url, types: [...types], items_count: itemCount };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Detect JSON-LD schema on sample pages and merge with DataForSEO microdata.
+ * Picks homepage + a few diverse crawled pages to get a representative sample.
+ */
+async function supplementMicrodataWithJsonLd(
+  existingMicrodata: MicrodataItem[] | undefined,
+  clientDomain: string,
+  crawledPages: OnPagePageData[] | undefined,
+  errors: string[]
+): Promise<MicrodataItem[]> {
+  const merged = [...(existingMicrodata || [])];
+  const existingUrls = new Set(merged.map((m) => m.url));
+
+  // Pick sample URLs: homepage + up to 4 diverse pages from the crawl
+  const sampleUrls = new Set<string>();
+  sampleUrls.add(`https://${clientDomain}`);
+  sampleUrls.add(`https://www.${clientDomain}`);
+
+  if (crawledPages?.length) {
+    // Pick pages from different URL paths for diversity
+    const pathBuckets = new Map<string, string>();
+    for (const page of crawledPages) {
+      if (page.status_code !== 200 || page.is_redirect) continue;
+      try {
+        const path = new URL(page.url).pathname.split("/").filter(Boolean)[0] || "/";
+        if (!pathBuckets.has(path)) {
+          pathBuckets.set(path, page.url);
+        }
+      } catch {
+        continue;
+      }
+    }
+    for (const url of pathBuckets.values()) {
+      sampleUrls.add(url);
+      if (sampleUrls.size >= 6) break;
+    }
+  }
+
+  const results = await Promise.allSettled(
+    [...sampleUrls].map((url) => detectJsonLdSchemaTypes(url))
+  );
+
+  let newFindings = 0;
+  for (const result of results) {
+    if (result.status === "fulfilled" && result.value) {
+      const { url, types, items_count } = result.value;
+      if (!existingUrls.has(url)) {
+        merged.push({ url, types, items_count });
+        existingUrls.add(url);
+        newFindings++;
+      }
+    }
+  }
+
+  if (newFindings > 0) {
+    console.log(`[SEO] JSON-LD supplementary check: found schema on ${newFindings} additional pages`);
+  } else if ((existingMicrodata?.length || 0) === 0) {
+    console.log(`[SEO] JSON-LD supplementary check: no JSON-LD found on sampled pages either`);
+  }
+
+  return merged;
+}
+
 function dedupeByKeyword<T extends { keyword: string }>(items: T[]): T[] {
   const seen = new Set<string>();
   return items.filter((item) => {
@@ -578,7 +683,9 @@ export async function gatherAllSeoIntelligence(
       duplicateTags = dupes;
       redirectChains = redirects;
       nonIndexable = nonIdx;
-      microdata = micro;
+
+      // Supplement DataForSEO microdata with direct JSON-LD detection
+      microdata = await supplementMicrodataWithJsonLd(micro, clientDomain, pages, errors);
 
       // Run Lighthouse on key pages (homepage + live pages with worst score)
       const keyUrls = [
