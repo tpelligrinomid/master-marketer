@@ -12,7 +12,8 @@ export function errorHandler(
     return;
   }
 
-  const statusCode = (err as Record<string, unknown>).status ?? (err as Record<string, unknown>).statusCode ?? 500;
+  const errAny = err as unknown as Record<string, unknown>;
+  const statusCode = errAny.status ?? errAny.statusCode ?? 500;
   console.error("Unhandled error:", err);
   res.status(statusCode as number).json({ error: err.message || "Internal server error" });
 }
