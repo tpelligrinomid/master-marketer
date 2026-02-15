@@ -15,14 +15,15 @@ Your approach synthesizes THREE sources of insight:
 **When meetings and data conflict, meetings take priority.** The client's stated priorities and business reality override data-driven recommendations.
 
 Output rules:
-- Return ONLY valid JSON matching the specified schema
-- No markdown code blocks, no explanations, no meta-commentary — just raw JSON
-- Every field must contain specific, client-relevant content — no placeholder text like "TBD" or "[insert here]"
+- Write in professional, narrative markdown suitable for a C-suite audience
+- Use headers (##, ###), tables, bullet lists, bold text, and blockquotes as appropriate
+- Every recommendation must be specific and client-relevant — no placeholder text like "TBD" or "[insert here]"
 - All recommendations must be grounded in the roadmap data, SEO audit data, and meeting context provided
-- Write in a professional, strategic tone appropriate for a C-suite audience
 - Content categories must map to SEO keyword clusters from the audit
 - KPI targets must reference roadmap goals and SEO baselines
-- Channel recommendations must be specific with tactics and cadence, not generic`;
+- Channel recommendations must be specific with tactics and cadence, not generic
+- Separate distinct output sections with HTML comment markers: <!-- SECTION: section_name -->
+- Do NOT wrap output in code blocks — write raw markdown`;
 
 // --- Shared Helpers ---
 
@@ -60,17 +61,26 @@ function formatTranscripts(transcripts: string[], maxChars: number): string {
   return parts.join("\n");
 }
 
-function summarizePriorResults(accumulated: Record<string, unknown>): string {
-  const keys = Object.keys(accumulated);
-  if (keys.length === 0) return "";
+/**
+ * Summarize prior markdown sections for coherence across calls.
+ * Instead of accumulating JSON, we accumulate the markdown text itself (truncated).
+ */
+function summarizePriorSections(accumulated: string[]): string {
+  if (accumulated.length === 0) return "";
 
-  const parts = ["# Prior Results (from earlier calls — maintain coherence)\n"];
-  for (const key of keys) {
-    const value = accumulated[key];
-    const json = JSON.stringify(value, null, 2);
+  const parts = [
+    "# Prior Sections (from earlier calls — maintain coherence)\n",
+    "The following markdown sections have already been written. Maintain consistency with terminology, recommendations, and strategic direction established in these sections.\n",
+  ];
+
+  for (const section of accumulated) {
     // Truncate large sections to keep context manageable
-    const truncated = json.length > 3000 ? json.slice(0, 3000) + "\n... (truncated)" : json;
-    parts.push(`## ${key}\n\`\`\`json\n${truncated}\n\`\`\`\n`);
+    const truncated =
+      section.length > 3000
+        ? section.slice(0, 3000) + "\n\n... (truncated)"
+        : section;
+    parts.push(truncated);
+    parts.push("\n---\n");
   }
 
   return parts.join("\n");
@@ -119,11 +129,10 @@ function summarizeSeoAuditForContext(
 
 /**
  * Format previous content plan sections for quarterly iteration.
- * Same pattern as formatPreviousRoadmap in roadmap.ts.
+ * Now passes previous markdown sections as context instead of JSON.
  */
 function formatPreviousContentPlan(
   previousPlan: Record<string, unknown> | undefined,
-  sectionKeys: string[],
   guidance: string
 ): string {
   if (!previousPlan) return "";
@@ -133,13 +142,27 @@ function formatPreviousContentPlan(
     "You are building a QUARTERLY UPDATE to an existing content plan. The previous version's relevant sections are below. Evolve it — don't regenerate from scratch. Maintain continuity where appropriate, and make fresh strategic choices where indicated.\n",
   ];
 
-  for (const key of sectionKeys) {
-    const value = previousPlan[key];
-    if (value === undefined) continue;
-    const json = JSON.stringify(value, null, 2);
-    const truncated =
-      json.length > 3000 ? json.slice(0, 3000) + "\n... (truncated)" : json;
-    parts.push(`## Previous ${key}\n\`\`\`json\n${truncated}\n\`\`\`\n`);
+  // Extract previous markdown sections if available (new format)
+  const sections = previousPlan.sections as
+    | Array<{ section_title: string; markdown: string }>
+    | undefined;
+  if (sections && Array.isArray(sections)) {
+    for (const section of sections) {
+      const md = section.markdown || "";
+      const truncated =
+        md.length > 3000 ? md.slice(0, 3000) + "\n... (truncated)" : md;
+      parts.push(`## Previous: ${section.section_title}\n${truncated}\n`);
+    }
+  } else {
+    // Fallback: pass full_document_markdown if available (still new format)
+    const fullMd = previousPlan.full_document_markdown as string | undefined;
+    if (fullMd) {
+      const truncated =
+        fullMd.length > 8000
+          ? fullMd.slice(0, 8000) + "\n... (truncated)"
+          : fullMd;
+      parts.push(`## Previous Content Plan\n${truncated}\n`);
+    }
   }
 
   parts.push(`## Evolution Guidance\n${guidance}\n`);
@@ -152,15 +175,11 @@ function formatPreviousContentPlan(
 /**
  * Call 1: Foundation + Brand Messaging
  *
- * Generates: Content mission statement, 4-6 content categories (topic pillars),
- * asset type selections, messaging guidelines (one-liner, elevator pitch, dos/donts)
- *
- * Inputs:
- * - Roadmap: target_market (full ICPs + empathy maps), brand_story (full StoryBrand),
- *   products_and_solutions, goals
- * - SEO Audit: keyword_landscape (cluster names + themes), content_gap (gap themes)
- * - Transcripts (15K chars)
- * - Instructions
+ * Produces markdown with SECTION markers:
+ * - <!-- SECTION: content_mission -->
+ * - <!-- SECTION: content_categories -->
+ * - <!-- SECTION: asset_types -->
+ * - <!-- SECTION: messaging_guidelines -->
  */
 export function buildFoundationAndMessagingPrompt(
   input: ContentPlanInput
@@ -177,7 +196,6 @@ export function buildFoundationAndMessagingPrompt(
   );
   const previousContext = formatPreviousContentPlan(
     input.previous_content_plan as Record<string, unknown> | undefined,
-    ["foundation", "brand_positioning"],
     "Keep content categories stable unless the business has pivoted or new SEO data reveals missed opportunities. Refine the content mission only if ICPs or brand story have changed. Update asset type cadences based on what worked. Evolve messaging dos/donts based on lessons learned — keep the one-liner and elevator pitch consistent unless StoryBrand has been updated."
   );
 
@@ -193,26 +211,25 @@ ${previousContext}
 
 ---
 
-# Task: Generate Foundation + Brand Messaging
+# Task: Write Foundation + Brand Messaging Sections
 
-Generate a JSON object with four top-level keys: \`content_mission\`, \`content_categories\`, \`asset_types\`, and \`messaging\`.
+Write four markdown sections, each preceded by an HTML comment marker. Write in professional narrative prose with tables, bullet lists, and bold text as appropriate.
 
-## content_mission
+<!-- SECTION: content_mission -->
+## Content Mission
 
-Create a content mission statement:
-- \`statement\`: One or two sentences defining the intersection of the client's expertise and their audience's needs. It should answer: Who is the audience? What will they get? Why does it matter?
-- \`rationale\`: 2-3 sentences explaining why this mission is appropriate given the client's ICPs, brand story, and business goals
+Write a content mission statement as a narrative paragraph. The mission should define the intersection of the client's expertise and their audience's needs — answering: Who is the audience? What will they get? Why does it matter? Follow with 2-3 sentences of rationale explaining why this mission is appropriate given the client's ICPs, brand story, and business goals.
 
 Ground this in the roadmap's target market profiles and StoryBrand framework.
 
-## content_categories
+<!-- SECTION: content_categories -->
+## Content Categories
 
-Create 4-6 content categories (topic pillars). For each:
-- \`name\`: Category name (e.g., "Talent Acquisition Strategy")
-- \`description\`: 30-50 words on what this category covers and why it matters to the audience
-- \`icp_alignment\`: Array of ICP names this category serves (from roadmap target_market)
-- \`example_topics\`: 3-5 example topics within this category
-- \`seo_cluster_connection\`: 1-2 sentences connecting this category to keyword clusters from the SEO audit
+Create 4-6 content categories (topic pillars). For each category, write a subsection (### Category Name) containing:
+- A 30-50 word description of what this category covers and why it matters to the audience
+- **ICP Alignment:** Which ICPs this category serves (from roadmap target_market)
+- **Example Topics:** 3-5 example topics within this category
+- **SEO Connection:** 1-2 sentences connecting this category to keyword clusters from the SEO audit
 
 Categories should:
 1. Map to the client's core service/product areas (from roadmap products_and_solutions)
@@ -220,58 +237,30 @@ Categories should:
 3. Connect to keyword clusters from the SEO audit (keyword_landscape.keyword_clusters)
 4. Each sustain at least 12 months of unique content ideas
 
-## asset_types
+<!-- SECTION: asset_types -->
+## Asset Types
 
-Select 5-8 asset types the program will produce. For each:
-- \`asset_type\`: The type (e.g., "Video Episode", "Blog Post", "Short-Form Video Clip", "Podcast Episode", "Email Newsletter", "Case Study", "Ebook/Whitepaper", "Social Media Post")
-- \`cadence\`: How often (e.g., "2x/month", "Weekly", "Per episode")
-- \`primary_owner\`: Who produces this ("Agency", "Client", "Agency + Client")
-- \`notes\`: Any specifics about format, length, or requirements
+Select 5-8 asset types the program will produce. Present as a table:
 
-Asset types should align with the ICPs' content preferences (from empathy map data) and the flagship program format that will be designed in Call 2.
+| Asset Type | Cadence | Primary Owner | Notes |
+|---|---|---|---|
 
-## messaging
+Asset types should align with the ICPs' content preferences (from empathy map data) and the flagship program format that will be designed later.
+
+<!-- SECTION: messaging_guidelines -->
+## Messaging Guidelines
 
 Create messaging guidelines derived from the StoryBrand framework:
-- \`one_liner\`: A single statement in the format: [Problem] → [Solution] → [Result]. Should be usable at conferences, in email signatures, and on the website
-- \`elevator_pitch\`: 2-3 sentences expanding the one-liner into a compelling pitch
-- \`messaging_dos\`: 5-7 messaging principles the team should follow (e.g., "Lead with the customer's pain, not your features")
-- \`messaging_donts\`: 5-7 messaging anti-patterns to avoid (e.g., "Don't use jargon the customer wouldn't use")
 
-Return as:
-\`\`\`
-{
-  "content_mission": {
-    "statement": "...",
-    "rationale": "..."
-  },
-  "content_categories": [
-    {
-      "name": "...",
-      "description": "...",
-      "icp_alignment": ["..."],
-      "example_topics": ["..."],
-      "seo_cluster_connection": "..."
-    }
-  ],
-  "asset_types": [
-    {
-      "asset_type": "...",
-      "cadence": "...",
-      "primary_owner": "...",
-      "notes": "..."
-    }
-  ],
-  "messaging": {
-    "one_liner": "...",
-    "elevator_pitch": "...",
-    "messaging_dos": ["..."],
-    "messaging_donts": ["..."]
-  }
-}
-\`\`\`
+**One-Liner:** A single statement in the format: [Problem] → [Solution] → [Result]. Should be usable at conferences, in email signatures, and on the website.
 
-Return ONLY the JSON object. No other text.`;
+**Elevator Pitch:** 2-3 sentences expanding the one-liner into a compelling pitch.
+
+**Messaging Dos:**
+- List 5-7 messaging principles the team should follow
+
+**Messaging Don'ts:**
+- List 5-7 messaging anti-patterns to avoid`;
 
   return { system: CONTENT_PLAN_SYSTEM_PROMPT, user };
 }
@@ -279,28 +268,23 @@ Return ONLY the JSON object. No other text.`;
 /**
  * Call 2: Content Program Design
  *
- * Generates: Flagship program (name, format, cadence, host, channels),
- * episode structure with segments, intro/outro script templates
- *
- * Inputs:
- * - Accumulated: categories, asset types, mission, messaging
- * - Roadmap: target_market, brand_story, roadmap_phases
- * - Transcripts (10K chars)
+ * Produces markdown with SECTION markers:
+ * - <!-- SECTION: flagship_program -->
+ * - <!-- SECTION: episode_structure -->
  */
 export function buildContentProgramPrompt(
   input: ContentPlanInput,
-  accumulated: Record<string, unknown>
+  accumulated: string[]
 ): { system: string; user: string } {
   const context = buildContextBlock(input);
   const transcripts = formatTranscripts(input.transcripts, 10000);
-  const priorResults = summarizePriorResults(accumulated);
+  const priorSections = summarizePriorSections(accumulated);
   const roadmapContext = summarizeRoadmapForContext(
     input.roadmap as Record<string, unknown>,
     ["target_market", "brand_story", "roadmap_phases"]
   );
   const previousContext = formatPreviousContentPlan(
     input.previous_content_plan as Record<string, unknown> | undefined,
-    ["content_program"],
     "Keep the flagship program name, format, and identity — these are brand assets that build equity over time. Evolve the theme statement only if the audience or positioning has shifted. Update the episode structure if feedback or performance data suggests changes. Keep the host the same unless there's a reason to change. Refresh derivative asset strategy based on what channels performed best."
   );
 
@@ -308,7 +292,7 @@ export function buildContentProgramPrompt(
 
 ${transcripts}
 
-${priorResults}
+${priorSections}
 
 ${roadmapContext}
 
@@ -316,64 +300,43 @@ ${previousContext}
 
 ---
 
-# Task: Generate Content Program Design
+# Task: Write Content Program Design Sections
 
-Generate a JSON object with two top-level keys: \`flagship_program\` and \`episode_structure\`.
+Write two markdown sections, each preceded by an HTML comment marker. Write in professional narrative prose with tables and structured formatting.
 
-## flagship_program
+<!-- SECTION: flagship_program -->
+## Flagship Program
 
-Design the centerpiece content program:
-- \`program_name\`: A branded name for the series (e.g., "The Talent Table", "Growth Signals", "The Builder's Blueprint"). Should be memorable, relevant, and ownable.
-- \`theme_statement\`: One sentence describing what the program is about and who it's for
-- \`format\`: The format (e.g., "Video interview series", "Solo podcast", "Panel discussion", "Documentary-style video")
-- \`episode_cadence\`: How often episodes are produced (e.g., "Bi-weekly", "Monthly")
-- \`episode_length\`: Target length (e.g., "25-35 minutes")
-- \`host_name\`: Recommended host name (from client leadership — use meeting transcripts to identify the best fit, or suggest the CEO/founder if unclear)
-- \`host_title\`: Host's title
-- \`target_icps\`: Which ICPs this program primarily serves
-- \`content_categories_covered\`: Which content categories from Call 1 this program covers (typically 3-5 of them)
-- \`primary_distribution_channels\`: Where episodes will be published (e.g., ["YouTube", "Apple Podcasts", "Spotify", "Website"])
-- \`derivative_assets_per_episode\`: List of derivative assets generated from each episode (e.g., ["Full-length video", "Full-length audio", "Blog recap article", "3-5 short-form video clips", "Quote graphics", "Email newsletter feature", "5-8 social media posts", "Full transcript"])
+Design the centerpiece content program. Write as narrative prose that covers:
+- **Program Name:** A branded name for the series (e.g., "The Talent Table", "Growth Signals"). Should be memorable, relevant, and ownable.
+- **Theme Statement:** One sentence describing what the program is about and who it's for
+- **Format:** The format (e.g., "Video interview series", "Solo podcast")
+- **Episode Cadence:** How often episodes are produced
+- **Episode Length:** Target length
+- **Host:** Recommended host name and title (from client leadership — use meeting transcripts to identify the best fit, or suggest the CEO/founder if unclear)
+- **Target ICPs:** Which ICPs this program primarily serves
+- **Content Categories Covered:** Which content categories from the foundation section this program covers
+- **Primary Distribution Channels:** Where episodes will be published
+- **Derivative Assets Per Episode:** List of derivative assets generated from each episode
+
+Follow the narrative with a summary table capturing the key program parameters.
 
 The program name and format should reflect the client's brand personality (from StoryBrand) and resonate with the target ICPs.
 
-## episode_structure
+<!-- SECTION: episode_structure -->
+## Episode Structure
 
 Design the episode format:
-- \`segments\`: Array of 4-6 segments, each with:
-  - \`name\`: Segment name (e.g., "The Setup", "The Struggles", "The Wins", "The Lessons")
-  - \`purpose\`: What this segment accomplishes
-  - \`duration\`: Approximate duration (e.g., "3-5 minutes", "8-12 minutes")
-- \`intro_script_template\`: A template intro script using placeholders like [Program Name], [Host Name], [Host Title], [Client/Agency Name], [Guest Name], [Guest Title], [Company]. Include a cold open hook placeholder.
-- \`outro_script_template\`: A template outro script with CTA placeholders (direct CTA and transitional CTA from the StoryBrand framework).
 
-Return as:
-\`\`\`
-{
-  "flagship_program": {
-    "program_name": "...",
-    "theme_statement": "...",
-    "format": "...",
-    "episode_cadence": "...",
-    "episode_length": "...",
-    "host_name": "...",
-    "host_title": "...",
-    "target_icps": ["..."],
-    "content_categories_covered": ["..."],
-    "primary_distribution_channels": ["..."],
-    "derivative_assets_per_episode": ["..."]
-  },
-  "episode_structure": {
-    "segments": [
-      { "name": "...", "purpose": "...", "duration": "..." }
-    ],
-    "intro_script_template": "...",
-    "outro_script_template": "..."
-  }
-}
-\`\`\`
+**Segments:** Present as a table with columns: Segment Name | Purpose | Duration
 
-Return ONLY the JSON object. No other text.`;
+Include 4-6 segments with names that fit the program's brand (e.g., "The Setup", "The Struggles", "The Wins", "The Lessons").
+
+**Intro Script Template:**
+Write a template intro script as a blockquote, using placeholders like [Program Name], [Host Name], [Host Title], [Client/Agency Name], [Guest Name], [Guest Title], [Company]. Include a cold open hook placeholder.
+
+**Outro Script Template:**
+Write a template outro script as a blockquote, with CTA placeholders (direct CTA and transitional CTA from the StoryBrand framework).`;
 
   return { system: CONTENT_PLAN_SYSTEM_PROMPT, user };
 }
@@ -381,21 +344,18 @@ Return ONLY the JSON object. No other text.`;
 /**
  * Call 3: Amplification + Management + Next Steps
  *
- * Generates: Owned/earned/paid channel recommendations with tactics and cadence,
- * ABM integration, KPI targets, 30/60/90-day milestones
- *
- * Inputs:
- * - Accumulated: categories, flagship program, asset types
- * - Roadmap: goals, roadmap_phases, quarterly_initiatives
- * - SEO Audit: competitive_search (channel strengths)
- * - Research: competitive_scores
+ * Produces markdown with SECTION markers:
+ * - <!-- SECTION: content_amplification -->
+ * - <!-- SECTION: abm_integration -->
+ * - <!-- SECTION: kpi_targets -->
+ * - <!-- SECTION: milestones -->
  */
 export function buildAmplificationAndManagementPrompt(
   input: ContentPlanInput,
-  accumulated: Record<string, unknown>
+  accumulated: string[]
 ): { system: string; user: string } {
   const context = buildContextBlock(input);
-  const priorResults = summarizePriorResults(accumulated);
+  const priorSections = summarizePriorSections(accumulated);
   const roadmapContext = summarizeRoadmapForContext(
     input.roadmap as Record<string, unknown>,
     ["goals", "roadmap_phases", "quarterly_initiatives", "points_plan"]
@@ -406,7 +366,6 @@ export function buildAmplificationAndManagementPrompt(
   );
   const previousContext = formatPreviousContentPlan(
     input.previous_content_plan as Record<string, unknown> | undefined,
-    ["content_amplification", "ongoing_management", "next_steps"],
     "Generate FRESH 30/60/90-day milestones for the new quarter — do not repeat prior milestones. Update KPI targets based on actual performance vs. prior goals (raise targets that were hit, adjust ones that were missed). Adjust channel priorities based on what worked — double down on high-performing channels, deprioritize underperformers. Evolve ABM tactics based on account engagement data."
   );
 
@@ -418,7 +377,7 @@ export function buildAmplificationAndManagementPrompt(
 
   const user = `${context}
 
-${priorResults}
+${priorSections}
 
 ${roadmapContext}
 
@@ -430,75 +389,74 @@ ${previousContext}
 
 ---
 
-# Task: Generate Amplification + Management + Next Steps
+# Task: Write Amplification + Management + Next Steps Sections
 
-Generate a JSON object with five top-level keys: \`owned_channels\`, \`earned_channels\`, \`paid_channels\`, \`abm_integration\`, \`kpi_targets\`, and \`milestones\`.
+Write four markdown sections, each preceded by an HTML comment marker. Write in professional narrative prose with tables, bullet lists, and bold text.
 
-## owned_channels, earned_channels, paid_channels
+<!-- SECTION: content_amplification -->
+## Content Amplification
 
-For each channel type, create 3-5 recommendations. Each recommendation:
-- \`channel\`: Channel name (e.g., "Website / Blog", "LinkedIn (Organic)", "Email Newsletter", "YouTube")
-- \`tactics\`: 3-5 specific tactics for this channel (not generic — reference the content categories and flagship program)
-- \`cadence\`: How often to activate this channel (e.g., "3-5 posts/week", "Bi-weekly", "Per episode")
-- \`priority\`: "high", "medium", or "low"
-- \`rationale\`: 1-2 sentences explaining why this channel matters for this client based on their ICPs, competitive landscape, and goals
+Write three subsections for channel recommendations:
+
+### Owned Channels
+For each of 3-5 owned channels, write a brief paragraph covering: channel name, 3-5 specific tactics (referencing the content categories and flagship program), cadence, priority level, and rationale. Then present a summary table:
+
+| Channel | Priority | Cadence | Key Tactics |
+|---|---|---|---|
+
+### Earned Channels
+Same format as owned channels for 3-5 earned channel recommendations.
+
+### Paid Channels
+Same format for 3-5 paid channel recommendations.
 
 Channel recommendations should:
-- Reference the flagship program and content categories from prior calls
+- Reference the flagship program and content categories from prior sections
 - Account for competitive strengths/weaknesses (from competitive scores and SEO audit)
 - Align with ICP content preferences
 - Include specific, actionable tactics (not just "post content on LinkedIn")
 
-## abm_integration
+<!-- SECTION: abm_integration -->
+## ABM Integration
 
-Create 4-6 ABM integration tactics:
-- \`activity\`: The ABM activity (e.g., "Account Research", "Personalized Outreach")
-- \`content_integration\`: How content integrates with this activity (specific to this client's content categories and program)
+Create 4-6 ABM integration tactics. Present as a table:
 
-## kpi_targets
+| Activity | Content Integration |
+|---|---|
 
-Create 8-12 KPI targets spanning content, engagement, and business outcomes:
-- \`metric\`: The specific metric (e.g., "Organic search sessions", "Content-attributed leads", "Podcast downloads per episode")
-- \`goal\`: A specific, measurable goal (e.g., "500 monthly organic sessions within 6 months", "10 MQLs per quarter from content")
-- \`data_source\`: Where this data is tracked (e.g., "Google Analytics 4", "HubSpot", "YouTube Studio")
-- \`review_cadence\`: How often to review (e.g., "Monthly", "Quarterly")
+Each content integration description should be specific to this client's content categories and program.
+
+<!-- SECTION: kpi_targets -->
+## KPI Targets
+
+Create 8-12 KPI targets spanning content, engagement, and business outcomes. Present as a table:
+
+| Metric | Goal | Data Source | Review Cadence |
+|---|---|---|---|
 
 KPI targets should:
 - Reference the roadmap's annual goals and benchmarks
 - Include both leading indicators (traffic, engagement) and lagging indicators (leads, revenue)
 - Be realistic for the client's stage and resources
 
-## milestones
+<!-- SECTION: milestones -->
+## 30/60/90-Day Milestones
 
-Create 30/60/90-day milestones. Return three arrays:
-- \`milestones_30_day\`: 5-7 milestones for Days 1-30 (Foundation phase)
-- \`milestones_60_day\`: 4-6 milestones for Days 31-60 (Build phase)
-- \`milestones_90_day\`: 4-6 milestones for Days 61-90 (Launch & Optimize phase)
+Write three subsections:
 
-Each milestone:
-- \`milestone\`: What needs to be accomplished
-- \`target\`: When within the phase (e.g., "Week 2-3", "Week 6")
-- \`category\`: "foundation", "build", or "launch"
+### Days 1-30: Foundation
+Present 5-7 milestones as a table:
 
-Milestones should align with the roadmap phases and reflect the realistic timeline for standing up the content program.
+| Milestone | Target | Category |
+|---|---|---|
 
-Return as:
-\`\`\`
-{
-  "owned_channels": [{ "channel": "...", "tactics": ["..."], "cadence": "...", "priority": "high|medium|low", "rationale": "..." }],
-  "earned_channels": [{ "channel": "...", "tactics": ["..."], "cadence": "...", "priority": "high|medium|low", "rationale": "..." }],
-  "paid_channels": [{ "channel": "...", "tactics": ["..."], "cadence": "...", "priority": "high|medium|low", "rationale": "..." }],
-  "abm_integration": [{ "activity": "...", "content_integration": "..." }],
-  "kpi_targets": [{ "metric": "...", "goal": "...", "data_source": "...", "review_cadence": "..." }],
-  "milestones": {
-    "milestones_30_day": [{ "milestone": "...", "target": "...", "category": "foundation" }],
-    "milestones_60_day": [{ "milestone": "...", "target": "...", "category": "build" }],
-    "milestones_90_day": [{ "milestone": "...", "target": "...", "category": "launch" }]
-  }
-}
-\`\`\`
+### Days 31-60: Build
+Present 4-6 milestones in the same table format.
 
-Return ONLY the JSON object. No other text.`;
+### Days 61-90: Launch & Optimize
+Present 4-6 milestones in the same table format.
+
+Milestones should align with the roadmap phases and reflect the realistic timeline for standing up the content program.`;
 
   return { system: CONTENT_PLAN_SYSTEM_PROMPT, user };
 }
@@ -506,20 +464,19 @@ Return ONLY the JSON object. No other text.`;
 /**
  * Call 4: SEO/AEO Appendix Part 1 — Foundation + Topic Clusters
  *
- * Generates: Technical SEO summary + recommendations, site architecture (hub-and-spoke),
- * keyword strategy summary, topic clusters mapped to content categories, FAQ/PAA targets
- *
- * Inputs:
- * - Accumulated: content categories, flagship program
- * - SEO Audit: technical_seo (full), keyword_landscape (full), content_gap (full), serp_features_aeo
- * - Roadmap: target_market (ICP pain points for question targeting)
+ * Produces markdown with SECTION markers:
+ * - <!-- SECTION: technical_seo -->
+ * - <!-- SECTION: site_architecture -->
+ * - <!-- SECTION: keyword_strategy -->
+ * - <!-- SECTION: topic_clusters -->
+ * - <!-- SECTION: faq_paa -->
  */
 export function buildSeoFoundationAndClustersPrompt(
   input: ContentPlanInput,
-  accumulated: Record<string, unknown>
+  accumulated: string[]
 ): { system: string; user: string } {
   const context = buildContextBlock(input);
-  const priorResults = summarizePriorResults(accumulated);
+  const priorSections = summarizePriorSections(accumulated);
   const seoContext = summarizeSeoAuditForContext(
     input.seo_audit as Record<string, unknown>,
     ["technical_seo", "keyword_landscape", "content_gap", "serp_features_aeo"]
@@ -530,13 +487,12 @@ export function buildSeoFoundationAndClustersPrompt(
   );
   const previousContext = formatPreviousContentPlan(
     input.previous_content_plan as Record<string, unknown> | undefined,
-    ["seo_aeo_appendix"],
     "Keep the topic cluster structure stable — pillar pages are long-term investments. Update subtopics based on new keyword data and content that has already been published (mark published subtopics and add new ones). Refresh technical SEO recommendations based on the new audit — remove resolved issues, add new ones. Update FAQ/PAA targets with new questions that have surfaced and remove ones that have been answered."
   );
 
   const user = `${context}
 
-${priorResults}
+${priorSections}
 
 ${seoContext}
 
@@ -546,86 +502,58 @@ ${previousContext}
 
 ---
 
-# Task: Generate SEO/AEO Foundation + Topic Clusters
+# Task: Write SEO/AEO Foundation + Topic Clusters Sections
 
-Generate a JSON object with six top-level keys: \`technical_seo_summary\`, \`technical_seo_recommendations\`, \`site_architecture_summary\`, \`keyword_strategy_summary\`, \`topic_clusters\`, and \`faq_paa_targets\`.
+Write five markdown sections, each preceded by an HTML comment marker. Write in professional narrative prose with tables and structured formatting.
 
-## technical_seo_summary
+<!-- SECTION: technical_seo -->
+## Technical SEO Assessment
 
-A 3-5 sentence summary of the client's technical SEO health, drawn from the SEO audit's technical_seo section. Reference the health score, key issues, and the technical verdict (proceed_to_content / technical_audit_first / parallel_workstreams).
+Write a 3-5 sentence summary of the client's technical SEO health, drawn from the SEO audit's technical_seo section. Reference the health score, key issues, and the technical verdict.
 
-## technical_seo_recommendations
+Then present 5-8 technical SEO recommendations as a table:
 
-Create 5-8 technical SEO recommendations based on the audit findings:
-- \`area\`: The area of technical SEO (e.g., "Core Web Vitals", "Schema Markup", "Redirect Chains")
-- \`current_status\`: Brief assessment of current state based on audit data
-- \`recommendation\`: Specific action to take
-- \`priority\`: "high", "medium", or "low"
+| Area | Current Status | Recommendation | Priority |
+|---|---|---|---|
 
-## site_architecture_summary
+<!-- SECTION: site_architecture -->
+## Site Architecture
 
-A 3-5 sentence summary recommending the hub-and-spoke (topic cluster) site architecture approach, specifically mapping to the content categories defined in Call 1. Explain how pillar pages will map to categories and how cluster content will fill keyword gaps identified in the SEO audit.
+Write a 3-5 sentence narrative recommending the hub-and-spoke (topic cluster) site architecture approach, specifically mapping to the content categories defined in the foundation section. Explain how pillar pages will map to categories and how cluster content will fill keyword gaps identified in the SEO audit.
 
-## keyword_strategy_summary
+<!-- SECTION: keyword_strategy -->
+## Keyword Strategy
 
-A 3-5 sentence summary of the keyword strategy, synthesizing the SEO audit's keyword landscape and content gaps into strategic direction. Reference the most impactful keyword clusters and how they map to the content categories.
+Write a 3-5 sentence summary of the keyword strategy, synthesizing the SEO audit's keyword landscape and content gaps into strategic direction. Reference the most impactful keyword clusters and how they map to the content categories.
 
-## topic_clusters
+<!-- SECTION: topic_clusters -->
+## Topic Clusters
 
-Create one topic cluster per content category (from Call 1). For each:
-- \`content_category\`: The category name (must match a category from Call 1)
-- \`pillar_page_topic\`: The broad topic for the pillar page
-- \`primary_keyword\`: The primary keyword for the pillar page (from SEO audit keyword data)
-- \`search_volume\`: Monthly search volume for the primary keyword
-- \`cluster_subtopics\`: 4-6 subtopics (spokes), each with:
-  - \`subtopic\`: The subtopic title
-  - \`target_keyword\`: The keyword to target
-  - \`search_volume\`: Monthly search volume
-  - \`intent\`: "informational", "commercial", "transactional", or "navigational"
-  - \`content_type\`: The recommended content type (e.g., "Blog post", "Landing page", "FAQ section", "Case study")
+Create one topic cluster per content category (from the foundation section). For each cluster, write a subsection (### Cluster: [Category Name]) containing:
 
-Topic clusters must:
+**Pillar Page:** [Topic] | Primary Keyword: [keyword] | Search Volume: [volume]
+
+**Subtopics:**
+
+| Subtopic | Target Keyword | Search Volume | Intent | Content Type |
+|---|---|---|---|---|
+
+Include 4-6 subtopics per cluster. Topic clusters must:
 - Use REAL keywords from the SEO audit data (keyword_landscape and content_gap)
 - Include actual search volumes from the data
-- Map each cluster to one content category from Call 1
+- Map each cluster to one content category from the foundation
 - Prioritize business-relevant keywords over vanity traffic
 - Include a mix of informational and commercial intent keywords
 
-## faq_paa_targets
+<!-- SECTION: faq_paa -->
+## FAQ & People Also Ask Targets
 
-Create 10-15 FAQ/PAA targets:
-- \`question\`: The question to target (from PAA data in the SEO audit, or derived from ICP pain points)
-- \`source\`: Where this question came from ("PAA", "ICP pain points", "Sales feedback", "Content gap")
-- \`target_page\`: Which page or content piece should answer this (reference the topic cluster pillar or spoke)
-- \`priority\`: "high", "medium", or "low"
+Create 10-15 FAQ/PAA targets as a table:
 
-Return as:
-\`\`\`
-{
-  "technical_seo_summary": "...",
-  "technical_seo_recommendations": [
-    { "area": "...", "current_status": "...", "recommendation": "...", "priority": "high|medium|low" }
-  ],
-  "site_architecture_summary": "...",
-  "keyword_strategy_summary": "...",
-  "topic_clusters": [
-    {
-      "content_category": "...",
-      "pillar_page_topic": "...",
-      "primary_keyword": "...",
-      "search_volume": 0,
-      "cluster_subtopics": [
-        { "subtopic": "...", "target_keyword": "...", "search_volume": 0, "intent": "...", "content_type": "..." }
-      ]
-    }
-  ],
-  "faq_paa_targets": [
-    { "question": "...", "source": "...", "target_page": "...", "priority": "high|medium|low" }
-  ]
-}
-\`\`\`
+| Question | Source | Target Page | Priority |
+|---|---|---|---|
 
-Return ONLY the JSON object. No other text.`;
+Questions should come from PAA data in the SEO audit, ICP pain points, sales feedback, or content gaps. Target pages should reference topic cluster pillars or spokes.`;
 
   return { system: CONTENT_PLAN_SYSTEM_PROMPT, user };
 }
@@ -633,33 +561,32 @@ Return ONLY the JSON object. No other text.`;
 /**
  * Call 5: SEO/AEO Appendix Part 2 — AEO + Authority + Measurement
  *
- * Generates: Entity optimization plan, schema markup recommendations,
- * AEO content recommendations, link building strategy, SEO/AEO KPI targets,
- * local SEO recommendations (conditional)
- *
- * Inputs:
- * - Accumulated: topic clusters, categories, KPI targets from Call 3
- * - SEO Audit: serp_features_aeo, backlink_profile, competitive_search, technical_seo (schema inventory)
+ * Produces markdown with SECTION markers:
+ * - <!-- SECTION: entity_optimization -->
+ * - <!-- SECTION: schema_recommendations -->
+ * - <!-- SECTION: aeo_content_strategy -->
+ * - <!-- SECTION: link_building -->
+ * - <!-- SECTION: seo_aeo_kpis -->
+ * - <!-- SECTION: local_seo --> (conditional)
  */
 export function buildAeoAndAuthorityPrompt(
   input: ContentPlanInput,
-  accumulated: Record<string, unknown>
+  accumulated: string[]
 ): { system: string; user: string } {
   const context = buildContextBlock(input);
-  const priorResults = summarizePriorResults(accumulated);
+  const priorSections = summarizePriorSections(accumulated);
   const seoContext = summarizeSeoAuditForContext(
     input.seo_audit as Record<string, unknown>,
     ["serp_features_aeo", "backlink_profile", "competitive_search", "technical_seo"]
   );
   const previousContext = formatPreviousContentPlan(
     input.previous_content_plan as Record<string, unknown> | undefined,
-    ["seo_aeo_appendix"],
     "Update schema recommendations based on what has been implemented — remove completed items, add new enrichment opportunities. Refresh AEO content recommendations based on new SERP/AEO data and what content has been published. Evolve link building tactics based on what worked (which tactics produced links, which didn't). Update SEO/AEO KPI targets based on actual performance — raise targets that were exceeded, adjust underperforming ones. Refresh entity optimization based on new AI visibility data."
   );
 
   const user = `${context}
 
-${priorResults}
+${priorSections}
 
 ${seoContext}
 
@@ -667,86 +594,64 @@ ${previousContext}
 
 ---
 
-# Task: Generate AEO + Authority + Measurement
+# Task: Write AEO + Authority + Measurement Sections
 
-Generate a JSON object with six top-level keys: \`entity_optimization_plan\`, \`schema_recommendations\`, \`aeo_content_recommendations\`, \`link_building_tactics\`, \`seo_aeo_kpi_targets\`, and \`local_seo_recommendations\`.
+Write five or six markdown sections, each preceded by an HTML comment marker. Write in professional narrative prose with tables and structured formatting.
 
-## entity_optimization_plan
+<!-- SECTION: entity_optimization -->
+## Entity Optimization
 
-A 4-6 sentence plan for building entity authority for the client's brand, key people, and core topics. Reference the SEO audit's schema inventory and SERP/AEO data to identify what's already established and what needs development. Include specific tactics for building entity recognition in AI answer engines.
+Write a 4-6 sentence plan for building entity authority for the client's brand, key people, and core topics. Reference the SEO audit's schema inventory and SERP/AEO data to identify what's already established and what needs development. Include specific tactics for building entity recognition in AI answer engines.
 
-## schema_recommendations
+<!-- SECTION: schema_recommendations -->
+## Schema Markup Recommendations
 
-Create 5-8 schema markup recommendations:
-- \`schema_type\`: The Schema.org type (e.g., "Organization", "Person", "Article", "FAQ", "VideoObject", "PodcastEpisode", "HowTo", "BreadcrumbList")
-- \`where_to_apply\`: Which pages or content types (e.g., "All blog posts", "Episode pages", "About page")
-- \`implementation_notes\`: Specific implementation guidance
-- \`priority\`: "high", "medium", or "low"
+Create 5-8 schema markup recommendations as a table:
 
-Reference the existing schema inventory from the SEO audit. For types already implemented, recommend enrichments. For missing types, recommend implementation. Do NOT recommend schema types that don't exist in Schema.org.
+| Schema Type | Where to Apply | Implementation Notes | Priority |
+|---|---|---|---|
 
-## aeo_content_recommendations
+Reference the existing schema inventory from the SEO audit. For types already implemented, recommend enrichments. For missing types, recommend implementation. Only recommend valid Schema.org types.
 
-Create 5-8 AEO content recommendations:
-- \`tactic\`: The tactic name (e.g., "FAQ Schema Expansion", "Definitive Statement Content", "Conversational Query Targeting")
-- \`description\`: 2-3 sentences describing the specific approach
-- \`target_queries\`: 3-5 specific queries this tactic targets (from the SEO audit's PAA/snippet/AI overview data)
-- \`expected_impact\`: Expected impact description (e.g., "Win featured snippets for 3-5 target queries within 3 months")
+<!-- SECTION: aeo_content_strategy -->
+## AEO Content Strategy
+
+Create 5-8 AEO content recommendations. For each tactic, write a subsection (### [Tactic Name]) containing:
+- 2-3 sentences describing the specific approach
+- **Target Queries:** 3-5 specific queries this tactic targets (from the SEO audit's PAA/snippet/AI overview data)
+- **Expected Impact:** Expected impact description
 
 Recommendations should be grounded in the actual SERP features and AEO data from the audit.
 
-## link_building_tactics
+<!-- SECTION: link_building -->
+## Link Building Strategy
 
-Create 5-7 link building tactics:
-- \`tactic\`: Tactic name (e.g., "Thought Leadership PR", "Guest Podcast Appearances", "Original Research", "Resource Page Outreach")
-- \`description\`: 2-3 sentences on how to execute, specific to this client
-- \`expected_links_per_quarter\`: Estimated number of links this tactic can acquire per quarter
-- \`priority\`: "high", "medium", or "low"
+Create 5-7 link building tactics as a table:
 
-Reference the backlink profile data from the audit to identify gaps and opportunities.
+| Tactic | Description | Expected Links/Quarter | Priority |
+|---|---|---|---|
 
-## seo_aeo_kpi_targets
+Follow with a brief narrative paragraph for each high-priority tactic explaining the execution approach specific to this client. Reference the backlink profile data from the audit.
 
-Create 8-10 SEO/AEO-specific KPI targets:
-- \`metric\`: The metric (e.g., "Keywords ranking in top 10", "Featured snippets won", "AI Overview citations", "Domain Authority", "New referring domains per quarter")
-- \`goal\`: Specific, measurable target
-- \`data_source\`: Where to track this
-- \`review_cadence\`: How often to review
+<!-- SECTION: seo_aeo_kpis -->
+## SEO/AEO KPIs
 
-These should complement (not duplicate) the management KPI targets from Call 3. Focus on search-specific metrics.
+Create 8-10 SEO/AEO-specific KPI targets as a table:
 
-## local_seo_recommendations
+| Metric | Goal | Data Source | Review Cadence |
+|---|---|---|---|
 
-If the client has a physical location or targets geographic markets, create 3-5 local SEO recommendations:
-- \`area\`: The area (e.g., "Google Business Profile", "Local Citations", "Location Pages")
-- \`recommendation\`: Specific action
-- \`priority\`: "high", "medium", or "low"
+These should complement (not duplicate) the management KPI targets from the earlier section. Focus on search-specific metrics.
 
-If the client is purely digital/national with no geographic focus, return an empty array.
+<!-- SECTION: local_seo -->
+## Local SEO
 
-Return as:
-\`\`\`
-{
-  "entity_optimization_plan": "...",
-  "schema_recommendations": [
-    { "schema_type": "...", "where_to_apply": "...", "implementation_notes": "...", "priority": "high|medium|low" }
-  ],
-  "aeo_content_recommendations": [
-    { "tactic": "...", "description": "...", "target_queries": ["..."], "expected_impact": "..." }
-  ],
-  "link_building_tactics": [
-    { "tactic": "...", "description": "...", "expected_links_per_quarter": 0, "priority": "high|medium|low" }
-  ],
-  "seo_aeo_kpi_targets": [
-    { "metric": "...", "goal": "...", "data_source": "...", "review_cadence": "..." }
-  ],
-  "local_seo_recommendations": [
-    { "area": "...", "recommendation": "...", "priority": "high|medium|low" }
-  ]
-}
-\`\`\`
+If the client has a physical location or targets geographic markets, write 3-5 local SEO recommendations as a table:
 
-Return ONLY the JSON object. No other text.`;
+| Area | Recommendation | Priority |
+|---|---|---|
+
+If the client is purely digital/national with no geographic focus, write a brief sentence stating that local SEO is not applicable and omit the table.`;
 
   return { system: CONTENT_PLAN_SYSTEM_PROMPT, user };
 }

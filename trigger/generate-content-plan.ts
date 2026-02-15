@@ -3,23 +3,36 @@ import Anthropic from "@anthropic-ai/sdk";
 import { ContentPlanInput, ContentPlanInputSchema } from "../src/types/content-plan-input";
 import type {
   GeneratedContentPlanOutput,
-  ChannelRecommendation,
-  AbmTactic,
-  KpiTarget,
-  Milestone,
-  TechnicalSeoRecommendation,
-  TopicCluster,
-  FaqPaaTarget,
-  SchemaRecommendation,
-  AeoContentRecommendation,
-  LinkBuildingTactic,
-  SeoAeoKpiTarget,
-  LocalSeoRecommendation,
-  FlagshipProgram,
-  EpisodeStructure,
+  ContentPlanSection,
 } from "../src/types/content-plan-output";
 import { TaskCallback, deliverTaskResult } from "../src/lib/task-callback";
-import { CONTENT_PLAN_BOILERPLATE } from "../src/prompts/content-plan-boilerplate";
+import {
+  OVERVIEW_INTRO,
+  FOUNDATION_INTRO,
+  FOUNDATION_CONTENT_ATTRIBUTES,
+  FOUNDATION_CONTENT_BRIEF,
+  FOUNDATION_CONTENT_INTELLIGENCE,
+  BRAND_POSITIONING_INTRO,
+  BRAND_STORYBRAND_METHODOLOGY,
+  CONTENT_PROGRAM_INTRO,
+  WORKFLOW_INTRO,
+  WORKFLOW_THREE_PHASE,
+  WORKFLOW_PRODUCTION_PROCESS,
+  WORKFLOW_RACI,
+  AMPLIFICATION_INTRO,
+  MANAGEMENT_INTRO,
+  MANAGEMENT_MONTHLY_REVIEW,
+  MANAGEMENT_QUARTERLY_AUDIT,
+  MANAGEMENT_REFRESH_RETIREMENT,
+  NEXT_STEPS_INTRO,
+  NEXT_STEPS_ONBOARDING,
+  SEO_APPENDIX_INTRO,
+  SEO_CONTENT_STRUCTURE,
+  SEO_SNIPPET_OPTIMIZATION,
+  SEO_VIDEO_PODCAST,
+  SEO_MEASUREMENT_TEMPLATES,
+  SEO_ONGOING_MANAGEMENT,
+} from "../src/prompts/content-plan-boilerplate";
 import {
   buildFoundationAndMessagingPrompt,
   buildContentProgramPrompt,
@@ -27,7 +40,6 @@ import {
   buildSeoFoundationAndClustersPrompt,
   buildAeoAndAuthorityPrompt,
 } from "../src/prompts/content-plan";
-import { extractJson } from "../src/lib/json-utils";
 
 const MODEL = "claude-opus-4-20250514";
 const MAX_TOKENS = 32000;
@@ -54,6 +66,252 @@ async function callClaude(
   return textContent.text;
 }
 
+// --- Markdown Assembly Helpers ---
+
+function countWords(text: string): number {
+  return text
+    .split(/\s+/)
+    .filter((w) => w.length > 0).length;
+}
+
+function buildTableOfContents(sections: ContentPlanSection[]): string {
+  const lines = ["# Table of Contents", ""];
+  for (const section of sections) {
+    lines.push(
+      `${section.section_number}. [${section.section_title}](#${section.section_title.toLowerCase().replace(/[^a-z0-9]+/g, "-")})`
+    );
+  }
+  lines.push("");
+  return lines.join("\n");
+}
+
+/**
+ * Split a Claude markdown response on <!-- SECTION: name --> markers.
+ * Returns a map of section_name → markdown content.
+ */
+function splitOnSectionMarkers(response: string): Record<string, string> {
+  const sections: Record<string, string> = {};
+  const markerPattern = /<!--\s*SECTION:\s*(\w+)\s*-->/g;
+
+  const markers: { name: string; index: number }[] = [];
+  let match;
+  while ((match = markerPattern.exec(response)) !== null) {
+    markers.push({ name: match[1], index: match.index + match[0].length });
+  }
+
+  for (let i = 0; i < markers.length; i++) {
+    const start = markers[i].index;
+    const end = i + 1 < markers.length
+      ? response.lastIndexOf("<!--", markers[i + 1].index)
+      : response.length;
+    sections[markers[i].name] = response.slice(start, end).trim();
+  }
+
+  return sections;
+}
+
+/**
+ * Get a section from the parsed map, or return a fallback message.
+ */
+function getSection(
+  parsed: Record<string, string>,
+  name: string,
+  fallbackLabel?: string
+): string {
+  return parsed[name] || `*${fallbackLabel || name} section not generated.*`;
+}
+
+/**
+ * Assemble the full document markdown by interleaving Claude-generated
+ * sections with boilerplate blocks.
+ */
+function assembleFullDocument(
+  title: string,
+  engagementMeta: { client: string; industry: string; date: string },
+  call1Sections: Record<string, string>,
+  call2Sections: Record<string, string>,
+  call3Sections: Record<string, string>,
+  call4Sections: Record<string, string>,
+  call5Sections: Record<string, string>,
+  sections: ContentPlanSection[]
+): string {
+  const parts: string[] = [];
+
+  // Title + metadata
+  parts.push(`# ${title}`);
+  parts.push("");
+  parts.push(
+    `*Generated on ${engagementMeta.date} | ${sections.length} sections | ${sections.reduce((sum, s) => sum + s.word_count, 0).toLocaleString()} words*`
+  );
+  parts.push("");
+  parts.push(`**Client:** ${engagementMeta.client} | **Industry:** ${engagementMeta.industry}`);
+  parts.push("");
+
+  // TOC
+  parts.push(buildTableOfContents(sections));
+  parts.push("---");
+  parts.push("");
+
+  // ── Section 1: Overview ──
+  parts.push("# 1. Overview");
+  parts.push("");
+  parts.push(OVERVIEW_INTRO);
+  parts.push("");
+  parts.push("---");
+  parts.push("");
+
+  // ── Section 2: Content Foundation ──
+  parts.push("# 2. Content Foundation");
+  parts.push("");
+  parts.push(FOUNDATION_INTRO);
+  parts.push("");
+  parts.push(getSection(call1Sections, "content_mission", "Content Mission"));
+  parts.push("");
+  parts.push(getSection(call1Sections, "content_categories", "Content Categories"));
+  parts.push("");
+  parts.push(getSection(call1Sections, "asset_types", "Asset Types"));
+  parts.push("");
+  parts.push(FOUNDATION_CONTENT_ATTRIBUTES);
+  parts.push("");
+  parts.push(FOUNDATION_CONTENT_BRIEF);
+  parts.push("");
+  parts.push(FOUNDATION_CONTENT_INTELLIGENCE);
+  parts.push("");
+  parts.push("---");
+  parts.push("");
+
+  // ── Section 3: Brand Positioning & Messaging ──
+  parts.push("# 3. Brand Positioning & Messaging");
+  parts.push("");
+  parts.push(BRAND_POSITIONING_INTRO);
+  parts.push("");
+  parts.push(BRAND_STORYBRAND_METHODOLOGY);
+  parts.push("");
+  parts.push(getSection(call1Sections, "messaging_guidelines", "Messaging Guidelines"));
+  parts.push("");
+  parts.push("---");
+  parts.push("");
+
+  // ── Section 4: Content Program ──
+  parts.push("# 4. Content Program");
+  parts.push("");
+  parts.push(CONTENT_PROGRAM_INTRO);
+  parts.push("");
+  parts.push(getSection(call2Sections, "flagship_program", "Flagship Program"));
+  parts.push("");
+  parts.push(getSection(call2Sections, "episode_structure", "Episode Structure"));
+  parts.push("");
+  parts.push("---");
+  parts.push("");
+
+  // ── Section 5: Content Workflow & Production (boilerplate only) ──
+  parts.push("# 5. Content Workflow & Production");
+  parts.push("");
+  parts.push(WORKFLOW_INTRO);
+  parts.push("");
+  parts.push(WORKFLOW_THREE_PHASE);
+  parts.push("");
+  parts.push(WORKFLOW_PRODUCTION_PROCESS);
+  parts.push("");
+  parts.push(WORKFLOW_RACI);
+  parts.push("");
+  parts.push("---");
+  parts.push("");
+
+  // ── Section 6: Content Amplification ──
+  parts.push("# 6. Content Amplification");
+  parts.push("");
+  parts.push(AMPLIFICATION_INTRO);
+  parts.push("");
+  parts.push(getSection(call3Sections, "content_amplification", "Content Amplification"));
+  parts.push("");
+  parts.push(getSection(call3Sections, "abm_integration", "ABM Integration"));
+  parts.push("");
+  parts.push("---");
+  parts.push("");
+
+  // ── Section 7: Ongoing Management & Optimization ──
+  parts.push("# 7. Ongoing Management & Optimization");
+  parts.push("");
+  parts.push(MANAGEMENT_INTRO);
+  parts.push("");
+  parts.push(getSection(call3Sections, "kpi_targets", "KPI Targets"));
+  parts.push("");
+  parts.push(MANAGEMENT_MONTHLY_REVIEW);
+  parts.push("");
+  parts.push(MANAGEMENT_QUARTERLY_AUDIT);
+  parts.push("");
+  parts.push(MANAGEMENT_REFRESH_RETIREMENT);
+  parts.push("");
+  parts.push("---");
+  parts.push("");
+
+  // ── Section 8: Next Steps ──
+  parts.push("# 8. Next Steps & Action Items");
+  parts.push("");
+  parts.push(NEXT_STEPS_INTRO);
+  parts.push("");
+  parts.push(NEXT_STEPS_ONBOARDING);
+  parts.push("");
+  parts.push(getSection(call3Sections, "milestones", "30/60/90-Day Milestones"));
+  parts.push("");
+  parts.push("---");
+  parts.push("");
+
+  // ── Appendix: SEO/AEO Strategy ──
+  parts.push("# Appendix: SEO/AEO Strategy");
+  parts.push("");
+  parts.push(SEO_APPENDIX_INTRO);
+  parts.push("");
+
+  // Call 4 sections
+  parts.push(getSection(call4Sections, "technical_seo", "Technical SEO Assessment"));
+  parts.push("");
+  parts.push(getSection(call4Sections, "site_architecture", "Site Architecture"));
+  parts.push("");
+  parts.push(getSection(call4Sections, "keyword_strategy", "Keyword Strategy"));
+  parts.push("");
+  parts.push(getSection(call4Sections, "topic_clusters", "Topic Clusters"));
+  parts.push("");
+  parts.push(getSection(call4Sections, "faq_paa", "FAQ & PAA Targets"));
+  parts.push("");
+
+  // Boilerplate between Call 4 and Call 5
+  parts.push(SEO_CONTENT_STRUCTURE);
+  parts.push("");
+  parts.push(SEO_SNIPPET_OPTIMIZATION);
+  parts.push("");
+  parts.push(SEO_VIDEO_PODCAST);
+  parts.push("");
+
+  // Call 5 sections
+  parts.push(getSection(call5Sections, "entity_optimization", "Entity Optimization"));
+  parts.push("");
+  parts.push(getSection(call5Sections, "schema_recommendations", "Schema Markup Recommendations"));
+  parts.push("");
+  parts.push(getSection(call5Sections, "aeo_content_strategy", "AEO Content Strategy"));
+  parts.push("");
+  parts.push(getSection(call5Sections, "link_building", "Link Building Strategy"));
+  parts.push("");
+  parts.push(getSection(call5Sections, "seo_aeo_kpis", "SEO/AEO KPIs"));
+  parts.push("");
+
+  // Local SEO (conditional — may be a "not applicable" statement)
+  const localSeo = call5Sections["local_seo"];
+  if (localSeo) {
+    parts.push(localSeo);
+    parts.push("");
+  }
+
+  // Closing boilerplate
+  parts.push(SEO_MEASUREMENT_TEMPLATES);
+  parts.push("");
+  parts.push(SEO_ONGOING_MANAGEMENT);
+  parts.push("");
+
+  return parts.join("\n");
+}
+
 export const generateContentPlan = task({
   id: "generate-content-plan",
   maxDuration: 2400, // 40 minutes — 5 Claude calls
@@ -75,8 +333,8 @@ export const generateContentPlan = task({
 
     const client = new Anthropic({ apiKey });
 
-    // Accumulated results from prior calls — carries forward for coherence
-    const accumulated: Record<string, unknown> = {};
+    // Accumulated markdown from prior calls — carries forward for coherence
+    const accumulated: string[] = [];
 
     // ═══════════════════════════════════════════════
     // Call 1: Foundation + Brand Messaging
@@ -86,17 +344,9 @@ export const generateContentPlan = task({
 
     const call1Prompt = buildFoundationAndMessagingPrompt(input);
     const call1Response = await callClaude(client, call1Prompt.system, call1Prompt.user);
-    const call1Result = extractJson(call1Response) as {
-      content_mission: { statement: string; rationale: string };
-      content_categories: Array<{ name: string; description: string; icp_alignment: string[]; example_topics: string[]; seo_cluster_connection: string }>;
-      asset_types: Array<{ asset_type: string; cadence: string; primary_owner: string; notes: string }>;
-      messaging: { one_liner: string; elevator_pitch: string; messaging_dos: string[]; messaging_donts: string[] };
-    };
+    const call1Sections = splitOnSectionMarkers(call1Response);
 
-    accumulated.content_mission = call1Result.content_mission;
-    accumulated.content_categories = call1Result.content_categories;
-    accumulated.asset_types = call1Result.asset_types;
-    accumulated.messaging = call1Result.messaging;
+    accumulated.push(call1Response);
 
     // ═══════════════════════════════════════════════
     // Call 2: Content Program Design
@@ -106,13 +356,9 @@ export const generateContentPlan = task({
 
     const call2Prompt = buildContentProgramPrompt(input, accumulated);
     const call2Response = await callClaude(client, call2Prompt.system, call2Prompt.user);
-    const call2Result = extractJson(call2Response) as {
-      flagship_program: Record<string, unknown>;
-      episode_structure: Record<string, unknown>;
-    };
+    const call2Sections = splitOnSectionMarkers(call2Response);
 
-    accumulated.flagship_program = call2Result.flagship_program;
-    accumulated.episode_structure = call2Result.episode_structure;
+    accumulated.push(call2Response);
 
     // ═══════════════════════════════════════════════
     // Call 3: Amplification + Management + Next Steps
@@ -122,25 +368,9 @@ export const generateContentPlan = task({
 
     const call3Prompt = buildAmplificationAndManagementPrompt(input, accumulated);
     const call3Response = await callClaude(client, call3Prompt.system, call3Prompt.user);
-    const call3Result = extractJson(call3Response) as {
-      owned_channels: Array<Record<string, unknown>>;
-      earned_channels: Array<Record<string, unknown>>;
-      paid_channels: Array<Record<string, unknown>>;
-      abm_integration: Array<Record<string, unknown>>;
-      kpi_targets: Array<Record<string, unknown>>;
-      milestones: {
-        milestones_30_day: Array<Record<string, unknown>>;
-        milestones_60_day: Array<Record<string, unknown>>;
-        milestones_90_day: Array<Record<string, unknown>>;
-      };
-    };
+    const call3Sections = splitOnSectionMarkers(call3Response);
 
-    accumulated.owned_channels = call3Result.owned_channels;
-    accumulated.earned_channels = call3Result.earned_channels;
-    accumulated.paid_channels = call3Result.paid_channels;
-    accumulated.abm_integration = call3Result.abm_integration;
-    accumulated.kpi_targets = call3Result.kpi_targets;
-    accumulated.milestones = call3Result.milestones;
+    accumulated.push(call3Response);
 
     // ═══════════════════════════════════════════════
     // Call 4: SEO/AEO Appendix Part 1 — Foundation + Topic Clusters
@@ -150,17 +380,9 @@ export const generateContentPlan = task({
 
     const call4Prompt = buildSeoFoundationAndClustersPrompt(input, accumulated);
     const call4Response = await callClaude(client, call4Prompt.system, call4Prompt.user);
-    const call4Result = extractJson(call4Response) as {
-      technical_seo_summary: string;
-      technical_seo_recommendations: Array<Record<string, unknown>>;
-      site_architecture_summary: string;
-      keyword_strategy_summary: string;
-      topic_clusters: Array<Record<string, unknown>>;
-      faq_paa_targets: Array<Record<string, unknown>>;
-    };
+    const call4Sections = splitOnSectionMarkers(call4Response);
 
-    accumulated.technical_seo_summary = call4Result.technical_seo_summary;
-    accumulated.topic_clusters = call4Result.topic_clusters;
+    accumulated.push(call4Response);
 
     // ═══════════════════════════════════════════════
     // Call 5: SEO/AEO Appendix Part 2 — AEO + Authority + Measurement
@@ -170,20 +392,13 @@ export const generateContentPlan = task({
 
     const call5Prompt = buildAeoAndAuthorityPrompt(input, accumulated);
     const call5Response = await callClaude(client, call5Prompt.system, call5Prompt.user);
-    const call5Result = extractJson(call5Response) as {
-      entity_optimization_plan: string;
-      schema_recommendations: Array<Record<string, unknown>>;
-      aeo_content_recommendations: Array<Record<string, unknown>>;
-      link_building_tactics: Array<Record<string, unknown>>;
-      seo_aeo_kpi_targets: Array<Record<string, unknown>>;
-      local_seo_recommendations: Array<Record<string, unknown>>;
-    };
+    const call5Sections = splitOnSectionMarkers(call5Response);
 
     // ═══════════════════════════════════════════════
     // Assembly Phase
     // ═══════════════════════════════════════════════
     metadata.set("phase", "assembly");
-    metadata.set("progress", "Assembling final content plan output...");
+    metadata.set("progress", "Assembling final content plan document...");
 
     const roadmapData = input.roadmap as Record<string, unknown>;
     const seoAuditData = input.seo_audit as Record<string, unknown>;
@@ -191,110 +406,151 @@ export const generateContentPlan = task({
     const title =
       input.title || `Content Plan: ${input.client.company_name}`;
 
-    // Build summary from accumulated data
-    const categoryNames = call1Result.content_categories.map((c) => c.name).join(", ");
-    const programName = (call2Result.flagship_program as { program_name?: string }).program_name || "flagship content program";
-    const summary = `This content plan for ${input.client.company_name} defines a comprehensive content strategy anchored by "${programName}" — a flagship content program built on ${call1Result.content_categories.length} content categories (${categoryNames}). It synthesizes the marketing roadmap and SEO audit into an actionable program with topic clusters, channel strategy, and 30/60/90-day milestones.`;
+    // Build summary from Call 1 + Call 2 content
+    const categorySection = call1Sections["content_categories"] || "";
+    const categoryCount = (categorySection.match(/^###\s/gm) || []).length || 4;
+    const programSection = call2Sections["flagship_program"] || "";
+    const programNameMatch = programSection.match(/(?:\*\*Program Name:\*\*|"([^"]+)"|"([^"]+)")\s*(.+)/);
+    const programName = programNameMatch
+      ? (programNameMatch[1] || programNameMatch[2] || programNameMatch[3] || "").trim()
+      : "flagship content program";
+
+    const summary = `This content plan for ${input.client.company_name} defines a comprehensive content strategy anchored by a flagship content program built on ${categoryCount} content categories. It synthesizes the marketing roadmap and SEO audit into an actionable program with topic clusters, channel strategy, and 30/60/90-day milestones.`;
+
+    // Build the sections array — one per top-level document section
+    const sectionDefs: { title: string; markdownParts: string[] }[] = [
+      {
+        title: "Overview",
+        markdownParts: [OVERVIEW_INTRO],
+      },
+      {
+        title: "Content Foundation",
+        markdownParts: [
+          FOUNDATION_INTRO,
+          getSection(call1Sections, "content_mission", "Content Mission"),
+          getSection(call1Sections, "content_categories", "Content Categories"),
+          getSection(call1Sections, "asset_types", "Asset Types"),
+          FOUNDATION_CONTENT_ATTRIBUTES,
+          FOUNDATION_CONTENT_BRIEF,
+          FOUNDATION_CONTENT_INTELLIGENCE,
+        ],
+      },
+      {
+        title: "Brand Positioning & Messaging",
+        markdownParts: [
+          BRAND_POSITIONING_INTRO,
+          BRAND_STORYBRAND_METHODOLOGY,
+          getSection(call1Sections, "messaging_guidelines", "Messaging Guidelines"),
+        ],
+      },
+      {
+        title: "Content Program",
+        markdownParts: [
+          CONTENT_PROGRAM_INTRO,
+          getSection(call2Sections, "flagship_program", "Flagship Program"),
+          getSection(call2Sections, "episode_structure", "Episode Structure"),
+        ],
+      },
+      {
+        title: "Content Workflow & Production",
+        markdownParts: [
+          WORKFLOW_INTRO,
+          WORKFLOW_THREE_PHASE,
+          WORKFLOW_PRODUCTION_PROCESS,
+          WORKFLOW_RACI,
+        ],
+      },
+      {
+        title: "Content Amplification",
+        markdownParts: [
+          AMPLIFICATION_INTRO,
+          getSection(call3Sections, "content_amplification", "Content Amplification"),
+          getSection(call3Sections, "abm_integration", "ABM Integration"),
+        ],
+      },
+      {
+        title: "Ongoing Management & Optimization",
+        markdownParts: [
+          MANAGEMENT_INTRO,
+          getSection(call3Sections, "kpi_targets", "KPI Targets"),
+          MANAGEMENT_MONTHLY_REVIEW,
+          MANAGEMENT_QUARTERLY_AUDIT,
+          MANAGEMENT_REFRESH_RETIREMENT,
+        ],
+      },
+      {
+        title: "Next Steps & Action Items",
+        markdownParts: [
+          NEXT_STEPS_INTRO,
+          NEXT_STEPS_ONBOARDING,
+          getSection(call3Sections, "milestones", "30/60/90-Day Milestones"),
+        ],
+      },
+      {
+        title: "Appendix: SEO/AEO Strategy",
+        markdownParts: [
+          SEO_APPENDIX_INTRO,
+          getSection(call4Sections, "technical_seo", "Technical SEO Assessment"),
+          getSection(call4Sections, "site_architecture", "Site Architecture"),
+          getSection(call4Sections, "keyword_strategy", "Keyword Strategy"),
+          getSection(call4Sections, "topic_clusters", "Topic Clusters"),
+          getSection(call4Sections, "faq_paa", "FAQ & PAA Targets"),
+          SEO_CONTENT_STRUCTURE,
+          SEO_SNIPPET_OPTIMIZATION,
+          SEO_VIDEO_PODCAST,
+          getSection(call5Sections, "entity_optimization", "Entity Optimization"),
+          getSection(call5Sections, "schema_recommendations", "Schema Markup Recommendations"),
+          getSection(call5Sections, "aeo_content_strategy", "AEO Content Strategy"),
+          getSection(call5Sections, "link_building", "Link Building Strategy"),
+          getSection(call5Sections, "seo_aeo_kpis", "SEO/AEO KPIs"),
+          ...(call5Sections["local_seo"] ? [call5Sections["local_seo"]] : []),
+          SEO_MEASUREMENT_TEMPLATES,
+          SEO_ONGOING_MANAGEMENT,
+        ],
+      },
+    ];
+
+    const sections: ContentPlanSection[] = sectionDefs.map((def, i) => {
+      const markdown = def.markdownParts.join("\n\n");
+      return {
+        section_number: i + 1,
+        section_title: def.title,
+        markdown,
+        word_count: countWords(markdown),
+      };
+    });
+
+    // Assemble full document
+    const engagementMeta = {
+      client: input.client.company_name,
+      industry: extractIndustry(roadmapData),
+      date: new Date().toISOString().slice(0, 10),
+    };
+
+    const full_document_markdown = assembleFullDocument(
+      title,
+      engagementMeta,
+      call1Sections,
+      call2Sections,
+      call3Sections,
+      call4Sections,
+      call5Sections,
+      sections
+    );
+
+    const totalWordCount = sections.reduce((sum, s) => sum + s.word_count, 0);
 
     const output: GeneratedContentPlanOutput = {
       type: "content_plan",
       title,
       summary,
-
-      overview: {
-        section_description: CONTENT_PLAN_BOILERPLATE.overview,
-        engagement_summary: {
-          client: input.client.company_name,
-          industry: extractIndustry(roadmapData),
-          engagement_start_date: new Date().toISOString().split("T")[0],
-          content_plan_delivery_date: new Date().toISOString().split("T")[0],
-          first_content_launch_target: getDateWeeksFromNow(10),
-        },
-      },
-
-      foundation: {
-        section_description: CONTENT_PLAN_BOILERPLATE.foundation,
-        content_mission: call1Result.content_mission,
-        content_categories: call1Result.content_categories,
-        asset_types: call1Result.asset_types,
-        content_attributes_description: CONTENT_PLAN_BOILERPLATE.content_attributes,
-        content_brief_description: CONTENT_PLAN_BOILERPLATE.content_brief,
-        content_intelligence_description: CONTENT_PLAN_BOILERPLATE.content_intelligence,
-      },
-
-      brand_positioning: {
-        section_description: CONTENT_PLAN_BOILERPLATE.brand_positioning,
-        storybrand_methodology_description: CONTENT_PLAN_BOILERPLATE.storybrand_methodology,
-        messaging: call1Result.messaging,
-      },
-
-      content_program: {
-        section_description: CONTENT_PLAN_BOILERPLATE.content_program,
-        flagship_program: call2Result.flagship_program as unknown as FlagshipProgram,
-        episode_structure: call2Result.episode_structure as unknown as EpisodeStructure,
-      },
-
-      content_workflow: {
-        section_description: CONTENT_PLAN_BOILERPLATE.content_workflow,
-        three_phase_workflow_description: CONTENT_PLAN_BOILERPLATE.three_phase_workflow,
-        production_process_description: CONTENT_PLAN_BOILERPLATE.production_process,
-        raci_description: CONTENT_PLAN_BOILERPLATE.raci_matrix,
-      },
-
-      content_amplification: {
-        section_description: CONTENT_PLAN_BOILERPLATE.content_amplification,
-        owned_channels: call3Result.owned_channels as unknown as ChannelRecommendation[],
-        earned_channels: call3Result.earned_channels as unknown as ChannelRecommendation[],
-        paid_channels: call3Result.paid_channels as unknown as ChannelRecommendation[],
-        abm_integration: call3Result.abm_integration as unknown as AbmTactic[],
-      },
-
-      ongoing_management: {
-        section_description: CONTENT_PLAN_BOILERPLATE.ongoing_management,
-        monthly_review_description: CONTENT_PLAN_BOILERPLATE.monthly_review,
-        quarterly_audit_description: CONTENT_PLAN_BOILERPLATE.quarterly_audit,
-        refresh_retirement_description: CONTENT_PLAN_BOILERPLATE.refresh_retirement,
-        kpi_targets: call3Result.kpi_targets as unknown as KpiTarget[],
-      },
-
-      next_steps: {
-        section_description: CONTENT_PLAN_BOILERPLATE.next_steps,
-        onboarding_checklist_description: CONTENT_PLAN_BOILERPLATE.onboarding_checklist,
-        milestones_30_day: call3Result.milestones.milestones_30_day as unknown as Milestone[],
-        milestones_60_day: call3Result.milestones.milestones_60_day as unknown as Milestone[],
-        milestones_90_day: call3Result.milestones.milestones_90_day as unknown as Milestone[],
-      },
-
-      seo_aeo_appendix: {
-        section_description: CONTENT_PLAN_BOILERPLATE.seo_aeo_appendix,
-        aeo_seo_intro_description: CONTENT_PLAN_BOILERPLATE.aeo_seo_intro,
-        content_structure_description: CONTENT_PLAN_BOILERPLATE.content_structure_guidelines,
-        snippet_optimization_description: CONTENT_PLAN_BOILERPLATE.snippet_optimization,
-        video_podcast_seo_description: CONTENT_PLAN_BOILERPLATE.video_podcast_seo,
-        measurement_description: CONTENT_PLAN_BOILERPLATE.measurement_templates,
-        ongoing_management_description: CONTENT_PLAN_BOILERPLATE.ongoing_seo_management,
-
-        technical_seo_summary: call4Result.technical_seo_summary,
-        technical_seo_recommendations: call4Result.technical_seo_recommendations as unknown as TechnicalSeoRecommendation[],
-        site_architecture_summary: call4Result.site_architecture_summary,
-        keyword_strategy_summary: call4Result.keyword_strategy_summary,
-        topic_clusters: call4Result.topic_clusters as unknown as TopicCluster[],
-        faq_paa_targets: call4Result.faq_paa_targets as unknown as FaqPaaTarget[],
-
-        entity_optimization_plan: call5Result.entity_optimization_plan,
-        schema_recommendations: call5Result.schema_recommendations as unknown as SchemaRecommendation[],
-        aeo_content_recommendations: call5Result.aeo_content_recommendations as unknown as AeoContentRecommendation[],
-        link_building_tactics: call5Result.link_building_tactics as unknown as LinkBuildingTactic[],
-        seo_aeo_kpi_targets: call5Result.seo_aeo_kpi_targets as unknown as SeoAeoKpiTarget[],
-        local_seo_recommendations: call5Result.local_seo_recommendations.length > 0
-          ? call5Result.local_seo_recommendations as unknown as LocalSeoRecommendation[]
-          : undefined,
-      },
-
+      sections,
+      full_document_markdown,
       metadata: {
         model: MODEL,
         version: extractPreviousVersion(input.previous_content_plan as Record<string, unknown> | undefined) + 1,
         generated_at: new Date().toISOString(),
+        total_word_count: totalWordCount,
         roadmap_title: (roadmapData.title as string) || `Marketing Roadmap: ${input.client.company_name}`,
         seo_audit_title: (seoAuditData.title as string) || `SEO/AEO Audit: ${input.client.company_name}`,
       },
@@ -333,15 +589,6 @@ function extractIndustry(roadmap: Record<string, unknown>): string {
     // Fall through
   }
   return "B2B";
-}
-
-/**
- * Get a date N weeks from now, formatted as YYYY-MM-DD.
- */
-function getDateWeeksFromNow(weeks: number): string {
-  const date = new Date();
-  date.setDate(date.getDate() + weeks * 7);
-  return date.toISOString().split("T")[0];
 }
 
 /**
