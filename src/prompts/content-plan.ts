@@ -179,6 +179,7 @@ function formatPreviousContentPlan(
  * - <!-- SECTION: content_mission -->
  * - <!-- SECTION: content_categories -->
  * - <!-- SECTION: asset_types -->
+ * - <!-- SECTION: brand_canvas -->
  * - <!-- SECTION: messaging_guidelines -->
  */
 export function buildFoundationAndMessagingPrompt(
@@ -213,7 +214,7 @@ ${previousContext}
 
 # Task: Write Foundation + Brand Messaging Sections
 
-Write four markdown sections, each preceded by an HTML comment marker. Write in professional narrative prose with tables, bullet lists, and bold text as appropriate.
+Write five markdown sections, each preceded by an HTML comment marker. Write in professional narrative prose with tables, bullet lists, and bold text as appropriate.
 
 <!-- SECTION: content_mission -->
 ## Content Mission
@@ -225,7 +226,15 @@ Ground this in the roadmap's target market profiles and StoryBrand framework.
 <!-- SECTION: content_categories -->
 ## Content Categories
 
-Create 4-6 content categories (topic pillars). For each category, write a subsection (### Category Name) containing:
+Create 4-6 content categories (topic pillars).
+
+First, present a summary table:
+
+| Category | Description |
+|---|---|
+| [Category Name] | [10-15 word description of what this category covers] |
+
+Then, for each category, write a detailed subsection (### Category Name) containing:
 - A 30-50 word description of what this category covers and why it matters to the audience
 - **ICP Alignment:** Which ICPs this category serves (from roadmap target_market)
 - **Example Topics:** 3-5 example topics within this category
@@ -242,10 +251,36 @@ Categories should:
 
 Select 5-8 asset types the program will produce. Present as a table:
 
-| Asset Type | Cadence | Primary Owner | Notes |
-|---|---|---|---|
+| Asset Type | Cadence | Notes |
+|---|---|---|
 
 Asset types should align with the ICPs' content preferences (from empathy map data) and the flagship program format that will be designed later.
+
+<!-- SECTION: brand_canvas -->
+## Brand Canvas
+
+Render the client's actual StoryBrand framework from the roadmap's brand_story data. Do NOT describe the StoryBrand methodology generically — extract and present the CLIENT-SPECIFIC brand story elements. Present each element with the client's actual content:
+
+**Character:** Who is the hero (the customer)? What do they want?
+
+**Problem:**
+- **External Problem:** The tangible challenge they face
+- **Internal Problem:** How it makes them feel
+- **Philosophical Problem:** Why it's just plain wrong
+
+**Guide:** How the client demonstrates empathy and authority
+
+**The Plan:** The clear steps the client gives customers (typically 3 steps)
+
+**Call to Action:**
+- **Direct CTA:** The primary action (e.g., "Schedule a consultation")
+- **Transitional CTA:** The lower-commitment action (e.g., "Download our guide")
+
+**Avoid Failure:** What's at stake if they don't act
+
+**Achieve Success:** The transformation — what life looks like after
+
+Pull ALL of this directly from the roadmap's brand_story section. Use the client's actual language and specifics, not generic placeholders.
 
 <!-- SECTION: messaging_guidelines -->
 ## Messaging Guidelines

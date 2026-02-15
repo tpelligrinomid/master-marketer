@@ -30,7 +30,15 @@ export const OVERVIEW_INTRO = `A content plan is the strategic foundation for ev
 
 Without a documented plan, content efforts fragment — teams produce one-off assets that don't connect, messaging drifts, and results become impossible to measure. A content plan aligns stakeholders around a shared strategy and gives every contributor a north star.
 
-This document includes: Foundation (mission, audiences, content categories, asset types, and content intelligence infrastructure), Brand Positioning & Messaging (the StoryBrand-based messaging framework), Content Program (the flagship content series), Workflow & Production (the step-by-step process from idea to published asset), Amplification (how content reaches its audience across owned, earned, and paid channels), Ongoing Management (the review cadence, metrics, and optimization process), and the AEO/SEO Strategy Appendix (the full search and answer-engine optimization layer).`;
+**This document includes:**
+
+- **Content Foundation** — Mission, audiences, content categories, asset types, and content intelligence infrastructure
+- **Brand Positioning & Messaging** — The StoryBrand-based messaging framework
+- **Content Program** — The flagship content series and episode structure
+- **Workflow & Production** — The step-by-step process from idea to published asset
+- **Content Amplification** — How content reaches its audience across owned, earned, and paid channels
+- **Ongoing Management & Optimization** — The review cadence, metrics, and optimization process
+- **SEO/AEO Strategy Appendix** — The full search and answer-engine optimization layer`;
 
 // ─────────────────────────────────────────────
 // Section 2: Content Foundation
@@ -51,7 +59,41 @@ Every piece of content carries attributes that determine where it fits in the st
 
 export const FOUNDATION_CONTENT_BRIEF = `### Content Brief Template
 
-A content brief is the handoff document between strategy and production. Every piece of content should have a brief before production begins. This ensures alignment on intent, audience, and success criteria. The brief template includes fields for strategy (asset type, content category, target ICP, buying stage, business objective), content (abstract, key points, target length), inputs & references (SME, reference materials, competitor content, database source assets), SEO/AEO (primary keyword, secondary keywords, target intent, schema type, snippet opportunity, AI answer target), distribution (primary channel, amplification plan, internal links), and approval workflow.`;
+A content brief is the handoff document between strategy and production. Every piece of content should have a brief before production begins. This ensures alignment on intent, audience, and success criteria.
+
+**Strategy**
+- **Asset Type:** Blog Post
+- **Content Category:** [e.g., Talent Acquisition Strategy]
+- **Target ICP:** [e.g., VP of HR at mid-market companies]
+- **Buying Stage:** Awareness
+- **Business Objective:** Drive organic traffic to pillar page; build thought leadership
+
+**Content**
+- **Working Title:** "The Hidden Cost of a Bad Hire — And How to Prevent It"
+- **Abstract:** Explores the financial and cultural impact of poor hiring decisions, positions the client's methodology as the preventive solution. Targets HR leaders who feel the pain but haven't started evaluating partners.
+- **Key Points:** (1) Quantify the cost of a bad hire, (2) Root causes most companies miss, (3) Framework for building a hiring process that filters earlier, (4) CTA to assessment or consultation
+- **Target Length:** 1,500–2,000 words
+
+**Inputs & References**
+- **SME:** [Client CEO or Head of Talent]
+- **Reference Materials:** Industry salary data, internal case study, capture session transcript from [date]
+- **Competitor Content:** [Competitor blog post URL to beat]
+- **Database Source Assets:** Capture session #4 (hiring methodology discussion), existing FAQ content
+
+**SEO/AEO**
+- **Primary Keyword:** [e.g., "cost of a bad hire"]
+- **Secondary Keywords:** [e.g., "bad hire statistics," "hiring mistakes"]
+- **Target Intent:** Informational
+- **Schema Type:** Article
+- **Snippet Opportunity:** Paragraph snippet for "how much does a bad hire cost"
+- **AI Answer Target:** "What is the cost of a bad hire?"
+
+**Distribution**
+- **Primary Channel:** Website blog (pillar cluster)
+- **Amplification Plan:** LinkedIn organic (3 posts), email newsletter feature, paid promotion ($200 budget)
+- **Internal Links:** Link to pillar page, link to related case study
+
+**Approval:** Strategist drafts → Client reviews → One revision round → Publish`;
 
 export const FOUNDATION_CONTENT_INTELLIGENCE = `### Content Intelligence Infrastructure
 
@@ -73,18 +115,6 @@ The database grows continuously through structured capture sessions with subject
 
 export const BRAND_POSITIONING_INTRO = `Establishing a distinct and resonant brand story is a crucial part of everything developed in the content program. This section synthesizes the StoryBrand framework from the marketing roadmap into messaging guidelines that ensure every piece of content — from blog posts to video episodes — reinforces a consistent narrative.`;
 
-export const BRAND_STORYBRAND_METHODOLOGY = `### The StoryBrand Framework
-
-We use Donald Miller's StoryBrand Framework to structure brand messaging. The core insight: your customer is the hero of the story, not your brand. Your brand is the guide. This framework ensures every content piece reinforces a consistent narrative. The seven elements are:
-
-1. **A Character** — your customer wants something
-2. **Has a Problem** — something stands in their way
-3. **And Meets a Guide** — your brand demonstrates empathy and authority
-4. **Who Gives Them a Plan** — a clear path forward
-5. **And Calls Them to Action** — direct and transitional CTAs
-6. **That Helps Them Avoid Failure** — what's at stake
-7. **And Ends in Success** — the transformation they achieve`;
-
 // ─────────────────────────────────────────────
 // Section 4: Content Program
 // ─────────────────────────────────────────────
@@ -95,7 +125,7 @@ export const CONTENT_PROGRAM_INTRO = `A content program is different from a cont
 // Section 5: Content Workflow & Production (boilerplate only)
 // ─────────────────────────────────────────────
 
-export const WORKFLOW_INTRO = `This section defines the step-by-step process from idea to published asset, powered by the content database. It covers the three-phase workflow, the detailed production process, and the responsibilities matrix.`;
+export const WORKFLOW_INTRO = `This section defines the step-by-step process from idea to published asset, powered by the content database. It covers the three-phase workflow and the detailed production process.`;
 
 export const WORKFLOW_THREE_PHASE = `### Three-Phase Workflow
 
@@ -123,25 +153,6 @@ export const WORKFLOW_PRODUCTION_PROCESS = `### 12-Step Production Process
 | 10 | Connect | Distribution — push to owned channels |
 | 11 | Connect | Amplification — activate paid promotion, outreach, employee advocacy |
 | 12 | Connect | Performance Tracking — monitor initial performance at 48-hour, 1-week, 1-month checkpoints |`;
-
-export const WORKFLOW_RACI = `### RACI Responsibilities Matrix
-
-| Activity | Client | Agency Strategist | Agency Producer | Agency Designer |
-|---|---|---|---|---|
-| Topic identification | C | R | I | I |
-| Content brief approval | A | R | C | I |
-| Recording / interview | R | C | R | I |
-| Writing / editing | C | R | R | I |
-| Design / visual production | C | C | I | R |
-| SEO/AEO optimization | I | R | R | I |
-| Final approval | A | R | R | R |
-| Publishing | I | A | R | I |
-| Social media distribution | C | R | R | R |
-| Paid promotion | A | R | I | C |
-| Performance reporting | I | R | C | I |
-| Content database maintenance | C | R | R | I |
-
-**Legend:** R = Responsible, A = Accountable (approver), C = Consulted, I = Informed`;
 
 // ─────────────────────────────────────────────
 // Section 6: Content Amplification

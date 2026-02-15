@@ -13,12 +13,10 @@ import {
   FOUNDATION_CONTENT_BRIEF,
   FOUNDATION_CONTENT_INTELLIGENCE,
   BRAND_POSITIONING_INTRO,
-  BRAND_STORYBRAND_METHODOLOGY,
   CONTENT_PROGRAM_INTRO,
   WORKFLOW_INTRO,
   WORKFLOW_THREE_PHASE,
   WORKFLOW_PRODUCTION_PROCESS,
-  WORKFLOW_RACI,
   AMPLIFICATION_INTRO,
   MANAGEMENT_INTRO,
   MANAGEMENT_MONTHLY_REVIEW,
@@ -153,7 +151,7 @@ function assembleFullDocument(
   parts.push("");
 
   // ── Section 1: Overview ──
-  parts.push("# 1. Overview");
+  parts.push("# Overview");
   parts.push("");
   parts.push(OVERVIEW_INTRO);
   parts.push("");
@@ -161,7 +159,7 @@ function assembleFullDocument(
   parts.push("");
 
   // ── Section 2: Content Foundation ──
-  parts.push("# 2. Content Foundation");
+  parts.push("# Content Foundation");
   parts.push("");
   parts.push(FOUNDATION_INTRO);
   parts.push("");
@@ -181,11 +179,11 @@ function assembleFullDocument(
   parts.push("");
 
   // ── Section 3: Brand Positioning & Messaging ──
-  parts.push("# 3. Brand Positioning & Messaging");
+  parts.push("# Brand Positioning & Messaging");
   parts.push("");
   parts.push(BRAND_POSITIONING_INTRO);
   parts.push("");
-  parts.push(BRAND_STORYBRAND_METHODOLOGY);
+  parts.push(getSection(call1Sections, "brand_canvas", "Brand Canvas"));
   parts.push("");
   parts.push(getSection(call1Sections, "messaging_guidelines", "Messaging Guidelines"));
   parts.push("");
@@ -193,7 +191,7 @@ function assembleFullDocument(
   parts.push("");
 
   // ── Section 4: Content Program ──
-  parts.push("# 4. Content Program");
+  parts.push("# Content Program");
   parts.push("");
   parts.push(CONTENT_PROGRAM_INTRO);
   parts.push("");
@@ -205,7 +203,7 @@ function assembleFullDocument(
   parts.push("");
 
   // ── Section 5: Content Workflow & Production (boilerplate only) ──
-  parts.push("# 5. Content Workflow & Production");
+  parts.push("# Content Workflow & Production");
   parts.push("");
   parts.push(WORKFLOW_INTRO);
   parts.push("");
@@ -213,13 +211,11 @@ function assembleFullDocument(
   parts.push("");
   parts.push(WORKFLOW_PRODUCTION_PROCESS);
   parts.push("");
-  parts.push(WORKFLOW_RACI);
-  parts.push("");
   parts.push("---");
   parts.push("");
 
   // ── Section 6: Content Amplification ──
-  parts.push("# 6. Content Amplification");
+  parts.push("# Content Amplification");
   parts.push("");
   parts.push(AMPLIFICATION_INTRO);
   parts.push("");
@@ -231,7 +227,7 @@ function assembleFullDocument(
   parts.push("");
 
   // ── Section 7: Ongoing Management & Optimization ──
-  parts.push("# 7. Ongoing Management & Optimization");
+  parts.push("# Ongoing Management & Optimization");
   parts.push("");
   parts.push(MANAGEMENT_INTRO);
   parts.push("");
@@ -247,7 +243,7 @@ function assembleFullDocument(
   parts.push("");
 
   // ── Section 8: Next Steps ──
-  parts.push("# 8. Next Steps & Action Items");
+  parts.push("# Next Steps & Action Items");
   parts.push("");
   parts.push(NEXT_STEPS_INTRO);
   parts.push("");
@@ -439,7 +435,7 @@ export const generateContentPlan = task({
         title: "Brand Positioning & Messaging",
         markdownParts: [
           BRAND_POSITIONING_INTRO,
-          BRAND_STORYBRAND_METHODOLOGY,
+          getSection(call1Sections, "brand_canvas", "Brand Canvas"),
           getSection(call1Sections, "messaging_guidelines", "Messaging Guidelines"),
         ],
       },
@@ -457,7 +453,6 @@ export const generateContentPlan = task({
           WORKFLOW_INTRO,
           WORKFLOW_THREE_PHASE,
           WORKFLOW_PRODUCTION_PROCESS,
-          WORKFLOW_RACI,
         ],
       },
       {
