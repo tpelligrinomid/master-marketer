@@ -179,6 +179,7 @@ function formatPreviousContentPlan(
  * - <!-- SECTION: content_mission -->
  * - <!-- SECTION: content_categories -->
  * - <!-- SECTION: asset_types -->
+ * - <!-- SECTION: content_brief_example -->
  * - <!-- SECTION: brand_canvas -->
  * - <!-- SECTION: messaging_guidelines -->
  */
@@ -214,7 +215,7 @@ ${previousContext}
 
 # Task: Write Foundation + Brand Messaging Sections
 
-Write five markdown sections, each preceded by an HTML comment marker. Write in professional narrative prose with tables, bullet lists, and bold text as appropriate.
+Write six markdown sections, each preceded by an HTML comment marker. Write in professional narrative prose with tables, bullet lists, and bold text as appropriate.
 
 <!-- SECTION: content_mission -->
 ## Content Mission
@@ -255,6 +256,49 @@ Select 5-8 asset types the program will produce. Present as a table:
 |---|---|---|
 
 Asset types should align with the ICPs' content preferences (from empathy map data) and the flagship program format that will be designed later.
+
+<!-- SECTION: content_brief_example -->
+## Sample Content Brief
+
+Write a complete sample content brief for ONE specific content piece that this client would actually produce. Use the client's real content categories, ICPs, keywords from the SEO audit, and business context. The brief should demonstrate how the template works with real content.
+
+Format it exactly as follows, filling in every field with client-specific content:
+
+**Strategy**
+- **Asset Type:** [pick one from the asset types above]
+- **Content Category:** [pick one from the categories above]
+- **Target ICP:** [use an actual ICP name and title from the roadmap]
+- **Buying Stage:** [Awareness, Consideration, or Decision]
+- **Business Objective:** [specific objective tied to roadmap goals]
+
+**Content**
+- **Working Title:** [a compelling, specific title for this client]
+- **Abstract:** [2-3 sentences describing the piece — specific to this client's expertise and audience pain points]
+- **Key Points:** [4-5 numbered key points the piece will cover]
+- **Target Length:** [appropriate length for the asset type]
+
+**Inputs & References**
+- **SME:** [a specific person/role from the client's team]
+- **Reference Materials:** [specific data sources, studies, or internal materials]
+- **Competitor Content:** [reference a competitor and their content to beat]
+- **Database Source Assets:** [specific capture sessions or existing content to draw from]
+
+**SEO/AEO**
+- **Primary Keyword:** [a real keyword from the SEO audit data]
+- **Secondary Keywords:** [2-3 real keywords from the SEO audit data]
+- **Target Intent:** [Informational, Commercial, or Transactional]
+- **Schema Type:** [Article, FAQ, HowTo, etc.]
+- **Snippet Opportunity:** [specific snippet format and target query]
+- **AI Answer Target:** [specific question this content should answer in AI engines]
+
+**Distribution**
+- **Primary Channel:** [specific channel]
+- **Amplification Plan:** [2-3 specific distribution tactics]
+- **Internal Links:** [specific pages to link to/from]
+
+**Approval:** Strategist drafts → Client reviews → One revision round → Publish
+
+Make this brief feel like a REAL assignment a content team would execute — not a template with placeholders.
 
 <!-- SECTION: brand_canvas -->
 ## Brand Canvas

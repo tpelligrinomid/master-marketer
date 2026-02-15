@@ -10,7 +10,7 @@ import {
   OVERVIEW_INTRO,
   FOUNDATION_INTRO,
   FOUNDATION_CONTENT_ATTRIBUTES,
-  FOUNDATION_CONTENT_BRIEF,
+  FOUNDATION_CONTENT_BRIEF_INTRO,
   FOUNDATION_CONTENT_INTELLIGENCE,
   BRAND_POSITIONING_INTRO,
   CONTENT_PROGRAM_INTRO,
@@ -171,7 +171,9 @@ function assembleFullDocument(
   parts.push("");
   parts.push(FOUNDATION_CONTENT_ATTRIBUTES);
   parts.push("");
-  parts.push(FOUNDATION_CONTENT_BRIEF);
+  parts.push(FOUNDATION_CONTENT_BRIEF_INTRO);
+  parts.push("");
+  parts.push(getSection(call1Sections, "content_brief_example", "Sample Content Brief"));
   parts.push("");
   parts.push(FOUNDATION_CONTENT_INTELLIGENCE);
   parts.push("");
@@ -427,7 +429,8 @@ export const generateContentPlan = task({
           getSection(call1Sections, "content_categories", "Content Categories"),
           getSection(call1Sections, "asset_types", "Asset Types"),
           FOUNDATION_CONTENT_ATTRIBUTES,
-          FOUNDATION_CONTENT_BRIEF,
+          FOUNDATION_CONTENT_BRIEF_INTRO,
+          getSection(call1Sections, "content_brief_example", "Sample Content Brief"),
           FOUNDATION_CONTENT_INTELLIGENCE,
         ],
       },

@@ -57,43 +57,11 @@ Every piece of content carries attributes that determine where it fits in the st
 | **Decision** | Prospect is ready to select a partner or solution | Prove ROI, reduce risk, enable action | Case studies, demos, ROI calculators, proposals |
 | **Customer Success** | Existing customer who can expand, renew, or refer | Retain, upsell, activate advocacy | Tutorials, advanced guides, community content, review requests |`;
 
-export const FOUNDATION_CONTENT_BRIEF = `### Content Brief Template
+export const FOUNDATION_CONTENT_BRIEF_INTRO = `### Content Brief Template
 
-A content brief is the handoff document between strategy and production. Every piece of content should have a brief before production begins. This ensures alignment on intent, audience, and success criteria.
+A content brief is the handoff document between strategy and production. Every piece of content should have a brief before production begins. This ensures alignment on intent, audience, and success criteria. Each brief covers: strategy (asset type, content category, target ICP, buying stage, business objective), content (title, abstract, key points, target length), inputs & references (SME, reference materials, competitor content, database source assets), SEO/AEO (primary keyword, secondary keywords, target intent, schema type, snippet opportunity, AI answer target), distribution (primary channel, amplification plan, internal links), and approval workflow.
 
-**Strategy**
-- **Asset Type:** Blog Post
-- **Content Category:** [e.g., Talent Acquisition Strategy]
-- **Target ICP:** [e.g., VP of HR at mid-market companies]
-- **Buying Stage:** Awareness
-- **Business Objective:** Drive organic traffic to pillar page; build thought leadership
-
-**Content**
-- **Working Title:** "The Hidden Cost of a Bad Hire — And How to Prevent It"
-- **Abstract:** Explores the financial and cultural impact of poor hiring decisions, positions the client's methodology as the preventive solution. Targets HR leaders who feel the pain but haven't started evaluating partners.
-- **Key Points:** (1) Quantify the cost of a bad hire, (2) Root causes most companies miss, (3) Framework for building a hiring process that filters earlier, (4) CTA to assessment or consultation
-- **Target Length:** 1,500–2,000 words
-
-**Inputs & References**
-- **SME:** [Client CEO or Head of Talent]
-- **Reference Materials:** Industry salary data, internal case study, capture session transcript from [date]
-- **Competitor Content:** [Competitor blog post URL to beat]
-- **Database Source Assets:** Capture session #4 (hiring methodology discussion), existing FAQ content
-
-**SEO/AEO**
-- **Primary Keyword:** [e.g., "cost of a bad hire"]
-- **Secondary Keywords:** [e.g., "bad hire statistics," "hiring mistakes"]
-- **Target Intent:** Informational
-- **Schema Type:** Article
-- **Snippet Opportunity:** Paragraph snippet for "how much does a bad hire cost"
-- **AI Answer Target:** "What is the cost of a bad hire?"
-
-**Distribution**
-- **Primary Channel:** Website blog (pillar cluster)
-- **Amplification Plan:** LinkedIn organic (3 posts), email newsletter feature, paid promotion ($200 budget)
-- **Internal Links:** Link to pillar page, link to related case study
-
-**Approval:** Strategist drafts → Client reviews → One revision round → Publish`;
+Below is a sample brief for this client's content program:`;
 
 export const FOUNDATION_CONTENT_INTELLIGENCE = `### Content Intelligence Infrastructure
 
