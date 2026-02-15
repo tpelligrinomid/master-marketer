@@ -293,7 +293,7 @@ export const generateContentPlan = task({
 
       metadata: {
         model: MODEL,
-        version: 1,
+        version: extractPreviousVersion(input.previous_content_plan as Record<string, unknown> | undefined) + 1,
         generated_at: new Date().toISOString(),
         roadmap_title: (roadmapData.title as string) || `Marketing Roadmap: ${input.client.company_name}`,
         seo_audit_title: (seoAuditData.title as string) || `SEO/AEO Audit: ${input.client.company_name}`,
@@ -342,4 +342,20 @@ function getDateWeeksFromNow(weeks: number): string {
   const date = new Date();
   date.setDate(date.getDate() + weeks * 7);
   return date.toISOString().split("T")[0];
+}
+
+/**
+ * Extract the version number from a previous content plan output.
+ * Returns 0 if no previous plan exists (so version starts at 1).
+ */
+function extractPreviousVersion(
+  previousPlan: Record<string, unknown> | undefined
+): number {
+  if (!previousPlan) return 0;
+  try {
+    const metadata = previousPlan.metadata as { version?: number } | undefined;
+    return metadata?.version ?? 0;
+  } catch {
+    return 0;
+  }
 }

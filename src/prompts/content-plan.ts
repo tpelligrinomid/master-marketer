@@ -117,6 +117,36 @@ function summarizeSeoAuditForContext(
   return parts.join("\n");
 }
 
+/**
+ * Format previous content plan sections for quarterly iteration.
+ * Same pattern as formatPreviousRoadmap in roadmap.ts.
+ */
+function formatPreviousContentPlan(
+  previousPlan: Record<string, unknown> | undefined,
+  sectionKeys: string[],
+  guidance: string
+): string {
+  if (!previousPlan) return "";
+
+  const parts = [
+    "# Previous Quarter's Content Plan (for continuity)\n",
+    "You are building a QUARTERLY UPDATE to an existing content plan. The previous version's relevant sections are below. Evolve it — don't regenerate from scratch. Maintain continuity where appropriate, and make fresh strategic choices where indicated.\n",
+  ];
+
+  for (const key of sectionKeys) {
+    const value = previousPlan[key];
+    if (value === undefined) continue;
+    const json = JSON.stringify(value, null, 2);
+    const truncated =
+      json.length > 3000 ? json.slice(0, 3000) + "\n... (truncated)" : json;
+    parts.push(`## Previous ${key}\n\`\`\`json\n${truncated}\n\`\`\`\n`);
+  }
+
+  parts.push(`## Evolution Guidance\n${guidance}\n`);
+
+  return parts.join("\n");
+}
+
 // --- Prompt Builders ---
 
 /**
@@ -145,6 +175,11 @@ export function buildFoundationAndMessagingPrompt(
     input.seo_audit as Record<string, unknown>,
     ["keyword_landscape", "content_gap"]
   );
+  const previousContext = formatPreviousContentPlan(
+    input.previous_content_plan as Record<string, unknown> | undefined,
+    ["foundation", "brand_positioning"],
+    "Keep content categories stable unless the business has pivoted or new SEO data reveals missed opportunities. Refine the content mission only if ICPs or brand story have changed. Update asset type cadences based on what worked. Evolve messaging dos/donts based on lessons learned — keep the one-liner and elevator pitch consistent unless StoryBrand has been updated."
+  );
 
   const user = `${context}
 
@@ -153,6 +188,8 @@ ${transcripts}
 ${roadmapContext}
 
 ${seoContext}
+
+${previousContext}
 
 ---
 
@@ -261,6 +298,11 @@ export function buildContentProgramPrompt(
     input.roadmap as Record<string, unknown>,
     ["target_market", "brand_story", "roadmap_phases"]
   );
+  const previousContext = formatPreviousContentPlan(
+    input.previous_content_plan as Record<string, unknown> | undefined,
+    ["content_program"],
+    "Keep the flagship program name, format, and identity — these are brand assets that build equity over time. Evolve the theme statement only if the audience or positioning has shifted. Update the episode structure if feedback or performance data suggests changes. Keep the host the same unless there's a reason to change. Refresh derivative asset strategy based on what channels performed best."
+  );
 
   const user = `${context}
 
@@ -269,6 +311,8 @@ ${transcripts}
 ${priorResults}
 
 ${roadmapContext}
+
+${previousContext}
 
 ---
 
@@ -360,6 +404,11 @@ export function buildAmplificationAndManagementPrompt(
     input.seo_audit as Record<string, unknown>,
     ["competitive_search"]
   );
+  const previousContext = formatPreviousContentPlan(
+    input.previous_content_plan as Record<string, unknown> | undefined,
+    ["content_amplification", "ongoing_management", "next_steps"],
+    "Generate FRESH 30/60/90-day milestones for the new quarter — do not repeat prior milestones. Update KPI targets based on actual performance vs. prior goals (raise targets that were hit, adjust ones that were missed). Adjust channel priorities based on what worked — double down on high-performing channels, deprioritize underperformers. Evolve ABM tactics based on account engagement data."
+  );
 
   // Include competitive scores for channel strength analysis
   const competitiveScores = input.research.competitive_scores;
@@ -376,6 +425,8 @@ ${roadmapContext}
 ${seoContext}
 
 ${scoresBlock}
+
+${previousContext}
 
 ---
 
@@ -477,6 +528,11 @@ export function buildSeoFoundationAndClustersPrompt(
     input.roadmap as Record<string, unknown>,
     ["target_market"]
   );
+  const previousContext = formatPreviousContentPlan(
+    input.previous_content_plan as Record<string, unknown> | undefined,
+    ["seo_aeo_appendix"],
+    "Keep the topic cluster structure stable — pillar pages are long-term investments. Update subtopics based on new keyword data and content that has already been published (mark published subtopics and add new ones). Refresh technical SEO recommendations based on the new audit — remove resolved issues, add new ones. Update FAQ/PAA targets with new questions that have surfaced and remove ones that have been answered."
+  );
 
   const user = `${context}
 
@@ -485,6 +541,8 @@ ${priorResults}
 ${seoContext}
 
 ${roadmapContext}
+
+${previousContext}
 
 ---
 
@@ -593,12 +651,19 @@ export function buildAeoAndAuthorityPrompt(
     input.seo_audit as Record<string, unknown>,
     ["serp_features_aeo", "backlink_profile", "competitive_search", "technical_seo"]
   );
+  const previousContext = formatPreviousContentPlan(
+    input.previous_content_plan as Record<string, unknown> | undefined,
+    ["seo_aeo_appendix"],
+    "Update schema recommendations based on what has been implemented — remove completed items, add new enrichment opportunities. Refresh AEO content recommendations based on new SERP/AEO data and what content has been published. Evolve link building tactics based on what worked (which tactics produced links, which didn't). Update SEO/AEO KPI targets based on actual performance — raise targets that were exceeded, adjust underperforming ones. Refresh entity optimization based on new AI visibility data."
+  );
 
   const user = `${context}
 
 ${priorResults}
 
 ${seoContext}
+
+${previousContext}
 
 ---
 
