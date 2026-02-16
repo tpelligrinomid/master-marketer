@@ -62,6 +62,8 @@ function createIntakeRoute(type: DeliverableType) {
 
       const parseResult = DeliverableIntakeInputSchema.safeParse(body);
       if (!parseResult.success) {
+        console.error(`[intake/${type}] Validation failed:`, JSON.stringify(parseResult.error.flatten()));
+        console.error(`[intake/${type}] Received keys:`, Object.keys(body));
         res.status(400).json({
           error: "Invalid input",
           details: parseResult.error.flatten(),
@@ -104,6 +106,8 @@ router.post(
 
       const parseResult = MeetingNotesInputSchema.safeParse(body);
       if (!parseResult.success) {
+        console.error("[intake/meeting-notes] Validation failed:", JSON.stringify(parseResult.error.flatten()));
+        console.error("[intake/meeting-notes] Received keys:", Object.keys(body));
         res.status(400).json({
           error: "Invalid input",
           details: parseResult.error.flatten(),
@@ -145,6 +149,8 @@ router.post(
 
       const parseResult = ResearchInputSchema.safeParse(body);
       if (!parseResult.success) {
+        console.error("[intake/research] Validation failed:", JSON.stringify(parseResult.error.flatten()));
+        console.error("[intake/research] Received keys:", Object.keys(body));
         res.status(400).json({
           error: "Invalid input",
           details: parseResult.error.flatten(),
@@ -194,6 +200,8 @@ const seoAuditHandler = async (req: Request, res: Response, next: NextFunction) 
 
       const parseResult = SeoAuditInputSchema.safeParse(body);
       if (!parseResult.success) {
+        console.error("[intake/seo-audit] Validation failed:", JSON.stringify(parseResult.error.flatten()));
+        console.error("[intake/seo-audit] Received keys:", Object.keys(body));
         res.status(400).json({
           error: "Invalid input",
           details: parseResult.error.flatten(),
@@ -236,6 +244,8 @@ const contentPlanHandler = async (req: Request, res: Response, next: NextFunctio
 
       const parseResult = ContentPlanInputSchema.safeParse(body);
       if (!parseResult.success) {
+        console.error("[intake/content-plan] Validation failed:", JSON.stringify(parseResult.error.flatten()));
+        console.error("[intake/content-plan] Received keys:", Object.keys(body));
         res.status(400).json({
           error: "Invalid input",
           details: parseResult.error.flatten(),
