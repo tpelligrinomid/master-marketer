@@ -124,7 +124,7 @@ Generate a JSON object with two top-level keys: \`target_market\` and \`brand_st
 ## target_market
 
 Create 2-3 Ideal Customer Profiles (ICPs). Each profile has:
-- \`target_account\`: An ideal target account with name, description (30-40 words), location, industry, revenue range, number_of_employees range, technologies array, and key_characteristics array (3-5 bullets)
+- \`target_account\`: An ideal target account with name (a descriptive label for the account TYPE — e.g., "Enterprise Manufacturing Leaders" or "Mid-Market SaaS Companies" — NOT a fictional company name), description (30-40 words), location, industry, revenue range, number_of_employees range, technologies array, and key_characteristics array (3-5 bullets)
 - \`empathy_map\`: A fictional persona with fictional_name, fictional_job_title, and empathy dimensions: thinks, feels, says, does, sees, hears, pains, goals (each 1-2 sentences)
 
 Ground personas in the research data and meeting transcripts. If meetings mention specific buyer types, industries, or pain points, those take priority.
@@ -210,7 +210,7 @@ Generate a JSON object with two top-level keys: \`products_and_solutions\` and \
 
 ## products_and_solutions
 
-Identify the client's key products/solutions from the research and meetings. For each product:
+Identify the client's core products or services — the things they sell to customers. Do NOT include marketing tactics, lead magnets, downloadable tools, or campaign assets (e.g., eBooks, ROI calculators, webinars) — those are marketing vehicles, not products. For each product:
 - \`product\`: Product or solution name
 - \`helps_overcome\`: 50-75 words on what challenges this helps overcome
 - \`picture_of_success\`: 50-75 words on what success looks like
@@ -375,7 +375,7 @@ ${previousContext}
 # Process Library (available deliverables to select from)
 ${processMenu}
 
-# Points Budget: ${input.points_budget} points (across 3 months)
+# Points Budget: ${input.points_budget} points PER MONTH
 
 ---
 
@@ -398,20 +398,20 @@ Create 3-5 categories with 2-4 initiatives each.
 
 ## points_plan
 
-Select deliverables from the Process Library above and allocate across 3 months. Rules:
+Select deliverables from the Process Library above and allocate across 3 months. The budget is ${input.points_budget} points PER MONTH — each month gets its own ${input.points_budget}-point budget. Rules:
 - Only select tasks that exist in the Process Library — use exact task names
-- Total points across all 3 months must not exceed the budget of ${input.points_budget} points
+- Each month's total must not exceed ${input.points_budget} points
 - Month 1 should focus on Foundation-stage tasks
 - Month 2 should ramp into Execution-stage tasks
 - Month 3 should include Analysis-stage tasks alongside continued execution
-- Each month should have a balanced workload
+- Each month should use its full budget (aim to get close to ${input.points_budget} points each month)
 
 For each month:
 - \`month\`: e.g., "Month 1" or a specific month name
 - \`tasks\`: Array of selected tasks with exact task name, description, stage, and points from the library
 - \`month_total\`: Sum of points for that month
 
-Also include \`total_points\`: the total points allocated (should be <= ${input.points_budget}).
+Also include \`total_points\`: the grand total points allocated across all 3 months (should be approximately ${input.points_budget} × 3 = ${input.points_budget * 3}).
 
 Return as:
 \`\`\`
