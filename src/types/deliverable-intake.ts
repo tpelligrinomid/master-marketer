@@ -9,10 +9,14 @@ const DeliverableContextSchema = z.object({
 });
 
 export const DeliverableIntakeInputSchema = z.object({
-  content: z.string(),
+  content: z.string().optional(),
+  file_url: z.string().url().optional(),
   deliverable_type: z.enum(["roadmap", "plan", "brief"]),
   context: DeliverableContextSchema,
-});
+}).refine(
+  (data) => data.content || data.file_url,
+  { message: "Either content or file_url is required" }
+);
 
 export type DeliverableIntakeInput = z.infer<typeof DeliverableIntakeInputSchema>;
 export type DeliverableType = DeliverableIntakeInput["deliverable_type"];

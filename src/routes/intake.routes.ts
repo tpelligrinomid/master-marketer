@@ -7,6 +7,7 @@ import { ResearchInputSchema } from "../types/research-input";
 import { SeoAuditInputSchema } from "../types/seo-audit-input";
 import { ContentPlanInputSchema } from "../types/content-plan-input";
 import { jobStore } from "../lib/job-store";
+import { fetchAndParseFile } from "../lib/file-parse";
 import { getEnv } from "../config/env";
 
 const router = Router();
@@ -74,9 +75,18 @@ function createIntakeRoute(type: DeliverableType) {
       const input = parseResult.data;
       const jobId = uuidv4();
 
+      // If file_url provided, fetch and parse the file to get content
+      let content = input.content;
+      if (!content && input.file_url) {
+        console.log(`[intake/${type}] Fetching file: ${input.file_url}`);
+        content = await fetchAndParseFile(input.file_url);
+        console.log(`[intake/${type}] Parsed ${content.length} chars from file`);
+      }
+
       // Pass callback info through to the Trigger.dev task — IT will deliver results
       const triggerPayload = {
         ...input,
+        content, // always a string by this point
         _callback: buildCallbackPayload(callbackUrl, callbackMetadata),
         _jobId: jobId,
       };

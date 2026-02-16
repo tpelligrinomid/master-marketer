@@ -144,11 +144,12 @@ Builds a new content plan from roadmap + SEO audit + research. See `src/types/co
 
 `POST /api/intake/roadmap` | `/api/intake/plan` | `/api/intake/brief`
 
-Takes raw text of an existing document and restructures it.
+Takes raw text (or a file URL) of an existing document and restructures it. Provide either `content` or `file_url` (at least one is required).
 
 ```json
 {
-  "content": "string (required) — the full text content of the existing document",
+  "content": "string (optional) — the full text content of the existing document",
+  "file_url": "string (optional) — URL to a PDF, DOCX, or text file to fetch and parse",
   "context": {
     "contract_name": "string (required)",
     "industry": "string (required)",
@@ -156,6 +157,8 @@ Takes raw text of an existing document and restructures it.
   }
 }
 ```
+
+**File URL support:** When `file_url` is provided instead of `content`, the server fetches the file and extracts text server-side. Supported file types: `.pdf`, `.docx`, `.doc`, `.txt`, `.md`. If both fields are provided, `content` takes precedence.
 
 ### Meeting Notes
 
