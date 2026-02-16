@@ -16,7 +16,8 @@ Your approach synthesizes THREE sources of insight:
 
 Output rules:
 - Write in professional, narrative markdown suitable for a C-suite audience
-- Use headers (##, ###), tables, bullet lists, bold text, and blockquotes as appropriate
+- NEVER use # (h1) or ## (h2) — those heading levels are reserved for the document title and section headers added during assembly. Use ### for section sub-headers, #### for sub-sub-headers
+- Use tables, bullet lists, bold text, and blockquotes as appropriate
 - Every recommendation must be specific and client-relevant — no placeholder text like "TBD" or "[insert here]"
 - All recommendations must be grounded in the roadmap data, SEO audit data, and meeting context provided
 - Content categories must map to SEO keyword clusters from the audit
@@ -218,14 +219,14 @@ ${previousContext}
 Write six markdown sections, each preceded by an HTML comment marker. Write in professional narrative prose with tables, bullet lists, and bold text as appropriate.
 
 <!-- SECTION: content_mission -->
-## Content Mission
+### Content Mission
 
 Write a content mission statement as a narrative paragraph. The mission should define the intersection of the client's expertise and their audience's needs — answering: Who is the audience? What will they get? Why does it matter? Follow with 2-3 sentences of rationale explaining why this mission is appropriate given the client's ICPs, brand story, and business goals.
 
 Ground this in the roadmap's target market profiles and StoryBrand framework.
 
 <!-- SECTION: content_categories -->
-## Content Categories
+### Content Categories
 
 Create 4-6 content categories (topic pillars).
 
@@ -235,7 +236,7 @@ First, present a summary table:
 |---|---|
 | [Category Name] | [10-15 word description of what this category covers] |
 
-Then, for each category, write a detailed subsection (### Category Name) containing:
+Then, for each category, write a detailed subsection (#### Category Name) containing:
 - A 30-50 word description of what this category covers and why it matters to the audience
 - **ICP Alignment:** Which ICPs this category serves (from roadmap target_market)
 - **Example Topics:** 3-5 example topics within this category
@@ -248,7 +249,7 @@ Categories should:
 4. Each sustain at least 12 months of unique content ideas
 
 <!-- SECTION: asset_types -->
-## Asset Types
+### Asset Types
 
 Select 5-8 asset types the program will produce. Present as a table:
 
@@ -258,7 +259,7 @@ Select 5-8 asset types the program will produce. Present as a table:
 Asset types should align with the ICPs' content preferences (from empathy map data) and the flagship program format that will be designed later.
 
 <!-- SECTION: content_brief_example -->
-## Sample Content Brief
+### Sample Content Brief
 
 Write a complete sample content brief for ONE specific content piece that this client would actually produce. Use the client's real content categories, ICPs, keywords from the SEO audit, and business context. The brief should demonstrate how the template works with real content.
 
@@ -301,7 +302,7 @@ Format it exactly as follows, filling in every field with client-specific conten
 Make this brief feel like a REAL assignment a content team would execute — not a template with placeholders.
 
 <!-- SECTION: brand_canvas -->
-## Brand Canvas
+### Brand Canvas
 
 Render the client's actual StoryBrand framework from the roadmap's brand_story data. Do NOT describe the StoryBrand methodology generically — extract and present the CLIENT-SPECIFIC brand story elements. Present each element with the client's actual content:
 
@@ -327,7 +328,7 @@ Render the client's actual StoryBrand framework from the roadmap's brand_story d
 Pull ALL of this directly from the roadmap's brand_story section. Use the client's actual language and specifics, not generic placeholders.
 
 <!-- SECTION: messaging_guidelines -->
-## Messaging Guidelines
+### Messaging Guidelines
 
 Create messaging guidelines derived from the StoryBrand framework:
 
@@ -384,7 +385,7 @@ ${previousContext}
 Write two markdown sections, each preceded by an HTML comment marker. Write in professional narrative prose with tables and structured formatting.
 
 <!-- SECTION: flagship_program -->
-## Flagship Program
+### Flagship Program
 
 Design the centerpiece content program. Write as narrative prose that covers:
 - **Program Name:** A branded name for the series (e.g., "The Talent Table", "Growth Signals"). Should be memorable, relevant, and ownable.
@@ -403,7 +404,7 @@ Follow the narrative with a summary table capturing the key program parameters.
 The program name and format should reflect the client's brand personality (from StoryBrand) and resonate with the target ICPs.
 
 <!-- SECTION: episode_structure -->
-## Episode Structure
+### Episode Structure
 
 Design the episode format:
 
@@ -473,20 +474,20 @@ ${previousContext}
 Write four markdown sections, each preceded by an HTML comment marker. Write in professional narrative prose with tables, bullet lists, and bold text.
 
 <!-- SECTION: content_amplification -->
-## Content Amplification
+### Content Amplification
 
 Write three subsections for channel recommendations:
 
-### Owned Channels
+#### Owned Channels
 For each of 3-5 owned channels, write a brief paragraph covering: channel name, 3-5 specific tactics (referencing the content categories and flagship program), cadence, priority level, and rationale. Then present a summary table:
 
 | Channel | Priority | Cadence | Key Tactics |
 |---|---|---|---|
 
-### Earned Channels
+#### Earned Channels
 Same format as owned channels for 3-5 earned channel recommendations.
 
-### Paid Channels
+#### Paid Channels
 Same format for 3-5 paid channel recommendations.
 
 Channel recommendations should:
@@ -496,7 +497,7 @@ Channel recommendations should:
 - Include specific, actionable tactics (not just "post content on LinkedIn")
 
 <!-- SECTION: abm_integration -->
-## ABM Integration
+### ABM Integration
 
 Create 4-6 ABM integration tactics. Present as a table:
 
@@ -506,7 +507,7 @@ Create 4-6 ABM integration tactics. Present as a table:
 Each content integration description should be specific to this client's content categories and program.
 
 <!-- SECTION: kpi_targets -->
-## KPI Targets
+### KPI Targets
 
 Create 8-12 KPI targets spanning content, engagement, and business outcomes. Present as a table:
 
@@ -519,20 +520,20 @@ KPI targets should:
 - Be realistic for the client's stage and resources
 
 <!-- SECTION: milestones -->
-## 30/60/90-Day Milestones
+### 30/60/90-Day Milestones
 
 Write three subsections:
 
-### Days 1-30: Foundation
+#### Days 1-30: Foundation
 Present 5-7 milestones as a table:
 
 | Milestone | Target | Category |
 |---|---|---|
 
-### Days 31-60: Build
+#### Days 31-60: Build
 Present 4-6 milestones in the same table format.
 
-### Days 61-90: Launch & Optimize
+#### Days 61-90: Launch & Optimize
 Present 4-6 milestones in the same table format.
 
 Milestones should align with the roadmap phases and reflect the realistic timeline for standing up the content program.`;
@@ -586,7 +587,7 @@ ${previousContext}
 Write five markdown sections, each preceded by an HTML comment marker. Write in professional narrative prose with tables and structured formatting.
 
 <!-- SECTION: technical_seo -->
-## Technical SEO Assessment
+### Technical SEO Assessment
 
 Write a 3-5 sentence summary of the client's technical SEO health, drawn from the SEO audit's technical_seo section. Reference the health score, key issues, and the technical verdict.
 
@@ -596,19 +597,19 @@ Then present 5-8 technical SEO recommendations as a table:
 |---|---|---|---|
 
 <!-- SECTION: site_architecture -->
-## Site Architecture
+### Site Architecture
 
 Write a 3-5 sentence narrative recommending the hub-and-spoke (topic cluster) site architecture approach, specifically mapping to the content categories defined in the foundation section. Explain how pillar pages will map to categories and how cluster content will fill keyword gaps identified in the SEO audit.
 
 <!-- SECTION: keyword_strategy -->
-## Keyword Strategy
+### Keyword Strategy
 
 Write a 3-5 sentence summary of the keyword strategy, synthesizing the SEO audit's keyword landscape and content gaps into strategic direction. Reference the most impactful keyword clusters and how they map to the content categories.
 
 <!-- SECTION: topic_clusters -->
-## Topic Clusters
+### Topic Clusters
 
-Create one topic cluster per content category (from the foundation section). For each cluster, write a subsection (### Cluster: [Category Name]) containing:
+Create one topic cluster per content category (from the foundation section). For each cluster, write a subsection (#### Cluster: [Category Name]) containing:
 
 **Pillar Page:** [Topic] | Primary Keyword: [keyword] | Search Volume: [volume]
 
@@ -625,7 +626,7 @@ Include 4-6 subtopics per cluster. Topic clusters must:
 - Include a mix of informational and commercial intent keywords
 
 <!-- SECTION: faq_paa -->
-## FAQ & People Also Ask Targets
+### FAQ & People Also Ask Targets
 
 Create 10-15 FAQ/PAA targets as a table:
 
@@ -678,12 +679,12 @@ ${previousContext}
 Write five or six markdown sections, each preceded by an HTML comment marker. Write in professional narrative prose with tables and structured formatting.
 
 <!-- SECTION: entity_optimization -->
-## Entity Optimization
+### Entity Optimization
 
 Write a 4-6 sentence plan for building entity authority for the client's brand, key people, and core topics. Reference the SEO audit's schema inventory and SERP/AEO data to identify what's already established and what needs development. Include specific tactics for building entity recognition in AI answer engines.
 
 <!-- SECTION: schema_recommendations -->
-## Schema Markup Recommendations
+### Schema Markup Recommendations
 
 Create 5-8 schema markup recommendations as a table:
 
@@ -693,9 +694,9 @@ Create 5-8 schema markup recommendations as a table:
 Reference the existing schema inventory from the SEO audit. For types already implemented, recommend enrichments. For missing types, recommend implementation. Only recommend valid Schema.org types.
 
 <!-- SECTION: aeo_content_strategy -->
-## AEO Content Strategy
+### AEO Content Strategy
 
-Create 5-8 AEO content recommendations. For each tactic, write a subsection (### [Tactic Name]) containing:
+Create 5-8 AEO content recommendations. For each tactic, write a subsection (#### [Tactic Name]) containing:
 - 2-3 sentences describing the specific approach
 - **Target Queries:** 3-5 specific queries this tactic targets (from the SEO audit's PAA/snippet/AI overview data)
 - **Expected Impact:** Expected impact description
@@ -703,7 +704,7 @@ Create 5-8 AEO content recommendations. For each tactic, write a subsection (###
 Recommendations should be grounded in the actual SERP features and AEO data from the audit.
 
 <!-- SECTION: link_building -->
-## Link Building Strategy
+### Link Building Strategy
 
 Create 5-7 link building tactics as a table:
 
@@ -713,7 +714,7 @@ Create 5-7 link building tactics as a table:
 Follow with a brief narrative paragraph for each high-priority tactic explaining the execution approach specific to this client. Reference the backlink profile data from the audit.
 
 <!-- SECTION: seo_aeo_kpis -->
-## SEO/AEO KPIs
+### SEO/AEO KPIs
 
 Create 8-10 SEO/AEO-specific KPI targets as a table:
 
@@ -723,7 +724,7 @@ Create 8-10 SEO/AEO-specific KPI targets as a table:
 These should complement (not duplicate) the management KPI targets from the earlier section. Focus on search-specific metrics.
 
 <!-- SECTION: local_seo -->
-## Local SEO
+### Local SEO
 
 If the client has a physical location or targets geographic markets, write 3-5 local SEO recommendations as a table:
 

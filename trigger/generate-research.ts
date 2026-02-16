@@ -53,7 +53,7 @@ function countWords(text: string): number {
 }
 
 function buildTableOfContents(sections: ResearchDocumentSection[]): string {
-  const lines = ["# Table of Contents", ""];
+  const lines = ["## Table of Contents", ""];
   for (const section of sections) {
     lines.push(
       `${section.section_number}. [${section.section_title}](#${section.section_title.toLowerCase().replace(/[^a-z0-9]+/g, "-")})`

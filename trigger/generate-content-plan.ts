@@ -73,7 +73,7 @@ function countWords(text: string): number {
 }
 
 function buildTableOfContents(sections: ContentPlanSection[]): string {
-  const lines = ["# Table of Contents", ""];
+  const lines = ["## Table of Contents", ""];
   for (const section of sections) {
     lines.push(
       `${section.section_number}. [${section.section_title}](#${section.section_title.toLowerCase().replace(/[^a-z0-9]+/g, "-")})`
@@ -151,7 +151,7 @@ function assembleFullDocument(
   parts.push("");
 
   // ── Section 1: Overview ──
-  parts.push("# Overview");
+  parts.push("## Overview");
   parts.push("");
   parts.push(OVERVIEW_INTRO);
   parts.push("");
@@ -159,7 +159,7 @@ function assembleFullDocument(
   parts.push("");
 
   // ── Section 2: Content Foundation ──
-  parts.push("# Content Foundation");
+  parts.push("## Content Foundation");
   parts.push("");
   parts.push(FOUNDATION_INTRO);
   parts.push("");
@@ -181,7 +181,7 @@ function assembleFullDocument(
   parts.push("");
 
   // ── Section 3: Brand Positioning & Messaging ──
-  parts.push("# Brand Positioning & Messaging");
+  parts.push("## Brand Positioning & Messaging");
   parts.push("");
   parts.push(BRAND_POSITIONING_INTRO);
   parts.push("");
@@ -193,7 +193,7 @@ function assembleFullDocument(
   parts.push("");
 
   // ── Section 4: Content Program ──
-  parts.push("# Content Program");
+  parts.push("## Content Program");
   parts.push("");
   parts.push(CONTENT_PROGRAM_INTRO);
   parts.push("");
@@ -205,7 +205,7 @@ function assembleFullDocument(
   parts.push("");
 
   // ── Section 5: Content Workflow & Production (boilerplate only) ──
-  parts.push("# Content Workflow & Production");
+  parts.push("## Content Workflow & Production");
   parts.push("");
   parts.push(WORKFLOW_INTRO);
   parts.push("");
@@ -217,7 +217,7 @@ function assembleFullDocument(
   parts.push("");
 
   // ── Section 6: Content Amplification ──
-  parts.push("# Content Amplification");
+  parts.push("## Content Amplification");
   parts.push("");
   parts.push(AMPLIFICATION_INTRO);
   parts.push("");
@@ -229,7 +229,7 @@ function assembleFullDocument(
   parts.push("");
 
   // ── Section 7: Ongoing Management & Optimization ──
-  parts.push("# Ongoing Management & Optimization");
+  parts.push("## Ongoing Management & Optimization");
   parts.push("");
   parts.push(MANAGEMENT_INTRO);
   parts.push("");
@@ -245,7 +245,7 @@ function assembleFullDocument(
   parts.push("");
 
   // ── Section 8: Next Steps ──
-  parts.push("# Next Steps & Action Items");
+  parts.push("## Next Steps & Action Items");
   parts.push("");
   parts.push(NEXT_STEPS_INTRO);
   parts.push("");
@@ -257,7 +257,7 @@ function assembleFullDocument(
   parts.push("");
 
   // ── Appendix: SEO/AEO Strategy ──
-  parts.push("# Appendix: SEO/AEO Strategy");
+  parts.push("## Appendix: SEO/AEO Strategy");
   parts.push("");
   parts.push(SEO_APPENDIX_INTRO);
   parts.push("");
@@ -406,7 +406,7 @@ export const generateContentPlan = task({
 
     // Build summary from Call 1 + Call 2 content
     const categorySection = call1Sections["content_categories"] || "";
-    const categoryCount = (categorySection.match(/^###\s/gm) || []).length || 4;
+    const categoryCount = (categorySection.match(/^####\s/gm) || []).length || 4;
     const programSection = call2Sections["flagship_program"] || "";
     const programNameMatch = programSection.match(/(?:\*\*Program Name:\*\*|"([^"]+)"|"([^"]+)")\s*(.+)/);
     const programName = programNameMatch

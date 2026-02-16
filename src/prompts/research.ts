@@ -32,7 +32,7 @@ Writing standards:
 - Bold key findings and critical metrics
 - Provide specific, actionable implications — not generic advice
 - Write in complete, publication-ready prose. Bullet points only inside tables or for brief enumeration within larger prose sections
-- Use proper markdown heading hierarchy (## for main sections, ### for subsections, #### for sub-subsections)
+- NEVER use # (h1) — that heading level is reserved for the document title added during assembly. Use ## for main sections, ### for subsections, #### for sub-subsections
 
 Output markdown only. No JSON wrapping. No meta-commentary about the task.`;
 
