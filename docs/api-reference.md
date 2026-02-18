@@ -29,8 +29,9 @@ All routes accept optional top-level fields that are stripped before validation:
 | Research | `POST /api/intake/research` | `generate-research` | `ResearchInputSchema` |
 | SEO Audit | `POST /api/intake/seo_audit` | `generate-seo-audit` | `SeoAuditInputSchema` |
 | Content Plan | `POST /api/intake/content_plan` | `generate-content-plan` | `ContentPlanInputSchema` |
+| ABM Plan | `POST /api/intake/abm_plan` | `generate-abm-plan` | `AbmPlanInputSchema` |
 
-> **Note:** Research, SEO Audit, and Content Plan generators live under `/api/intake/` for historical reasons. Duplicate routes also exist at `/api/generate/seo-audit` and `/api/generate/content-plan` (same behavior). Research has no `/api/generate/` equivalent.
+> **Note:** Research, SEO Audit, Content Plan, and ABM Plan generators live under `/api/intake/` for historical reasons. Duplicate routes also exist at `/api/generate/seo-audit`, `/api/generate/content-plan`, and `/api/generate/abm-plan` (same behavior). Research has no `/api/generate/` equivalent.
 
 ### Reformatters (ingest existing document, restructure it)
 
@@ -140,6 +141,76 @@ Builds a new SEO/AEO audit. See `src/types/seo-audit-input.ts` for full schema.
 
 Builds a new content plan from roadmap + SEO audit + research. See `src/types/content-plan-input.ts` for full schema.
 
+### Generate ABM Plan
+
+`POST /api/intake/abm_plan` (or `/api/generate/abm-plan`)
+
+Builds an Account-Based Marketing plan from roadmap, research, and client-specific channel/tech configuration. See `src/types/abm-plan-input.ts` for full schema and `docs/abm-plan-form-spec.md` for the frontend form spec.
+
+```json
+{
+  "client": {
+    "company_name": "string (required)",
+    "domain": "string (required)"
+  },
+  "roadmap": "object (required) — full roadmap output, passthrough",
+  "research": {
+    "full_document_markdown": "string (required)",
+    "competitive_scores": { "<Company>": { "organic_seo": 0, "...": "..." } }
+  },
+  "transcripts": ["string array"],
+  "target_segments": [
+    {
+      "segment_name": "string (required)",
+      "description": "string (required)",
+      "estimated_account_count": "number, positive (required)",
+      "tier": "tier_1 | tier_2 | tier_3 (required)"
+    }
+  ],
+  "offers": [
+    {
+      "offer_name": "string (required)",
+      "offer_type": "assessment | audit | demo | trial | consultation | report | case_study | webinar | toolkit | calculator | custom (required)",
+      "funnel_stage": "top | middle | bottom (required)",
+      "description": "string (optional)"
+    }
+  ],
+  "channels": {
+    "email": {
+      "enabled": true,
+      "platform": "smartlead | outreach | salesloft | apollo | instantly | other",
+      "sending_domains": ["string array, min 1"],
+      "daily_send_volume": "number, positive",
+      "warmup_needed": "boolean",
+      "sequences_count": "number, positive (optional)"
+    },
+    "linkedin_ads": {
+      "enabled": true,
+      "monthly_budget": "number, positive",
+      "formats": ["sponsored_content | message_ads | conversation_ads | text_ads | document_ads | video_ads | lead_gen_forms"]
+    },
+    "display_ads": { "enabled": true, "platform": "...", "monthly_budget": "number", "retargeting": "boolean" },
+    "direct_mail": { "enabled": true, "provider": "...", "budget_per_send": "number" },
+    "events": { "enabled": true, "types": ["webinars | trade_shows | ..."], "annual_event_count": "number" },
+    "website_intelligence": { "enabled": true, "platform": "factors_ai | rb2b | clearbit_reveal | leadfeeder | other" }
+  },
+  "tech_stack": {
+    "crm": "hubspot | salesforce | pipedrive | other (required)",
+    "marketing_automation": "hubspot | marketo | pardot | activecampaign | none | other (optional)",
+    "data_enrichment": "clay | apollo | zoominfo | lusha | clearbit | other (required)",
+    "intent_data": "factors_ai | bombora | 6sense | demandbase | g2 | none | other (optional)",
+    "workflow_automation": "n8n | zapier | make | tray_io | none | other (optional)"
+  },
+  "monthly_ad_budget": "number, positive (optional) — combined LinkedIn + display ad spend",
+  "sales_follow_up_sla_hours": "number, positive (optional, default 24)",
+  "launch_timeline": "30_days | 60_days | 90_days (optional, default 60_days)",
+  "instructions": "string (optional)",
+  "title": "string (optional)"
+}
+```
+
+**Channel validation:** At least one of `email` or `linkedin_ads` must be present. Each channel key is optional — only include channels that are enabled. Every enum field supports "other" with a companion `{field}_other` free-text string.
+
 ### Reformat Existing Document (Roadmap, Plan, Brief)
 
 `POST /api/intake/roadmap` | `/api/intake/plan` | `/api/intake/brief`
@@ -193,5 +264,6 @@ Poll `GET /api/jobs/:jobId` for completion, or use `callback_url` for push deliv
 | Roadmap | Structured JSON | Typed sections (target_market, brand_story, etc.) |
 | SEO Audit | Structured JSON | Typed sections (technical_seo, keyword_landscape, etc.) |
 | Content Plan | `full_document_markdown` + `sections[]` | Narrative markdown |
+| ABM Plan | `full_document_markdown` + `sections[]` | Narrative markdown |
 
-Research and Content Plan output narrative markdown documents. Roadmap and SEO Audit output structured JSON that frontends render into visual layouts.
+Research, Content Plan, and ABM Plan output narrative markdown documents. Roadmap and SEO Audit output structured JSON that frontends render into visual layouts.
