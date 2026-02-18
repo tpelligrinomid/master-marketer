@@ -3,13 +3,15 @@ import { v4 as uuidv4 } from "uuid";
 import { tasks } from "@trigger.dev/sdk/v3";
 import { MeetingNotesInputSchema } from "../types/meeting-notes";
 import { DeliverableIntakeInputSchema, DeliverableType } from "../types/deliverable-intake";
-import { ResearchInputSchema } from "../types/research-input";
-import { SeoAuditInputSchema } from "../types/seo-audit-input";
-import { ContentPlanInputSchema } from "../types/content-plan-input";
-import { AbmPlanInputSchema } from "../types/abm-plan-input";
 import { jobStore } from "../lib/job-store";
 import { fetchAndParseFile } from "../lib/file-parse";
 import { getEnv } from "../config/env";
+import {
+  researchHandler,
+  seoAuditHandler,
+  contentPlanHandler,
+  abmPlanHandler,
+} from "./generate.routes";
 
 const router = Router();
 
@@ -150,188 +152,17 @@ router.post(
   }
 );
 
-// POST /intake/research
-router.post(
-  "/research",
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { callbackUrl, callbackMetadata } = extractWebhookFields(req.body);
-      const body = stripWebhookFields(req.body);
-
-      const parseResult = ResearchInputSchema.safeParse(body);
-      if (!parseResult.success) {
-        console.error("[intake/research] Validation failed:", JSON.stringify(parseResult.error.flatten()));
-        console.error("[intake/research] Received keys:", Object.keys(body));
-        res.status(400).json({
-          error: "Invalid input",
-          details: parseResult.error.flatten(),
-        });
-        return;
-      }
-
-      const input = parseResult.data;
-      const jobId = uuidv4();
-
-      const triggerPayload = {
-        ...input,
-        _callback: buildCallbackPayload(callbackUrl, callbackMetadata),
-        _jobId: jobId,
-      };
-
-      const handle = await tasks.trigger("generate-research", triggerPayload);
-      jobStore.create(jobId, handle.id);
-
-      res.status(202).json({
-        jobId,
-        triggerRunId: handle.id,
-        status: "accepted",
-        message:
-          "Research generation started. Results will be delivered to callback_url when complete. You can also poll GET /api/jobs/:jobId for status.",
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-);
-
-// POST /intake/roadmap
+// Reformatter routes
 router.post("/roadmap", createIntakeRoute("roadmap"));
-
-// POST /intake/plan
 router.post("/plan", createIntakeRoute("plan"));
-
-// POST /intake/brief
 router.post("/brief", createIntakeRoute("brief"));
 
-// POST /intake/seo-audit and /intake/seo_audit (underscore alias for Mid App compatibility)
-const seoAuditHandler = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { callbackUrl, callbackMetadata } = extractWebhookFields(req.body);
-      const body = stripWebhookFields(req.body);
-
-      const parseResult = SeoAuditInputSchema.safeParse(body);
-      if (!parseResult.success) {
-        console.error("[intake/seo-audit] Validation failed:", JSON.stringify(parseResult.error.flatten()));
-        console.error("[intake/seo-audit] Received keys:", Object.keys(body));
-        res.status(400).json({
-          error: "Invalid input",
-          details: parseResult.error.flatten(),
-        });
-        return;
-      }
-
-      const input = parseResult.data;
-      const jobId = uuidv4();
-
-      const triggerPayload = {
-        ...input,
-        _callback: buildCallbackPayload(callbackUrl, callbackMetadata),
-        _jobId: jobId,
-      };
-
-      const handle = await tasks.trigger("generate-seo-audit", triggerPayload);
-      jobStore.create(jobId, handle.id);
-
-      res.status(202).json({
-        jobId,
-        triggerRunId: handle.id,
-        status: "accepted",
-        message:
-          "SEO/AEO audit generation started. Results will be delivered to callback_url when complete. You can also poll GET /api/jobs/:jobId for status.",
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
-
+// Legacy aliases — canonical routes are at /api/generate/*
+router.post("/research", researchHandler);
 router.post("/seo-audit", seoAuditHandler);
 router.post("/seo_audit", seoAuditHandler);
-
-// POST /intake/content-plan and /intake/content_plan (underscore alias for Mid App compatibility)
-const contentPlanHandler = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { callbackUrl, callbackMetadata } = extractWebhookFields(req.body);
-      const body = stripWebhookFields(req.body);
-
-      const parseResult = ContentPlanInputSchema.safeParse(body);
-      if (!parseResult.success) {
-        console.error("[intake/content-plan] Validation failed:", JSON.stringify(parseResult.error.flatten()));
-        console.error("[intake/content-plan] Received keys:", Object.keys(body));
-        res.status(400).json({
-          error: "Invalid input",
-          details: parseResult.error.flatten(),
-        });
-        return;
-      }
-
-      const input = parseResult.data;
-      const jobId = uuidv4();
-
-      const triggerPayload = {
-        ...input,
-        _callback: buildCallbackPayload(callbackUrl, callbackMetadata),
-        _jobId: jobId,
-      };
-
-      const handle = await tasks.trigger("generate-content-plan", triggerPayload);
-      jobStore.create(jobId, handle.id);
-
-      res.status(202).json({
-        jobId,
-        triggerRunId: handle.id,
-        status: "accepted",
-        message:
-          "Content plan generation started. Results will be delivered to callback_url when complete. You can also poll GET /api/jobs/:jobId for status.",
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
-
 router.post("/content-plan", contentPlanHandler);
 router.post("/content_plan", contentPlanHandler);
-
-// POST /intake/abm-plan and /intake/abm_plan (underscore alias for Mid App compatibility)
-const abmPlanHandler = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { callbackUrl, callbackMetadata } = extractWebhookFields(req.body);
-      const body = stripWebhookFields(req.body);
-
-      const parseResult = AbmPlanInputSchema.safeParse(body);
-      if (!parseResult.success) {
-        console.error("[intake/abm-plan] Validation failed:", JSON.stringify(parseResult.error.flatten()));
-        console.error("[intake/abm-plan] Received keys:", Object.keys(body));
-        res.status(400).json({
-          error: "Invalid input",
-          details: parseResult.error.flatten(),
-        });
-        return;
-      }
-
-      const input = parseResult.data;
-      const jobId = uuidv4();
-
-      const triggerPayload = {
-        ...input,
-        _callback: buildCallbackPayload(callbackUrl, callbackMetadata),
-        _jobId: jobId,
-      };
-
-      const handle = await tasks.trigger("generate-abm-plan", triggerPayload);
-      jobStore.create(jobId, handle.id);
-
-      res.status(202).json({
-        jobId,
-        triggerRunId: handle.id,
-        status: "accepted",
-        message:
-          "ABM plan generation started. Results will be delivered to callback_url when complete. You can also poll GET /api/jobs/:jobId for status.",
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
-
 router.post("/abm-plan", abmPlanHandler);
 router.post("/abm_plan", abmPlanHandler);
 

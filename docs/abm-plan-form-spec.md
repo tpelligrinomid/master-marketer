@@ -1,6 +1,6 @@
 # ABM Plan — Frontend Form Spec
 
-Target: Lovable (React + Tailwind). This form captures all configuration needed to generate an ABM plan. The API endpoint is `POST /api/intake/abm_plan`.
+Target: Lovable (React + Tailwind). This form captures all configuration needed to generate an ABM plan. The API endpoint is `POST /api/generate/abm-plan`.
 
 ---
 

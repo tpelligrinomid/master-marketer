@@ -26,12 +26,12 @@ All routes accept optional top-level fields that are stripped before validation:
 | Deliverable | Endpoint | Trigger Task | Input Schema |
 |-------------|----------|-------------|--------------|
 | Roadmap | `POST /api/generate/roadmap` | `generate-roadmap` | `RoadmapInputSchema` |
-| Research | `POST /api/intake/research` | `generate-research` | `ResearchInputSchema` |
-| SEO Audit | `POST /api/intake/seo_audit` | `generate-seo-audit` | `SeoAuditInputSchema` |
-| Content Plan | `POST /api/intake/content_plan` | `generate-content-plan` | `ContentPlanInputSchema` |
-| ABM Plan | `POST /api/intake/abm_plan` | `generate-abm-plan` | `AbmPlanInputSchema` |
+| Research | `POST /api/generate/research` | `generate-research` | `ResearchInputSchema` |
+| SEO Audit | `POST /api/generate/seo-audit` | `generate-seo-audit` | `SeoAuditInputSchema` |
+| Content Plan | `POST /api/generate/content-plan` | `generate-content-plan` | `ContentPlanInputSchema` |
+| ABM Plan | `POST /api/generate/abm-plan` | `generate-abm-plan` | `AbmPlanInputSchema` |
 
-> **Note:** Research, SEO Audit, Content Plan, and ABM Plan generators live under `/api/intake/` for historical reasons. Duplicate routes also exist at `/api/generate/seo-audit`, `/api/generate/content-plan`, and `/api/generate/abm-plan` (same behavior). Research has no `/api/generate/` equivalent.
+> **Legacy Aliases:** All generators are also available under `/api/intake/` for backwards compatibility (e.g. `/api/intake/seo_audit`, `/api/intake/content_plan`, `/api/intake/research`, `/api/intake/abm_plan`). These hit the same handler — no redirect. New integrations should use `/api/generate/*`.
 
 ### Reformatters (ingest existing document, restructure it)
 
@@ -96,7 +96,7 @@ Builds a new roadmap from research data, transcripts, and process library.
 
 ### Generate Research
 
-`POST /api/intake/research`
+`POST /api/generate/research`
 
 Builds a new competitive research report from client/competitor data.
 
@@ -131,19 +131,19 @@ Builds a new competitive research report from client/competitor data.
 
 ### Generate SEO Audit
 
-`POST /api/intake/seo_audit` (or `/api/generate/seo-audit`)
+`POST /api/generate/seo-audit`
 
 Builds a new SEO/AEO audit. See `src/types/seo-audit-input.ts` for full schema.
 
 ### Generate Content Plan
 
-`POST /api/intake/content_plan` (or `/api/generate/content-plan`)
+`POST /api/generate/content-plan`
 
 Builds a new content plan from roadmap + SEO audit + research. See `src/types/content-plan-input.ts` for full schema.
 
 ### Generate ABM Plan
 
-`POST /api/intake/abm_plan` (or `/api/generate/abm-plan`)
+`POST /api/generate/abm-plan`
 
 Builds an Account-Based Marketing plan from roadmap, research, and client-specific channel/tech configuration. See `src/types/abm-plan-input.ts` for full schema and `docs/abm-plan-form-spec.md` for the frontend form spec.
 
