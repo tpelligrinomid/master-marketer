@@ -27,7 +27,7 @@ Your approach synthesizes FOUR sources of insight:
 
 Output rules:
 - Write in professional, narrative markdown suitable for a C-suite audience
-- NEVER use # (h1) or ## (h2) — those heading levels are reserved for the document title and section headers added during assembly. Use ### for section sub-headers, #### for sub-sub-headers
+- NEVER use # (h1) or ## (h2) — those heading levels are reserved for the document title and section headers added during assembly. Do NOT repeat the section title as a heading — just begin writing the content directly after the SECTION marker. Use ### for sub-headers within a section, #### for sub-sub-headers
 - Use tables, bullet lists, bold text, and blockquotes as appropriate
 - Every recommendation must be specific and client-relevant — no placeholder text like "TBD" or "[insert here]"
 - All recommendations must be grounded in the roadmap data, research, meeting context, and ABM configuration provided
@@ -417,7 +417,6 @@ ${programSettings}
 Write three markdown sections, each preceded by an HTML comment marker. Write in professional narrative prose with tables, bullet lists, and bold text as appropriate.
 
 <!-- SECTION: executive_summary -->
-### Executive Summary
 
 Write a 3-5 paragraph executive summary that:
 - Opens with the client's strategic opportunity in account-based marketing, grounded in their market position and competitive landscape
@@ -428,7 +427,6 @@ Write a 3-5 paragraph executive summary that:
 The summary should be compelling enough to stand alone as a board-level briefing document. Reference specific data from the roadmap, research, and ABM configuration — no generic statements.
 
 <!-- SECTION: target_account_strategy -->
-### Target Account Strategy
 
 For each target segment defined in the configuration, write a detailed subsection (#### [Segment Name]) containing:
 
@@ -446,7 +444,6 @@ Present a summary comparison table after all segment subsections:
 Ground all recommendations in the roadmap's target market data, competitive research, and the client's actual business context from transcripts.
 
 <!-- SECTION: offer_strategy -->
-### Offer Strategy & Conversion Architecture
 
 Write a comprehensive offer strategy that:
 
@@ -508,7 +505,6 @@ Write the following markdown sections based on the enabled channels. Each sectio
   // --- Outbound Section ---
   if (hasEmail || hasDirectMail) {
     taskParts.push(`<!-- SECTION: outbound_channels -->
-### Outbound Channel Strategy
 
 Design a comprehensive outbound strategy for the enabled outbound channels. Write as professional narrative with detailed, actionable recommendations.
 `);
@@ -561,7 +557,6 @@ Present as a table:
   // --- Paid Media Section ---
   if (hasLinkedinAds || hasDisplayAds) {
     taskParts.push(`<!-- SECTION: paid_media -->
-### Paid Media & Advertising Strategy
 
 Design a comprehensive ABM paid media strategy for the enabled advertising channels.
 `);
@@ -612,7 +607,6 @@ ${d.retargeting ? "4. **Retargeting Strategy:** Design the retargeting workflow 
   // --- Events & Community Section ---
   if (hasEvents || hasWebIntel || hasIntentData) {
     taskParts.push(`<!-- SECTION: events_community -->
-### Events & Community Strategy
 
 Design the events and community engagement strategy for the ABM program.
 `);
@@ -736,7 +730,6 @@ ${roadmapContext}
 Write two markdown sections, each preceded by an HTML comment marker. Write in professional narrative prose with tables, diagrams (as text), and structured formatting.
 
 <!-- SECTION: tech_stack_architecture -->
-### Tech Stack Architecture & Data Flow
 
 Design the complete ABM tech stack architecture based on the configured tools.
 
@@ -771,7 +764,6 @@ Present as a table:
    - Decay rules for aging engagement
 
 <!-- SECTION: sales_marketing_alignment -->
-### Sales-Marketing Alignment & Lead Management
 
 Design the operational model for sales-marketing collaboration in the ABM program.
 
@@ -840,7 +832,6 @@ ${programSettings}
 Write two markdown sections, each preceded by an HTML comment marker. Write in professional narrative prose with tables, bullet lists, and bold text.
 
 <!-- SECTION: measurement_framework -->
-### Measurement Framework & KPIs
 
 Design the comprehensive ABM measurement framework. Follow the account-level measurement hierarchy (coverage → awareness → engagement → pipeline → revenue).
 
@@ -874,7 +865,6 @@ Design the comprehensive ABM measurement framework. Follow the account-level mea
 All targets should be realistic for the client's stage, grounded in the roadmap's goals, and appropriate for the number of target accounts and channels enabled.
 
 <!-- SECTION: launch_plan -->
-### Launch Plan & 30/60/90-Day Timeline
 
 Design the phased launch plan for the ABM program.${input.launch_timeline ? ` The client has specified a **${input.launch_timeline.replace(/_/g, " ")}** launch timeline.` : ""}
 
