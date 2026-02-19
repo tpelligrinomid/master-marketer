@@ -10,8 +10,7 @@ import {
   ABM_TIER_METHODOLOGY,
   OUTBOUND_INTRO,
   PAID_MEDIA_INTRO,
-  EVENTS_COMMUNITY_INTRO,
-  SLA_FRAMEWORK,
+  EVENT_MANAGEMENT_INTRO,
   MEASUREMENT_INTRO,
   LAUNCH_METHODOLOGY_INTRO,
 } from "../src/prompts/abm-plan-boilerplate";
@@ -107,8 +106,8 @@ function getSection(
  * Assemble the full document markdown by interleaving Claude-generated
  * sections with boilerplate blocks.
  *
- * Conditional flags (hasOutbound, hasPaidMedia, hasEventsCommunity) are
- * pre-computed by the task and passed in so they match the sectionDefs logic.
+ * Conditional flags (hasOutbound, hasPaidMedia) are pre-computed by the
+ * task and passed in so they match the sectionDefs logic.
  */
 function assembleFullDocument(
   title: string,
@@ -117,7 +116,7 @@ function assembleFullDocument(
   call2Sections: Record<string, string>,
   call3Sections: Record<string, string>,
   call4Sections: Record<string, string>,
-  conditionals: { hasOutbound: boolean; hasPaidMedia: boolean; hasEventsCommunity: boolean },
+  conditionals: { hasOutbound: boolean; hasPaidMedia: boolean },
   sections: AbmPlanSection[]
 ): string {
   const parts: string[] = [];
@@ -195,34 +194,21 @@ function assembleFullDocument(
     sectionIdx++;
   }
 
-  // ── Section: Events & Community (conditional) ──
-  if (conditionals.hasEventsCommunity) {
-    parts.push(`## ${sections[sectionIdx].section_title}`);
-    parts.push("");
-    parts.push(EVENTS_COMMUNITY_INTRO);
-    parts.push("");
-    parts.push(getSection(call2Sections, "events_community", "Events & Community Strategy"));
-    parts.push("");
-    parts.push("---");
-    parts.push("");
-    sectionIdx++;
-  }
-
-  // ── Section: Tech Stack Architecture (always) ──
+  // ── Section: Event Management System (always) ──
   parts.push(`## ${sections[sectionIdx].section_title}`);
   parts.push("");
-  parts.push(getSection(call3Sections, "tech_stack_architecture", "Tech Stack Architecture & Data Flow"));
+  parts.push(EVENT_MANAGEMENT_INTRO);
+  parts.push("");
+  parts.push(getSection(call3Sections, "event_management", "Event Management System"));
   parts.push("");
   parts.push("---");
   parts.push("");
   sectionIdx++;
 
-  // ── Section: Sales-Marketing Alignment (always) ──
+  // ── Section: Tech Stack Architecture & Data Flow (always) ──
   parts.push(`## ${sections[sectionIdx].section_title}`);
   parts.push("");
-  parts.push(SLA_FRAMEWORK);
-  parts.push("");
-  parts.push(getSection(call3Sections, "sales_marketing_alignment", "Sales-Marketing Alignment & Lead Management"));
+  parts.push(getSection(call3Sections, "tech_stack_architecture", "Tech Stack Architecture & Data Flow"));
   parts.push("");
   parts.push("---");
   parts.push("");
@@ -277,8 +263,6 @@ export const generateAbmPlan = task({
     // Determine which conditional sections are active
     const hasOutbound = !!channels.email || !!channels.direct_mail;
     const hasPaidMedia = !!channels.linkedin_ads || !!channels.display_ads;
-    const hasEventsCommunity = !!channels.events || !!channels.website_intelligence ||
-      !!(techStack.intent_data && techStack.intent_data !== "none");
 
     // Accumulated markdown from prior calls — carries forward for coherence
     const accumulated: string[] = [];
@@ -300,7 +284,7 @@ export const generateAbmPlan = task({
     // ═══════════════════════════════════════════════
     let call2Sections: Record<string, string> = {};
 
-    if (hasOutbound || hasPaidMedia || hasEventsCommunity) {
+    if (hasOutbound || hasPaidMedia) {
       metadata.set("phase", "call_2_channels");
       metadata.set("progress", "Generating channel strategies...");
 
@@ -312,10 +296,10 @@ export const generateAbmPlan = task({
     }
 
     // ═══════════════════════════════════════════════
-    // Call 3: Infrastructure (Tech Stack + Sales-Marketing Alignment)
+    // Call 3: Infrastructure (Event Management System + Tech Stack & Data Flow)
     // ═══════════════════════════════════════════════
     metadata.set("phase", "call_3_infrastructure");
-    metadata.set("progress", "Generating tech stack architecture and sales-marketing alignment...");
+    metadata.set("progress", "Generating event management system and tech stack architecture...");
 
     const call3Prompt = buildInfrastructurePrompt(input, accumulated);
     const call3Response = await callClaude(client, call3Prompt.system, call3Prompt.user);
@@ -395,33 +379,21 @@ export const generateAbmPlan = task({
       });
     }
 
-    // Conditional: section 6 — Events & Community
-    if (hasEventsCommunity) {
-      sectionDefs.push({
-        title: "Events & Community Strategy",
-        marker: "events_community",
-        markdownParts: [
-          EVENTS_COMMUNITY_INTRO,
-          getSection(call2Sections, "events_community", "Events & Community Strategy"),
-        ],
-      });
-    }
-
-    // Always present: sections 7-10
+    // Always present: sections 6-9
     sectionDefs.push(
+      {
+        title: "Event Management System",
+        marker: "event_management",
+        markdownParts: [
+          EVENT_MANAGEMENT_INTRO,
+          getSection(call3Sections, "event_management", "Event Management System"),
+        ],
+      },
       {
         title: "Tech Stack Architecture & Data Flow",
         marker: "tech_stack_architecture",
         markdownParts: [
           getSection(call3Sections, "tech_stack_architecture", "Tech Stack Architecture & Data Flow"),
-        ],
-      },
-      {
-        title: "Sales-Marketing Alignment & Lead Management",
-        marker: "sales_marketing_alignment",
-        markdownParts: [
-          SLA_FRAMEWORK,
-          getSection(call3Sections, "sales_marketing_alignment", "Sales-Marketing Alignment & Lead Management"),
         ],
       },
       {
@@ -466,7 +438,7 @@ export const generateAbmPlan = task({
       call2Sections,
       call3Sections,
       call4Sections,
-      { hasOutbound, hasPaidMedia, hasEventsCommunity },
+      { hasOutbound, hasPaidMedia },
       sections
     );
 
@@ -477,7 +449,7 @@ export const generateAbmPlan = task({
     );
 
     // Auto-generate summary
-    const summary = `This ABM plan for ${input.client.company_name} defines a ${input.target_segments.length}-segment account-based marketing program targeting ${totalTargetAccounts.toLocaleString()} accounts across ${enabledChannels.length} channels (${enabledChannels.map((c) => c.replace(/_/g, " ")).join(", ")}). It includes tiered engagement strategies, offer-to-funnel mapping, tech stack architecture, sales-marketing SLA, and a phased launch plan.`;
+    const summary = `This ABM plan for ${input.client.company_name} defines a ${input.target_segments.length}-segment account-based marketing program targeting ${totalTargetAccounts.toLocaleString()} accounts across ${enabledChannels.length} channels (${enabledChannels.map((c) => c.replace(/_/g, " ")).join(", ")}). It includes tiered engagement strategies, offer-to-funnel mapping, event management system, tech stack architecture with data flow, and a phased launch plan.`;
 
     const output: GeneratedAbmPlanOutput = {
       type: "abm_plan",

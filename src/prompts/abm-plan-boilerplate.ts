@@ -5,17 +5,16 @@
  * document assembly. Each block is pre-formatted markdown ready to be
  * concatenated into the full_document_markdown.
  *
- * Assembly order (sections 4-6 conditional based on enabled channels):
+ * Assembly order (sections 4-5 conditional based on enabled channels):
  *   1. Executive Summary — Claude Call 1
  *   2. Target Account Strategy — Claude Call 1 + ABM_TIER_METHODOLOGY boilerplate
  *   3. Offer Strategy & Conversion Architecture — Claude Call 1
  *   4. Outbound Channel Strategy — OUTBOUND_INTRO boilerplate + Claude Call 2 (if email or direct_mail)
  *   5. Paid Media & Advertising Strategy — PAID_MEDIA_INTRO boilerplate + Claude Call 2 (if linkedin_ads or display_ads)
- *   6. Events & Community Strategy — EVENTS_COMMUNITY_INTRO boilerplate + Claude Call 2 (if events, website_intelligence, or intent_data)
+ *   6. Event Management System — EVENT_MANAGEMENT_INTRO boilerplate + Claude Call 3
  *   7. Tech Stack Architecture & Data Flow — Claude Call 3
- *   8. Sales-Marketing Alignment & Lead Mgmt — SLA_FRAMEWORK boilerplate + Claude Call 3
- *   9. Measurement Framework & KPIs — MEASUREMENT_INTRO boilerplate + Claude Call 4
- *  10. Launch Plan & 30/60/90-Day Timeline — LAUNCH_METHODOLOGY_INTRO boilerplate + Claude Call 4
+ *   8. Measurement Framework & KPIs — MEASUREMENT_INTRO boilerplate + Claude Call 4
+ *   9. Launch Plan & 30/60/90-Day Timeline — LAUNCH_METHODOLOGY_INTRO boilerplate + Claude Call 4
  */
 
 // ─────────────────────────────────────────────
@@ -63,47 +62,18 @@ Key differences from demand gen paid media:
 - **Budget allocation follows account value** — Higher-value accounts and more advanced pipeline stages receive proportionally more ad spend`;
 
 // ─────────────────────────────────────────────
-// Section 6: Events & Community Strategy
+// Section 6: Event Management System
 // ─────────────────────────────────────────────
 
-export const EVENTS_COMMUNITY_INTRO = `Events are among the highest-impact touchpoints in an ABM program because they create real human connections that digital channels cannot replicate. In an account-based context, events are not just lead capture mechanisms — they are strategic engagement plays designed to accelerate relationships with specific target accounts.
+export const EVENT_MANAGEMENT_INTRO = `The event management system is the intelligence layer of the ABM program — it transforms raw engagement signals from every channel into actionable account-level intelligence. Rather than treating "events" as physical gatherings, this system defines "events" as trackable engagement signals: email opens, replies, website visits, ad clicks, form submissions, and content downloads.
 
-ABM event strategy differs from traditional event marketing in three ways:
+Built on a workflow automation platform, the event management system processes engagement signals in real-time, applies AI-powered classification to inbound replies, and routes qualified opportunities directly to sales. The sophistication lies not in the volume of data processed but in the intelligence applied to each signal.
 
-1. **Pre-event targeting** — Target accounts are identified and invited before the event. The event itself is a touchpoint in a broader orchestrated campaign, not a standalone activity.
-2. **During-event engagement** — Sales and marketing collaborate to ensure meaningful interactions with target account attendees. This includes pre-scheduled meetings, personalized booth experiences, and real-time intent capture.
-3. **Post-event follow-up** — Event engagement data feeds back into the ABM program. Attendees from target accounts receive tailored follow-up sequences, and non-attendees from those accounts receive "sorry we missed you" nurture streams.
+The system serves three critical functions:
 
-Website intelligence and intent data tools extend this philosophy into the digital realm — identifying which target accounts are actively researching relevant topics and visiting your site, enabling proactive and timely engagement.`;
-
-// ─────────────────────────────────────────────
-// Section 8: Sales-Marketing Alignment & Lead Mgmt
-// ─────────────────────────────────────────────
-
-export const SLA_FRAMEWORK = `### Sales-Marketing SLA Framework
-
-A service-level agreement (SLA) between sales and marketing is the operational backbone of any ABM program. Without clear commitments on both sides, account engagement stalls — marketing generates interest that sales never follows up on, or sales demands leads that marketing cannot qualify.
-
-The ABM SLA defines:
-
-**Marketing Commitments:**
-- Deliver account-qualified leads (AQLs) that meet agreed-upon criteria for account fit, engagement level, and buying stage
-- Provide sales with account intelligence packages for Tier 1 accounts (org charts, pain points, engagement history, intent signals)
-- Maintain and update target account lists on an agreed cadence
-- Deliver campaign performance data and account engagement scores
-
-**Sales Commitments:**
-- Follow up on Tier 1 AQLs within the agreed SLA window (typically 2-4 hours)
-- Follow up on Tier 2 AQLs within the agreed SLA window (typically 24-48 hours)
-- Log all account interactions in CRM for closed-loop reporting
-- Provide feedback on lead quality and account intelligence accuracy
-- Participate in weekly/biweekly ABM alignment meetings
-
-**Shared Commitments:**
-- Joint account planning sessions for Tier 1 accounts (quarterly)
-- Shared dashboard visibility into pipeline and engagement metrics
-- Regular review and refinement of AQL criteria
-- Collaborative win/loss analysis to improve targeting and messaging`;
+1. **Signal Processing** — Webhooks from email platforms, website intelligence tools, ad platforms, and CRM systems are received, validated, and transformed into standardized event records. Each event is tagged with an account ID, event type, source, and metadata for downstream analysis.
+2. **Intelligent Classification** — Inbound signals that require human judgment (email replies, form submissions) are processed through AI classification to determine intent, urgency, and routing. This eliminates manual triage while ensuring no qualified opportunity is missed.
+3. **Sales Notification & Handoff** — When engagement signals indicate buying intent, the system triggers immediate notifications to the appropriate sales representative with full account context, engagement history, and recommended next actions. SLA tracking ensures timely follow-up.`;
 
 // ─────────────────────────────────────────────
 // Section 9: Measurement Framework & KPIs

@@ -1,14 +1,4 @@
 import { AbmPlanInput } from "../types/abm-plan-input";
-import {
-  ABM_TIER_METHODOLOGY,
-  OUTBOUND_INTRO,
-  PAID_MEDIA_INTRO,
-  EVENTS_COMMUNITY_INTRO,
-  SLA_FRAMEWORK,
-  MEASUREMENT_INTRO,
-  LAUNCH_METHODOLOGY_INTRO,
-} from "./abm-plan-boilerplate";
-
 // --- System Prompt ---
 
 export const ABM_PLAN_SYSTEM_PROMPT = `You are a senior account-based marketing strategist at a top-tier B2B marketing consultancy building a client's ABM Plan — the comprehensive account-based marketing strategy document that turns a marketing roadmap, competitive research, and client input into an actionable ABM program.
@@ -467,12 +457,11 @@ Connect every recommendation to the specific offers, segments, and channels prov
 }
 
 /**
- * Call 2: Channel Strategy — Outbound + Paid Media + Events/Community (conditional)
+ * Call 2: Channel Strategy — Outbound + Paid Media (conditional)
  *
  * Produces markdown with SECTION markers (only for enabled channel groups):
  * - <!-- SECTION: outbound_channels --> (if email or direct_mail)
  * - <!-- SECTION: paid_media --> (if linkedin_ads or display_ads)
- * - <!-- SECTION: events_community --> (if events, website_intelligence, or intent_data)
  */
 export function buildChannelStrategyPrompt(
   input: AbmPlanInput,
@@ -490,9 +479,6 @@ export function buildChannelStrategyPrompt(
   const hasDirectMail = !!channels.direct_mail;
   const hasLinkedinAds = !!channels.linkedin_ads;
   const hasDisplayAds = !!channels.display_ads;
-  const hasEvents = !!channels.events;
-  const hasWebIntel = !!channels.website_intelligence;
-  const hasIntentData = !!(input.tech_stack.intent_data && input.tech_stack.intent_data !== "none");
 
   // Build the task section dynamically based on enabled channels
   const taskParts: string[] = [];
@@ -604,73 +590,6 @@ ${d.retargeting ? "4. **Retargeting Strategy:** Design the retargeting workflow 
     }
   }
 
-  // --- Events & Community Section ---
-  if (hasEvents || hasWebIntel || hasIntentData) {
-    taskParts.push(`<!-- SECTION: events_community -->
-
-Design the events and community engagement strategy for the ABM program.
-`);
-
-    if (hasEvents) {
-      const ev = channels.events!;
-      taskParts.push(`#### Events Calendar & Strategy
-
-Design the ABM events program with **${ev.annual_event_count} events per year** using these event types: **${ev.types.map((t) => t.replace(/_/g, " ")).join(", ")}**.
-
-Write:
-1. **Annual Events Calendar:** Design a 12-month events calendar with ${ev.annual_event_count} events. For each event, provide: event name/type, target quarter, target tier/segment, format, estimated attendees from target accounts, and primary objective.
-
-Present as a table:
-| Event | Quarter | Type | Target Tier | Est. Target Attendees | Objective |
-|---|---|---|---|---|---|
-
-2. **Pre-Event ABM Plays:** How target accounts are identified, invited, and engaged before each event type. Include personalization by tier.
-
-3. **Post-Event Follow-Up:** The follow-up workflow for each tier — what happens within 24 hours, 1 week, and 1 month after the event for attendees vs. no-shows from target accounts.
-`);
-    }
-
-    if (hasWebIntel) {
-      const wi = channels.website_intelligence!;
-      taskParts.push(`#### Website Intelligence
-
-Design the website intelligence workflow using **${resolveOther(wi.platform, wi.platform_other)}**.
-
-Write:
-1. **Identification Workflow:** How ${resolveOther(wi.platform, wi.platform_other)} identifies target account visits, what data is captured, and how alerts are routed to sales.
-
-2. **Engagement Triggers:** Define 3-5 website behaviors that trigger ABM plays (e.g., pricing page visit, multiple visits in a week, specific content consumption patterns). For each trigger, define the automated response.
-
-Present as a table:
-| Trigger | Behavior | Response | Owner | SLA |
-|---|---|---|---|---|
-
-3. **Integration with Outbound:** How website intelligence data feeds into email sequences, ad targeting, and sales outreach for coordinated follow-up.
-`);
-    }
-
-    if (hasIntentData) {
-      const intentTool = resolveOther(
-        input.tech_stack.intent_data!,
-        input.tech_stack.intent_data_other
-      );
-      taskParts.push(`#### Intent Data Strategy
-
-Design the intent data strategy using **${intentTool}**.
-
-Write:
-1. **Intent Signal Framework:** Define the intent signals that matter for this client's ABM program — what topics, keywords, and competitor research activities indicate buying intent. Map signals to funnel stages.
-
-2. **Signal-to-Action Mapping:** For each intent signal level (low, medium, high, surge), define the automated ABM response:
-
-| Intent Level | Signal Criteria | Marketing Action | Sales Action | Response SLA |
-|---|---|---|---|---|
-
-3. **Enrichment & Scoring:** How intent data from ${intentTool} integrates with the CRM and account scoring model to prioritize outreach.
-`);
-    }
-  }
-
   const user = `${context}
 
 ${priorSections}
@@ -691,11 +610,11 @@ ${taskParts.join("\n")}`;
 }
 
 /**
- * Call 3: Infrastructure — Tech Stack Architecture + Sales-Marketing Alignment
+ * Call 3: Infrastructure — Event Management System + Tech Stack Architecture & Data Flow
  *
  * Produces markdown with SECTION markers:
+ * - <!-- SECTION: event_management -->
  * - <!-- SECTION: tech_stack_architecture -->
- * - <!-- SECTION: sales_marketing_alignment -->
  */
 export function buildInfrastructurePrompt(
   input: AbmPlanInput,
@@ -711,6 +630,43 @@ export function buildInfrastructurePrompt(
     ["target_market", "goals"]
   );
 
+  const channels = input.channels;
+  const hasEmail = !!channels.email;
+  const hasWebIntel = !!channels.website_intelligence;
+  const hasIntentData = !!(input.tech_stack.intent_data && input.tech_stack.intent_data !== "none");
+  const hasLinkedinAds = !!channels.linkedin_ads;
+  const hasDisplayAds = !!channels.display_ads;
+
+  // Build dynamic list of webhook sources based on enabled channels
+  const webhookSources: string[] = [];
+  if (hasEmail) {
+    const platform = resolveOther(channels.email!.platform, channels.email!.platform_other);
+    webhookSources.push(`${platform} (email events: sends, opens, clicks, replies, bounces, unsubscribes)`);
+  }
+  if (hasWebIntel) {
+    const platform = resolveOther(channels.website_intelligence!.platform, channels.website_intelligence!.platform_other);
+    webhookSources.push(`${platform} (website visitor identification and behavior data)`);
+  }
+  if (hasLinkedinAds) {
+    webhookSources.push("LinkedIn Campaign Manager (ad engagement metrics via API polling)");
+  }
+  if (hasDisplayAds) {
+    const platform = resolveOther(channels.display_ads!.platform, channels.display_ads!.platform_other);
+    webhookSources.push(`${platform} (display ad engagement metrics)`);
+  }
+  if (hasIntentData) {
+    const platform = resolveOther(input.tech_stack.intent_data!, input.tech_stack.intent_data_other);
+    webhookSources.push(`${platform} (intent signals and topic surge data)`);
+  }
+
+  const webhookSourcesList = webhookSources.length > 0
+    ? webhookSources.map((s) => `- ${s}`).join("\n")
+    : "- CRM (contact and deal events)";
+
+  const workflowTool = input.tech_stack.workflow_automation && input.tech_stack.workflow_automation !== "none"
+    ? resolveOther(input.tech_stack.workflow_automation, input.tech_stack.workflow_automation_other)
+    : "n8n";
+
   const user = `${context}
 
 ${priorSections}
@@ -725,69 +681,94 @@ ${roadmapContext}
 
 ---
 
-# Task: Write Infrastructure Sections (Tech Stack Architecture + Sales-Marketing Alignment)
+# Task: Write Infrastructure Sections (Event Management System + Tech Stack Architecture & Data Flow)
 
 Write two markdown sections, each preceded by an HTML comment marker. Write in professional narrative prose with tables, diagrams (as text), and structured formatting.
 
+IMPORTANT: In this context, "events" means engagement tracking signals (email opens, replies, website visits, ad clicks, form submissions, content downloads) — NOT physical events like webinars or trade shows. The Event Management System is the intelligence layer that processes these engagement signals.
+
+<!-- SECTION: event_management -->
+
+Design the event management system — the intelligence layer that transforms raw engagement signals from every enabled channel into actionable account-level intelligence. The workflow automation platform is **${workflowTool}**.
+
+**Webhook/data sources to process:**
+${webhookSourcesList}
+
+Write the following subsections:
+
+1. **${workflowTool} Workflow Architecture:** Design the workflow automation architecture that serves as the central nervous system connecting all tools. Describe:
+   - How ${workflowTool} receives and processes webhooks from each enabled channel source
+   - The real-time processing pipeline: receive → validate → transform → enrich → store → alert
+   - How workflows route different event types to appropriate downstream actions
+   - Error handling and retry logic for failed webhook processing
+
+${hasEmail ? `2. **AI Reply Classification Logic:** Design the AI-powered reply classification system for inbound email replies. Include:
+   - Classification categories (e.g., INTERESTED, UNSUBSCRIBE, OUT_OF_OFFICE, NOT_RELEVANT) with clear definitions for each
+   - The classification prompt template that the AI model uses to analyze reply intent
+   - Expected accuracy targets and how the system handles edge cases
+   - How classifications feed into automated routing decisions
+
+3. **Sales Handoff & Notification Process:** Design the immediate notification protocol when the AI classifies a reply as interested or when high-value engagement signals are detected:
+   - Email forwarding with full account intelligence context (company details, engagement history, recommended next actions)
+   - Real-time Slack/Teams notification to the sales channel with key details and direct links to CRM records
+   - CRM record creation/update with engagement history logged
+   - SLA tracking: response time requirements by tier${input.sales_follow_up_sla_hours ? ` (base SLA: ${input.sales_follow_up_sla_hours} hours)` : ""}, escalation procedures if SLA is missed, reminder notifications
+
+` : `2. **Sales Notification & Handoff Process:** Design the notification protocol when high-value engagement signals are detected:
+   - What engagement patterns trigger sales notifications (e.g., multiple web visits, ad clicks + web visit combo, intent surge)
+   - Notification channels (email, Slack/Teams) with account context included
+   - CRM record updates with engagement history
+   - SLA tracking: response time requirements by tier${input.sales_follow_up_sla_hours ? ` (base SLA: ${input.sales_follow_up_sla_hours} hours)` : ""}, escalation procedures
+
+`}${hasEmail ? "4" : "3"}. **Event Taxonomy:** Define the complete set of event types the system tracks. Group by source and provide the event key, description, and intelligence value for each.
+
+**Email Events** (if applicable):
+- \`email_campaign_started\`, \`email_replied\`, \`email_unsubscribed\`, etc.
+
+**Web Events** (if applicable):
+- \`web_visit\`, \`web_form_submit\`, \`content_download\`, etc.
+
+**Ad Events** (if applicable):
+- \`ad_impression\`, \`ad_click\`, etc.
+
+**Intent Events** (if applicable):
+- \`intent_topic_surge\`, \`intent_competitor_research\`, etc.
+
+Present the full taxonomy as a table:
+| Event Type | Source | Description | Intelligence Value |
+|---|---|---|---|
+
+Each event includes metadata: timestamp, account_id, campaign_id (if applicable), and event_details (JSONB). Describe how this granular tracking enables engagement scoring and attribution modeling.
+
 <!-- SECTION: tech_stack_architecture -->
 
-Design the complete ABM tech stack architecture based on the configured tools.
+Design the complete ABM tech stack architecture and data management infrastructure based on the configured tools.
 
-1. **Stack Overview:** Present the tech stack as a layered architecture table:
+1. **Stack Overview:** Present the tech stack as a layered architecture:
 
 | Layer | Tool | Role in ABM Program |
 |---|---|---|
 
-Layers should include: CRM, Marketing Automation (if configured), Data Enrichment, Intent Data (if configured), Outbound (if email enabled), Advertising (if ads enabled), Website Intelligence (if configured), Workflow Automation (if configured), and Analytics.
+Layers should include: CRM, Marketing Automation (if configured), Data Enrichment, Intent Data (if configured), Outbound (if email enabled), Advertising (if ads enabled), Website Intelligence (if configured), Workflow Automation, Event Storage (Supabase or equivalent), and Analytics.
 
-2. **Data Flow Architecture:** Describe the data flow between systems in a step-by-step narrative:
-   - How new target accounts enter the system (enrichment → CRM → segmentation)
-   - How engagement data flows from channels back to the CRM
-   - How intent signals trigger outbound and advertising workflows
-   - How lead scoring and account scoring are maintained
-   - How reporting data is aggregated
+2. **Database Schema Design:** Design the account-level event storage schema. The key architectural principle is **separating account-level intelligence from personal contact information** — the CRM holds contacts, the event database holds account-level engagement signals. Include:
+   - **Accounts table:** Master record for each target company (account_id, company_name, domain, industry_segment, tier, etc.)
+   - **Account Events table:** All engagement signals stored at the account level (event_id, account_id, event_type, event_source, event_metadata JSONB, occurred_at)
+   - **Engagement Scores table:** Calculated account engagement scores (score_id, account_id, score_type, score_value, components JSONB, calculated_at)
+   - Include indexes for performance (account_id, occurred_at, event_type)
 
-3. **Integration Requirements:** For each tool-to-tool integration, specify:
-   - What data is synced
-   - Direction (one-way or bidirectional)
-   - Sync frequency (real-time, hourly, daily)
-   - Integration method (native, API, workflow automation)
+Present as SQL CREATE TABLE statements.
+
+3. **Data Flow Orchestration:** Describe how data flows through the complete system:
+   - **Ingestion pipeline:** How events from each channel enter the event database through ${workflowTool} workflows (validate → transform → enrich → store)
+   - **Privacy-preserving aggregation:** How personal actions are aggregated into account-level intelligence without storing personal data (e.g., three people from Company X open an email → three email_opened events for Company X without identifying individuals)
+   - **Account scoring:** How the engagement score is calculated from event data — score components (fit score + engagement score + intent score), specific actions and point values, thresholds (cold, warm, hot, AQL), and decay rules
+
+4. **System Integration Patterns:** For each tool-to-tool integration, specify the data flow pattern. The key principle is maintaining data isolation — the CRM holds contacts, the event database holds engagement intelligence, and they coordinate without full synchronization.
 
 Present as a table:
 | Source | Destination | Data | Direction | Frequency | Method |
-|---|---|---|---|---|---|
-
-4. **Account Scoring Model:** Design an account engagement scoring framework with:
-   - Score components (fit score + engagement score + intent score)
-   - Specific actions and their point values
-   - Threshold definitions (cold, warm, hot, AQL)
-   - Decay rules for aging engagement
-
-<!-- SECTION: sales_marketing_alignment -->
-
-Design the operational model for sales-marketing collaboration in the ABM program.
-
-1. **Account Qualification Framework:** Define the progression from target account to customer:
-   - **Target Account (TA):** Meets ICP criteria, on the target list
-   - **Engaged Account (EA):** Has shown meaningful engagement (define threshold)
-   - **Account Qualified Lead (AQL):** Meets agreed engagement + fit criteria for sales follow-up (define specific criteria)
-   - **Sales Accepted (SA):** Sales has accepted and begun working the account
-   - **Opportunity:** Active deal in pipeline
-
-2. **SLA Details:** Based on the configured SLA window${input.sales_follow_up_sla_hours ? ` of ${input.sales_follow_up_sla_hours} hours` : ""}, define:
-   - Response time by tier (Tier 1: fastest, Tier 3: standard)
-   - Escalation procedures if SLA is missed
-   - Feedback loop requirements
-
-3. **Meeting Cadence:** Define the regular alignment meetings:
-
-| Meeting | Frequency | Attendees | Agenda | Output |
-|---|---|---|---|---|
-
-4. **Reporting & Dashboards:** Define 3-4 shared dashboards:
-   - What metrics each dashboard shows
-   - Who the primary audience is
-   - Update frequency`;
+|---|---|---|---|---|---|`;
 
   return { system: ABM_PLAN_SYSTEM_PROMPT, user };
 }
