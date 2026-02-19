@@ -39,7 +39,7 @@ import {
   buildAeoAndAuthorityPrompt,
 } from "../src/prompts/content-plan";
 
-const MODEL = "claude-opus-4-20250514";
+const MODEL = "claude-opus-4-6";
 const MAX_TOKENS = 32000;
 
 async function callClaude(

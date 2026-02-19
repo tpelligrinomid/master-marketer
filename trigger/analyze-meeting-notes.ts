@@ -12,7 +12,7 @@ import {
 import { extractJson } from "../src/lib/json-utils";
 import { TaskCallback, deliverTaskResult } from "../src/lib/task-callback";
 
-const MODEL = "claude-opus-4-20250514";
+const MODEL = "claude-opus-4-6";
 const MAX_TOKENS = 4096;
 
 export const analyzeMeetingNotes = task({

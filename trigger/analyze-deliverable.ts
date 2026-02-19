@@ -9,7 +9,7 @@ import { buildDeliverablePrompt } from "../src/prompts/deliverable-intake";
 import { extractJson } from "../src/lib/json-utils";
 import { TaskCallback, deliverTaskResult } from "../src/lib/task-callback";
 
-const MODEL = "claude-opus-4-20250514";
+const MODEL = "claude-opus-4-6";
 const MAX_TOKENS = 8192;
 
 export const analyzeDeliverable = task({

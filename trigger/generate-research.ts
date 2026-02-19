@@ -21,7 +21,7 @@ import {
 import { extractJson } from "../src/lib/json-utils";
 
 
-const MODEL = "claude-opus-4-20250514";
+const MODEL = "claude-opus-4-6";
 const MAX_TOKENS = 32000;
 
 async function callClaude(
