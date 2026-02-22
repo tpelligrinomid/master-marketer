@@ -12,6 +12,7 @@ import {
   contentPlanHandler,
   abmPlanHandler,
 } from "./generate.routes";
+import { blogScrapeHandler } from "./handlers/blog-scrape";
 
 const router = Router();
 
@@ -151,6 +152,9 @@ router.post(
     }
   }
 );
+
+// Blog scrape
+router.post("/blog-scrape", blogScrapeHandler);
 
 // Reformatter routes
 router.post("/roadmap", createIntakeRoute("roadmap"));
