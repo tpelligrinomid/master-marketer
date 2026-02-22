@@ -24,6 +24,7 @@ export async function blogScrapeHandler(req: Request, res: Response, next: NextF
     const triggerPayload = {
       ...input,
       _jobId: jobId,
+      _apiKey: getEnv().API_KEY,
     };
 
     const handle = await tasks.trigger("scrape-blog-url", triggerPayload);

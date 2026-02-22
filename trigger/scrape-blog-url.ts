@@ -13,6 +13,7 @@ const CALLBACK_RETRY_DELAY_MS = 5_000;
 
 interface ScrapePayload extends BlogScrapeInput {
   _jobId?: string;
+  _apiKey?: string;
 }
 
 async function callbackWithRetry(
@@ -69,8 +70,8 @@ export const scrapeBlogUrl = task({
     maxAttempts: 1,
   },
   run: async (payload: ScrapePayload): Promise<BlogScrapeOutput | null> => {
-    const { url, callback_url, _jobId, metadata: inputMetadata } = payload;
-    const apiKey = process.env.API_KEY || "";
+    const { url, callback_url, _jobId, _apiKey, metadata: inputMetadata } = payload;
+    const apiKey = _apiKey || process.env.API_KEY || "";
 
     try {
       // Step 1: Fetch the URL
