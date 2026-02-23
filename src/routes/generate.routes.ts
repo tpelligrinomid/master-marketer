@@ -6,8 +6,12 @@ import { ResearchInputSchema } from "../types/research-input";
 import { SeoAuditInputSchema } from "../types/seo-audit-input";
 import { ContentPlanInputSchema } from "../types/content-plan-input";
 import { AbmPlanInputSchema } from "../types/abm-plan-input";
+import { ContentPieceInputSchema } from "../types/content-piece-input";
+import { ContentIdeasInputSchema } from "../types/content-ideas-input";
+import { CompetitiveDigestInputSchema } from "../types/competitive-digest-input";
 import { jobStore } from "../lib/job-store";
 import { getEnv } from "../config/env";
+import { playlistExtractHandler } from "./handlers/playlist-extract";
 
 const router = Router();
 
@@ -248,6 +252,120 @@ export const abmPlanHandler = async (req: Request, res: Response, next: NextFunc
   }
 };
 
+export const contentPieceHandler = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { callbackUrl, callbackMetadata } = extractWebhookFields(req.body);
+    const body = stripWebhookFields(req.body);
+
+    const parseResult = ContentPieceInputSchema.safeParse(body);
+    if (!parseResult.success) {
+      res.status(400).json({
+        error: "Invalid input",
+        details: parseResult.error.flatten(),
+      });
+      return;
+    }
+
+    const input = parseResult.data;
+    const jobId = uuidv4();
+
+    const triggerPayload = {
+      ...input,
+      _callback: buildCallbackPayload(callbackUrl, callbackMetadata),
+      _jobId: jobId,
+    };
+
+    const handle = await tasks.trigger("generate-content-piece", triggerPayload);
+    jobStore.create(jobId, handle.id);
+
+    res.status(202).json({
+      jobId,
+      triggerRunId: handle.id,
+      status: "accepted",
+      message:
+        "Content piece generation started. Results will be delivered to callback_url when complete. You can also poll GET /api/jobs/:jobId for status.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const contentIdeasHandler = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { callbackUrl, callbackMetadata } = extractWebhookFields(req.body);
+    const body = stripWebhookFields(req.body);
+
+    const parseResult = ContentIdeasInputSchema.safeParse(body);
+    if (!parseResult.success) {
+      res.status(400).json({
+        error: "Invalid input",
+        details: parseResult.error.flatten(),
+      });
+      return;
+    }
+
+    const input = parseResult.data;
+    const jobId = uuidv4();
+
+    const triggerPayload = {
+      ...input,
+      _callback: buildCallbackPayload(callbackUrl, callbackMetadata),
+      _jobId: jobId,
+    };
+
+    const handle = await tasks.trigger("generate-content-ideas", triggerPayload);
+    jobStore.create(jobId, handle.id);
+
+    res.status(202).json({
+      jobId,
+      triggerRunId: handle.id,
+      status: "accepted",
+      message:
+        "Content ideas generation started. Results will be delivered to callback_url when complete. You can also poll GET /api/jobs/:jobId for status.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const competitiveDigestHandler = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { callbackUrl, callbackMetadata } = extractWebhookFields(req.body);
+    const body = stripWebhookFields(req.body);
+
+    const parseResult = CompetitiveDigestInputSchema.safeParse(body);
+    if (!parseResult.success) {
+      res.status(400).json({
+        error: "Invalid input",
+        details: parseResult.error.flatten(),
+      });
+      return;
+    }
+
+    const input = parseResult.data;
+    const jobId = uuidv4();
+
+    const triggerPayload = {
+      ...input,
+      _callback: buildCallbackPayload(callbackUrl, callbackMetadata),
+      _jobId: jobId,
+    };
+
+    const handle = await tasks.trigger("generate-competitive-digest", triggerPayload);
+    jobStore.create(jobId, handle.id);
+
+    res.status(202).json({
+      jobId,
+      triggerRunId: handle.id,
+      status: "accepted",
+      message:
+        "Competitive digest generation started. Results will be delivered to callback_url when complete. You can also poll GET /api/jobs/:jobId for status.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // POST /research
 router.post("/research", researchHandler);
 
@@ -259,5 +377,17 @@ router.post("/content-plan", contentPlanHandler);
 
 // POST /abm-plan
 router.post("/abm-plan", abmPlanHandler);
+
+// POST /content-piece
+router.post("/content-piece", contentPieceHandler);
+
+// POST /content-ideas
+router.post("/content-ideas", contentIdeasHandler);
+
+// POST /competitive-digest
+router.post("/competitive-digest", competitiveDigestHandler);
+
+// POST /playlist-extract
+router.post("/playlist-extract", playlistExtractHandler);
 
 export default router;

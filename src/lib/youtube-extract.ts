@@ -13,21 +13,18 @@ export interface YouTubeResult {
   source_type?: string;
 }
 
+const APIFY_MAX_RETRIES = 3;
+const APIFY_RETRY_DELAY_MS = 3_000;
+
 /**
- * Extract YouTube video transcript and metadata via Apify.
- * Uses Apify to avoid YouTube captcha/rate-limit blocks from datacenter IPs.
+ * Call Apify transcript actor and extract caption strings.
+ * Returns null if the actor returns no captions (transient YouTube flake).
  */
-export async function extractYouTubeContent(
-  videoId: string,
-  url: string,
-  apifyApiKey: string,
-  youtubeApiKey?: string
-): Promise<YouTubeResult> {
-  const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
-
-  // 1. Fetch transcript via Apify actor
-  const client = new ApifyClient({ token: apifyApiKey });
-
+async function fetchTranscriptFromApify(
+  client: ApifyClient,
+  videoUrl: string,
+  videoId: string
+): Promise<{ captionStrings: string[]; item: Record<string, unknown> } | null> {
   const run = await client
     .actor("karamelo/youtube-transcripts")
     .call(
@@ -41,11 +38,7 @@ export async function extractYouTubeContent(
   const { items } = await client.dataset(run.defaultDatasetId).listItems();
   const item = items[0] as Record<string, unknown> | undefined;
 
-  if (!item) {
-    throw new Error(
-      "No transcript available for this video. The video may not have captions enabled."
-    );
-  }
+  if (!item) return null;
 
   // Log output for debugging
   console.log(`[youtube-extract] Apify response keys for ${videoId}:`, Object.keys(item));
@@ -66,10 +59,8 @@ export async function extractYouTubeContent(
       console.log(`[youtube-extract] Found array in field "${field}" with ${arr.length} items, first item type: ${typeof arr[0]}`);
 
       if (typeof arr[0] === "string") {
-        // Plain string array (karamelo/youtube-transcripts format)
         captionStrings = arr as string[];
       } else if (typeof arr[0] === "object" && arr[0] !== null) {
-        // Object array — extract text from each item
         for (const obj of arr as Record<string, unknown>[]) {
           const text = (obj.text ?? obj.content ?? obj.line ?? obj.value ?? obj.caption) as string | undefined;
           if (typeof text === "string" && text.trim()) {
@@ -83,14 +74,57 @@ export async function extractYouTubeContent(
 
   console.log(`[youtube-extract] Extracted ${captionStrings.length} caption strings`);
 
-  if (captionStrings.length === 0) {
-    // Dump the full response so we can debug
-    console.error(`[youtube-extract] Could not find transcript in Apify response. Full response:`,
-      JSON.stringify(item).slice(0, 2000));
+  if (captionStrings.length === 0) return null;
+
+  return { captionStrings, item };
+}
+
+/**
+ * Extract YouTube video transcript and metadata via Apify.
+ * Uses Apify to avoid YouTube captcha/rate-limit blocks from datacenter IPs.
+ * Retries up to 3 times — YouTube's caption API intermittently returns empty
+ * results under concurrent load from datacenter IPs.
+ */
+export async function extractYouTubeContent(
+  videoId: string,
+  url: string,
+  apifyApiKey: string,
+  youtubeApiKey?: string
+): Promise<YouTubeResult> {
+  const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+  // 1. Fetch transcript via Apify actor (with retries for transient failures)
+  const client = new ApifyClient({ token: apifyApiKey });
+
+  let result: { captionStrings: string[]; item: Record<string, unknown> } | null = null;
+
+  for (let attempt = 1; attempt <= APIFY_MAX_RETRIES; attempt++) {
+    try {
+      result = await fetchTranscriptFromApify(client, videoUrl, videoId);
+    } catch (err) {
+      console.warn(
+        `[youtube-extract] Apify attempt ${attempt}/${APIFY_MAX_RETRIES} threw for ${videoId}:`,
+        err instanceof Error ? err.message : err
+      );
+    }
+
+    if (result) break;
+
+    if (attempt < APIFY_MAX_RETRIES) {
+      console.log(
+        `[youtube-extract] No captions on attempt ${attempt}/${APIFY_MAX_RETRIES} for ${videoId}, retrying in ${APIFY_RETRY_DELAY_MS * attempt}ms...`
+      );
+      await new Promise((r) => setTimeout(r, APIFY_RETRY_DELAY_MS * attempt));
+    }
+  }
+
+  if (!result) {
     throw new Error(
-      "No transcript available for this video. The video may not have captions enabled."
+      "No transcript available for this video after 3 attempts. The video may not have captions enabled, or YouTube's caption API is temporarily unavailable."
     );
   }
+
+  const { captionStrings, item } = result;
 
   // Extract metadata
   const title =

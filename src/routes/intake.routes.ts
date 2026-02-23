@@ -14,6 +14,7 @@ import {
 } from "./generate.routes";
 import { blogScrapeHandler } from "./handlers/blog-scrape";
 import { fileExtractHandler } from "./handlers/file-extract";
+import { playlistExtractHandler } from "./handlers/playlist-extract";
 
 const router = Router();
 
@@ -164,6 +165,9 @@ router.post("/file-extract", fileExtractHandler);
 router.post("/roadmap", createIntakeRoute("roadmap"));
 router.post("/plan", createIntakeRoute("plan"));
 router.post("/brief", createIntakeRoute("brief"));
+
+// Playlist extraction
+router.post("/playlist-extract", playlistExtractHandler);
 
 // Legacy aliases — canonical routes are at /api/generate/*
 router.post("/research", researchHandler);
