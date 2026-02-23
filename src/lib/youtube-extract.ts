@@ -102,20 +102,54 @@ export async function extractYouTubeContent(
     (item.published_date as string) ||
     undefined;
 
-  // 2. Also try oEmbed for metadata (best-effort, no API key needed)
+  // 2. Fetch additional metadata (oEmbed + page HTML for publish date) — best-effort, parallel
   let oembedTitle: string | undefined;
   let oembedAuthor: string | undefined;
-  try {
-    const oembedUrl = `https://www.youtube.com/oembed?url=${videoUrl}&format=json`;
-    const oembedResponse = await fetch(oembedUrl);
-    if (oembedResponse.ok) {
-      const oembed = (await oembedResponse.json()) as { title?: string; author_name?: string };
-      oembedTitle = oembed.title;
-      oembedAuthor = oembed.author_name;
-    }
-  } catch {
-    // oEmbed is best-effort
-  }
+  let pagePublishedDate: string | undefined;
+
+  const metadataPromises = [
+    // oEmbed for title + author
+    (async () => {
+      try {
+        const oembedUrl = `https://www.youtube.com/oembed?url=${videoUrl}&format=json`;
+        const oembedResponse = await fetch(oembedUrl);
+        if (oembedResponse.ok) {
+          const oembed = (await oembedResponse.json()) as { title?: string; author_name?: string };
+          oembedTitle = oembed.title;
+          oembedAuthor = oembed.author_name;
+        }
+      } catch {
+        // best-effort
+      }
+    })(),
+    // YouTube page HTML for datePublished meta tag
+    (async () => {
+      try {
+        const pageResponse = await fetch(videoUrl, {
+          headers: { "User-Agent": "Mozilla/5.0 (compatible; MasterMarketerBot/1.0)" },
+        });
+        if (pageResponse.ok) {
+          const html = await pageResponse.text();
+          // <meta itemprop="datePublished" content="2024-08-06">
+          const dateMatch = html.match(/itemprop="datePublished"\s+content="([^"]+)"/);
+          if (dateMatch) {
+            pagePublishedDate = dateMatch[1];
+          }
+          // Fallback: <meta property="og:video:release_date" content="...">
+          if (!pagePublishedDate) {
+            const ogMatch = html.match(/property="og:video:release_date"\s+content="([^"]+)"/);
+            if (ogMatch) {
+              pagePublishedDate = ogMatch[1];
+            }
+          }
+        }
+      } catch {
+        // best-effort
+      }
+    })(),
+  ];
+
+  await Promise.allSettled(metadataPromises);
 
   const finalTitle = title !== `YouTube Video ${videoId}` ? title : (oembedTitle || title);
   const finalAuthor = author || oembedAuthor;
@@ -174,11 +208,12 @@ export async function extractYouTubeContent(
     durationSeconds = Math.ceil(start + (lastSegment.duration ?? 0));
   }
 
-  // Normalize published date
+  // Normalize published date (Apify actor > page meta tag)
+  const rawDate = publishedDate || pagePublishedDate;
   let normalizedDate: string | undefined;
-  if (publishedDate) {
+  if (rawDate) {
     try {
-      const d = new Date(publishedDate);
+      const d = new Date(rawDate);
       if (!isNaN(d.getTime())) {
         normalizedDate = d.toISOString().slice(0, 10);
       }
