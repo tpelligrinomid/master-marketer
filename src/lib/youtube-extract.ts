@@ -55,8 +55,15 @@ export async function extractYouTubeContent(
     );
   }
 
-  // Log output keys for debugging
+  // Log output for debugging
   console.log(`[youtube-extract] Apify response keys for ${videoId}:`, Object.keys(item));
+  console.log(`[youtube-extract] Apify raw data sizes:`, {
+    captions: Array.isArray(item.captions) ? (item.captions as unknown[]).length : 0,
+    transcript: Array.isArray(item.transcript) ? (item.transcript as unknown[]).length : 0,
+    subtitles: Array.isArray(item.subtitles) ? (item.subtitles as unknown[]).length : 0,
+    transcriptText: typeof item.transcriptText === "string" ? (item.transcriptText as string).length : 0,
+    text: typeof item.text === "string" ? (item.text as string).length : 0,
+  });
 
   // Extract transcript — handle common field names from Apify actors
   let transcriptItems: TranscriptItem[] = [];
@@ -221,6 +228,13 @@ export async function extractYouTubeContent(
       // ignore
     }
   }
+
+  console.log(`[youtube-extract] Final output for ${videoId}:`, {
+    transcriptItemsProcessed: transcriptItems.length,
+    markdownLength: markdown.length,
+    wordCount,
+    durationSeconds,
+  });
 
   return {
     url,
