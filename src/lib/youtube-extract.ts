@@ -20,7 +20,8 @@ export interface YouTubeResult {
 export async function extractYouTubeContent(
   videoId: string,
   url: string,
-  apifyApiKey: string
+  apifyApiKey: string,
+  youtubeApiKey?: string
 ): Promise<YouTubeResult> {
   const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
 
@@ -107,10 +108,10 @@ export async function extractYouTubeContent(
     (item.published_date as string) ||
     undefined;
 
-  // 2. Fetch additional metadata (oEmbed + page HTML for publish date) — best-effort, parallel
+  // 2. Fetch additional metadata via YouTube Data API + oEmbed — best-effort, parallel
   let oembedTitle: string | undefined;
   let oembedAuthor: string | undefined;
-  let pagePublishedDate: string | undefined;
+  let apiPublishedDate: string | undefined;
 
   const metadataPromises = [
     // oEmbed for title + author
@@ -127,43 +128,31 @@ export async function extractYouTubeContent(
         // best-effort
       }
     })(),
-    // YouTube page HTML for datePublished
+    // YouTube Data API v3 for publishedAt
     (async () => {
+      if (!youtubeApiKey) {
+        console.log(`[youtube-extract] No YOUTUBE_API_KEY — skipping Data API call for publish date`);
+        return;
+      }
       try {
-        const pageResponse = await fetch(videoUrl, {
-          headers: {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Accept-Language": "en-US,en;q=0.9",
-          },
-        });
-        console.log(`[youtube-extract] Page fetch status: ${pageResponse.status}`);
-        if (pageResponse.ok) {
-          const html = await pageResponse.text();
-          console.log(`[youtube-extract] Page HTML length: ${html.length}, contains datePublished: ${html.includes("datePublished")}`);
-
-          // Try meta tag: <meta itemprop="datePublished" content="2024-08-06">
-          const metaMatch = html.match(/itemprop="datePublished"\s+content="([^"]+)"/);
-          if (metaMatch) {
-            pagePublishedDate = metaMatch[1];
-          }
-          // Try JSON-LD: "datePublished":"2024-08-06"
-          if (!pagePublishedDate) {
-            const jsonLdMatch = html.match(/"datePublished"\s*:\s*"(\d{4}-\d{2}-\d{2})"/);
-            if (jsonLdMatch) {
-              pagePublishedDate = jsonLdMatch[1];
-            }
-          }
-          // Try ytInitialData: "publishDate":"2024-08-06"
-          if (!pagePublishedDate) {
-            const ytMatch = html.match(/"publishDate"\s*:\s*"(\d{4}-\d{2}-\d{2})"/);
-            if (ytMatch) {
-              pagePublishedDate = ytMatch[1];
-            }
-          }
-          console.log(`[youtube-extract] Extracted pagePublishedDate: ${pagePublishedDate}`);
+        const apiUrl = `https://www.googleapis.com/youtube/v3/videos?` +
+          new URLSearchParams({
+            part: "snippet",
+            id: videoId,
+            key: youtubeApiKey,
+          });
+        const apiResponse = await fetch(apiUrl);
+        if (apiResponse.ok) {
+          const data = (await apiResponse.json()) as {
+            items?: { snippet?: { publishedAt?: string } }[];
+          };
+          apiPublishedDate = data.items?.[0]?.snippet?.publishedAt;
+          console.log(`[youtube-extract] YouTube Data API publishedAt: ${apiPublishedDate}`);
+        } else {
+          console.warn(`[youtube-extract] YouTube Data API returned ${apiResponse.status}`);
         }
       } catch (err) {
-        console.warn(`[youtube-extract] Page fetch failed:`, err instanceof Error ? err.message : err);
+        console.warn(`[youtube-extract] YouTube Data API failed:`, err instanceof Error ? err.message : err);
       }
     })(),
   ];
@@ -188,7 +177,7 @@ export async function extractYouTubeContent(
   const wordCount = markdown.split(/\s+/).filter(Boolean).length;
 
   // Normalize published date (Apify actor > page meta tag)
-  const rawDate = publishedDate || pagePublishedDate;
+  const rawDate = publishedDate || apiPublishedDate;
   let normalizedDate: string | undefined;
   if (rawDate) {
     try {

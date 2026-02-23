@@ -27,6 +27,7 @@ export async function blogScrapeHandler(req: Request, res: Response, next: NextF
       _jobId: jobId,
       _apiKey: env.API_KEY,
       _apifyApiKey: env.APIFY_API_KEY,
+      _youtubeApiKey: env.YOUTUBE_API_KEY,
     };
 
     const handle = await tasks.trigger("scrape-blog-url", triggerPayload);
