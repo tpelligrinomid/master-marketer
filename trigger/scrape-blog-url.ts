@@ -18,6 +18,7 @@ const CALLBACK_RETRY_DELAY_MS = 5_000;
 interface ScrapePayload extends BlogScrapeInput {
   _jobId?: string;
   _apiKey?: string;
+  _apifyApiKey?: string;
 }
 
 async function callbackWithRetry(
@@ -74,17 +75,23 @@ export const scrapeBlogUrl = task({
     maxAttempts: 1,
   },
   run: async (payload: ScrapePayload): Promise<BlogScrapeOutput | null> => {
-    const { url, callback_url, _jobId, _apiKey, metadata: inputMetadata } = payload;
+    const { url, callback_url, _jobId, _apiKey, _apifyApiKey, metadata: inputMetadata } = payload;
     const apiKey = _apiKey || process.env.API_KEY || "";
+    const apifyApiKey = _apifyApiKey || process.env.APIFY_API_KEY || "";
 
     try {
       // YouTube detection — extract transcript instead of scraping HTML
       const youtubeMatch = url.match(YOUTUBE_REGEX);
       if (youtubeMatch) {
         const videoId = youtubeMatch[1];
+
+        if (!apifyApiKey) {
+          throw new Error("APIFY_API_KEY is required for YouTube transcript extraction");
+        }
+
         metadata.set("progress", `Extracting YouTube transcript for ${videoId}`);
 
-        const output = await extractYouTubeContent(videoId, url);
+        const output = await extractYouTubeContent(videoId, url, apifyApiKey);
 
         if (callback_url) {
           metadata.set("progress", "Delivering results via callback");
