@@ -37,6 +37,7 @@ export async function deliverTaskResult(
   // Echo back metadata fields at top level
   if (callback.metadata) {
     if (callback.metadata.deliverable_id) payload.deliverable_id = callback.metadata.deliverable_id;
+    if (callback.metadata.asset_id) payload.asset_id = callback.metadata.asset_id;
     if (callback.metadata.contract_id) payload.contract_id = callback.metadata.contract_id;
     if (callback.metadata.title) payload.title = callback.metadata.title;
   }
@@ -44,7 +45,7 @@ export async function deliverTaskResult(
   if (status === "completed" && output) {
     const out = output as Record<string, unknown>;
     payload.output = {
-      content_raw: out.full_document_markdown || "",
+      content_raw: out.full_document_markdown || out.content_body || "",
       content_structured: out,
     };
   }
