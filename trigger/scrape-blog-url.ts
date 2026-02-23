@@ -2,6 +2,10 @@ import { task, metadata } from "@trigger.dev/sdk/v3";
 import { BlogScrapeInput } from "../src/types/blog-scrape-input";
 import { BlogScrapeOutput } from "../src/types/blog-scrape-output";
 import { extractArticle } from "../src/lib/html-to-markdown";
+import { extractYouTubeContent } from "../src/lib/youtube-extract";
+
+// YouTube URL detection
+const YOUTUBE_REGEX = /(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
 
 const USER_AGENT =
   "Mozilla/5.0 (compatible; MasterMarketerBot/1.0; +https://mid.marketing)";
@@ -74,6 +78,28 @@ export const scrapeBlogUrl = task({
     const apiKey = _apiKey || process.env.API_KEY || "";
 
     try {
+      // YouTube detection — extract transcript instead of scraping HTML
+      const youtubeMatch = url.match(YOUTUBE_REGEX);
+      if (youtubeMatch) {
+        const videoId = youtubeMatch[1];
+        metadata.set("progress", `Extracting YouTube transcript for ${videoId}`);
+
+        const output = await extractYouTubeContent(videoId, url);
+
+        if (callback_url) {
+          metadata.set("progress", "Delivering results via callback");
+          await callbackWithRetry(callback_url, apiKey, {
+            job_id: _jobId || "unknown",
+            status: "completed",
+            metadata: inputMetadata,
+            output,
+          });
+        }
+
+        metadata.set("progress", "Complete");
+        return output;
+      }
+
       // Step 1: Fetch the URL
       metadata.set("progress", `Fetching ${url}`);
 

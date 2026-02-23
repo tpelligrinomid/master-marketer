@@ -13,6 +13,7 @@ import {
   abmPlanHandler,
 } from "./generate.routes";
 import { blogScrapeHandler } from "./handlers/blog-scrape";
+import { fileExtractHandler } from "./handlers/file-extract";
 
 const router = Router();
 
@@ -155,6 +156,9 @@ router.post(
 
 // Blog scrape
 router.post("/blog-scrape", blogScrapeHandler);
+
+// File extraction
+router.post("/file-extract", fileExtractHandler);
 
 // Reformatter routes
 router.post("/roadmap", createIntakeRoute("roadmap"));
