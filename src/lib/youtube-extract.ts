@@ -127,29 +127,43 @@ export async function extractYouTubeContent(
         // best-effort
       }
     })(),
-    // YouTube page HTML for datePublished meta tag
+    // YouTube page HTML for datePublished
     (async () => {
       try {
         const pageResponse = await fetch(videoUrl, {
-          headers: { "User-Agent": "Mozilla/5.0 (compatible; MasterMarketerBot/1.0)" },
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+          },
         });
+        console.log(`[youtube-extract] Page fetch status: ${pageResponse.status}`);
         if (pageResponse.ok) {
           const html = await pageResponse.text();
-          // <meta itemprop="datePublished" content="2024-08-06">
-          const dateMatch = html.match(/itemprop="datePublished"\s+content="([^"]+)"/);
-          if (dateMatch) {
-            pagePublishedDate = dateMatch[1];
+          console.log(`[youtube-extract] Page HTML length: ${html.length}, contains datePublished: ${html.includes("datePublished")}`);
+
+          // Try meta tag: <meta itemprop="datePublished" content="2024-08-06">
+          const metaMatch = html.match(/itemprop="datePublished"\s+content="([^"]+)"/);
+          if (metaMatch) {
+            pagePublishedDate = metaMatch[1];
           }
-          // Fallback: <meta property="og:video:release_date" content="...">
+          // Try JSON-LD: "datePublished":"2024-08-06"
           if (!pagePublishedDate) {
-            const ogMatch = html.match(/property="og:video:release_date"\s+content="([^"]+)"/);
-            if (ogMatch) {
-              pagePublishedDate = ogMatch[1];
+            const jsonLdMatch = html.match(/"datePublished"\s*:\s*"(\d{4}-\d{2}-\d{2})"/);
+            if (jsonLdMatch) {
+              pagePublishedDate = jsonLdMatch[1];
             }
           }
+          // Try ytInitialData: "publishDate":"2024-08-06"
+          if (!pagePublishedDate) {
+            const ytMatch = html.match(/"publishDate"\s*:\s*"(\d{4}-\d{2}-\d{2})"/);
+            if (ytMatch) {
+              pagePublishedDate = ytMatch[1];
+            }
+          }
+          console.log(`[youtube-extract] Extracted pagePublishedDate: ${pagePublishedDate}`);
         }
-      } catch {
-        // best-effort
+      } catch (err) {
+        console.warn(`[youtube-extract] Page fetch failed:`, err instanceof Error ? err.message : err);
       }
     })(),
   ];
