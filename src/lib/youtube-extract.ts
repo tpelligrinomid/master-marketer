@@ -13,8 +13,8 @@ export interface YouTubeResult {
   source_type?: string;
 }
 
-const APIFY_MAX_RETRIES = 3;
-const APIFY_RETRY_DELAY_MS = 3_000;
+const APIFY_MAX_RETRIES = 5;
+const APIFY_RETRY_DELAY_MS = 5_000;
 
 /**
  * Call Apify transcript actor and extract caption strings.
