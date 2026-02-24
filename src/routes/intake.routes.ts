@@ -161,8 +161,59 @@ router.post("/blog-scrape", blogScrapeHandler);
 // File extraction
 router.post("/file-extract", fileExtractHandler);
 
-// Reformatter routes
-router.post("/roadmap", createIntakeRoute("roadmap"));
+// Roadmap intake — uses specialized intake-roadmap task for full 10-section extraction
+router.post(
+  "/roadmap",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { callbackUrl, callbackMetadata } = extractWebhookFields(req.body);
+      const body = { ...stripWebhookFields(req.body), deliverable_type: "roadmap" as const };
+
+      const parseResult = DeliverableIntakeInputSchema.safeParse(body);
+      if (!parseResult.success) {
+        console.error("[intake/roadmap] Validation failed:", JSON.stringify(parseResult.error.flatten()));
+        console.error("[intake/roadmap] Received keys:", Object.keys(body));
+        res.status(400).json({
+          error: "Invalid input",
+          details: parseResult.error.flatten(),
+        });
+        return;
+      }
+
+      const input = parseResult.data;
+      const jobId = uuidv4();
+
+      // If file_url provided, fetch and parse the file to get content
+      let content = input.content;
+      if (!content && input.file_url) {
+        console.log(`[intake/roadmap] Fetching file: ${input.file_url}`);
+        content = await fetchAndParseFile(input.file_url);
+        console.log(`[intake/roadmap] Parsed ${content.length} chars from file`);
+      }
+
+      const triggerPayload = {
+        ...input,
+        content,
+        _callback: buildCallbackPayload(callbackUrl, callbackMetadata),
+        _jobId: jobId,
+      };
+
+      const handle = await tasks.trigger("intake-roadmap", triggerPayload);
+      jobStore.create(jobId, handle.id);
+
+      res.status(202).json({
+        jobId,
+        triggerRunId: handle.id,
+        status: "accepted",
+        message: "Roadmap intake started. Poll GET /api/jobs/:jobId for status.",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// Plan and brief still use the generic analyze-deliverable task
 router.post("/plan", createIntakeRoute("plan"));
 router.post("/brief", createIntakeRoute("brief"));
 
