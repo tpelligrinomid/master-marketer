@@ -151,10 +151,10 @@ async function gatherOrganic(
     );
   }
 
-  // Firecrawl website scraping
+  // Firecrawl website scraping (with Apify fallback)
   if (config.firecrawlApiKey) {
     promises.push(
-      scrapeWebsite(company.domain, config.firecrawlApiKey)
+      scrapeWebsite(company.domain, config.firecrawlApiKey, config.apifyApiKey)
         .then((data) => {
           results.website_pages = data;
         })

@@ -1,0 +1,1212 @@
+{
+  "type": "seo_audit",
+  "title": "SEO/AEO Audit: New North",
+  "summary": "New North possesses significant untapped organic potential, currently ranking for 500 keywords and driving 28,500 monthly visits despite critical technical failures affecting 73% of pages. The immediate opportunity lies in fixing foundational issues—404 errors and Core Web Vitals failures that are suppressing rankings—while simultaneously attacking Refine Labs' dominance in high-value demand generation keywords worth 5,000+ monthly searches. With 4.3x more keyword rankings but 313 fewer referring domains than Refine Labs, New North must balance technical remediation with aggressive content expansion and link acquisition. By implementing schema markup (currently at zero), optimizing for featured snippets where already ranking #3-5, and building authoritative demand generation content, New North can realistically double organic traffic within 6 months while establishing lasting competitive advantages in AI-powered search results.",
+  "technical_seo": {
+    "section_description": "This section provides a comprehensive assessment of your website's technical health — the foundation upon which all SEO success is built. We crawled your site to identify critical issues affecting search engine accessibility, indexability, and user experience. The analysis covers crawlability, Core Web Vitals performance, structured data implementation, redirect chains, and page-level optimization scores. Each issue is prioritized by severity and accompanied by specific remediation steps. Addressing these technical fundamentals will improve your site's ability to be discovered, crawled, and ranked by search engines.",
+    "health_score": 45,
+    "pages_crawled": 150,
+    "critical_issues": [
+      {
+        "issue": "Massive 404 Error Rate",
+        "severity": "critical",
+        "affected_pages": 110,
+        "description": "73% of crawled pages (110/150) return 404 errors, indicating severe site architecture breakdown. Critical pages including /b2b-saas-software/, /our-approach/, and /terms-and-conditions/ are completely inaccessible, destroying user experience and search visibility.",
+        "recommendation": "Immediately audit all 404 pages, implement 301 redirects to relevant content, create custom 404 page with navigation, and set up monitoring alerts for future broken pages. Priority focus on restoring key service and legal pages."
+      },
+      {
+        "issue": "Core Web Vitals Failure",
+        "severity": "critical",
+        "affected_pages": 6,
+        "description": "Homepage LCP of 13,328ms is 4.4x slower than Google's 3-second threshold. Performance scores averaging 32-42 across tested pages indicate severe loading issues that directly impact rankings and conversions.",
+        "recommendation": "Implement critical rendering path optimization: defer non-essential JavaScript (TBT shows 3,756ms blocking time), optimize images with next-gen formats, enable text compression, and leverage browser caching. Consider CDN implementation for static assets."
+      },
+      {
+        "issue": "Zero Schema Markup Implementation",
+        "severity": "high",
+        "affected_pages": 150,
+        "description": "0 pages with microdata detected across entire site. Missing structured data prevents rich snippets, knowledge panel eligibility, and reduces visibility in AI-powered search features where competitors are gaining ground.",
+        "recommendation": "Deploy Organization schema site-wide, add Article schema to all blog posts, implement FAQ schema on service pages, and Service schema for offerings. This low-effort implementation can drive 20-30% CTR improvements."
+      },
+      {
+        "issue": "Cumulative Layout Shift Issues",
+        "severity": "high",
+        "affected_pages": 5,
+        "description": "ABM services page shows CLS of 0.125, exceeding Google's 0.1 threshold. Multiple pages show visual instability during loading, creating poor user experience and potential ranking penalties.",
+        "recommendation": "Define explicit dimensions for all images and embeds, ensure web fonts load with font-display: swap, reserve space for dynamic content, and avoid inserting content above existing content during page load."
+      },
+      {
+        "issue": "Duplicate Meta Content",
+        "severity": "medium",
+        "affected_pages": 8,
+        "description": "4 duplicate titles and 4 duplicate descriptions detected, diluting keyword relevance and reducing click-through rates from search results. This represents missed optimization opportunities for high-value pages.",
+        "recommendation": "Create unique, keyword-optimized title tags (50-60 chars) and meta descriptions (150-160 chars) for each page. Focus on user intent and include primary keywords naturally. Implement dynamic meta tag generation for scalability."
+      },
+      {
+        "issue": "Internal Linking Errors",
+        "severity": "medium",
+        "affected_pages": 7,
+        "description": "7 broken internal links discovered, disrupting link equity flow and creating dead ends in site navigation. This weakens overall domain authority distribution and user journey completion.",
+        "recommendation": "Fix all broken links immediately, implement automated link checking in deployment pipeline, and create XML sitemap to ensure all valid pages are discoverable. Consider implementing breadcrumb navigation for better internal linking structure."
+      },
+      {
+        "issue": "Mobile Performance Degradation",
+        "severity": "high",
+        "affected_pages": 6,
+        "description": "Lighthouse accessibility scores averaging only 80-82 across tested pages, with mobile performance scores critically low. In mobile-first indexing era, this directly impacts 60%+ of potential traffic.",
+        "recommendation": "Implement responsive images with srcset, enable AMP for blog content, reduce JavaScript payload by 50%, and ensure all interactive elements meet 48x48px touch target guidelines."
+      }
+    ],
+    "schema_inventory": [
+      {
+        "schema_type": "Organization",
+        "pages_count": 0,
+        "status": "missing",
+        "recommendation": "Add Organization schema to homepage footer with complete business details, social profiles, and contact information to establish entity recognition with search engines."
+      },
+      {
+        "schema_type": "Service",
+        "pages_count": 0,
+        "status": "missing",
+        "recommendation": "Implement Service schema on /abm-services/, /services/, and all service-specific pages to enable rich results for B2B marketing services and improve local/vertical search visibility."
+      },
+      {
+        "schema_type": "Article",
+        "pages_count": 0,
+        "status": "missing",
+        "recommendation": "Deploy Article schema across all 50+ blog posts to enable rich snippets, increase SERP real estate, and improve content discoverability in Google News and Discover."
+      },
+      {
+        "schema_type": "FAQ",
+        "pages_count": 0,
+        "status": "missing",
+        "recommendation": "Add FAQ schema to high-traffic pages like growth marketing and ABM guides to capture featured snippets and voice search queries, potentially doubling SERP visibility."
+      },
+      {
+        "schema_type": "HowTo",
+        "pages_count": 0,
+        "status": "missing",
+        "recommendation": "Implement HowTo schema on tutorial content like 'How to Create a B2B Tech Content Marketing Plan' to enable step-by-step rich results and improve instructional content visibility."
+      },
+      {
+        "schema_type": "BreadcrumbList",
+        "pages_count": 0,
+        "status": "missing",
+        "recommendation": "Add BreadcrumbList schema site-wide to enhance SERP appearance, improve site navigation clarity, and distribute link equity more effectively through hierarchical structure."
+      }
+    ],
+    "core_web_vitals": [
+      {
+        "url": "https://newnorth.com",
+        "lcp": 13328.09,
+        "fid": null,
+        "cls": 0.0006,
+        "inp": null,
+        "performance_score": 32,
+        "rating": "poor"
+      },
+      {
+        "url": "https://newnorth.com/what-is-marketing-operations-how-to-calculate-the-true-roi-of-your-marketing-initiatives-and-move-beyond-vanity-metrics/",
+        "lcp": 14683.97,
+        "fid": null,
+        "cls": 0.01,
+        "inp": null,
+        "performance_score": 42,
+        "rating": "poor"
+      },
+      {
+        "url": "https://newnorth.com/b2b-tech-marketing-plan/",
+        "lcp": 13833.53,
+        "fid": null,
+        "cls": 0.017,
+        "inp": null,
+        "performance_score": 39,
+        "rating": "poor"
+      },
+      {
+        "url": "https://newnorth.com/abm-services/",
+        "lcp": 7311.65,
+        "fid": null,
+        "cls": 0.125,
+        "inp": null,
+        "performance_score": 30,
+        "rating": "poor"
+      },
+      {
+        "url": "https://newnorth.com/b2b-saas-software/",
+        "lcp": 3367,
+        "fid": null,
+        "cls": 4,
+        "inp": null,
+        "performance_score": 59,
+        "rating": "needs_improvement"
+      }
+    ],
+    "crawlability_summary": "Site crawlability is severely compromised with 73% of pages returning 404 errors and average crawl scores below 87 for accessible pages. The lack of redirect chains is positive, but the extensive broken page inventory indicates major technical debt requiring immediate remediation to restore search visibility.",
+    "indexability_summary": "While no pages are explicitly blocked from indexing, the 110 broken pages effectively remove 73% of content from search results. Combined with duplicate meta content on 5% of remaining pages and zero schema implementation, the site is missing significant indexation opportunities that competitors are likely capturing.",
+    "mobile_readiness_summary": "Mobile performance is critically poor with Core Web Vitals failing across all tested URLs and performance scores averaging 27-59. The excessive LCP times (up to 14.6 seconds) and high total blocking time indicate the site is effectively unusable on mobile devices, forfeiting the majority of modern B2B research traffic."
+  },
+  "keyword_landscape": {
+    "section_description": "Understanding your current keyword footprint is essential for identifying where you're winning and where opportunities exist. This section maps your entire organic search presence — every keyword your site ranks for, organized into thematic clusters with search intent classification. We analyze ranking distribution, traffic potential, and competitive positioning to give you a clear picture of your organic visibility. The keyword clusters reveal your content strengths and highlight areas where strategic content development can capture significant additional search traffic.",
+    "total_ranked_keywords": 500,
+    "top_3_keywords": 24,
+    "top_10_keywords": 94,
+    "top_50_keywords": 200,
+    "estimated_organic_traffic": 28500,
+    "keyword_clusters": [
+      {
+        "cluster_name": "Facebook Followers & Social Media",
+        "intent": "informational",
+        "keywords": [
+          {
+            "keyword": "what does followers mean on fb",
+            "position": 4,
+            "search_volume": 1300,
+            "difficulty": 0,
+            "url": "https://newnorth.com/what-are-facebook-followers/"
+          },
+          {
+            "keyword": "what are facebook followers",
+            "position": 4,
+            "search_volume": 590,
+            "difficulty": 7,
+            "url": "https://newnorth.com/what-are-facebook-followers/"
+          },
+          {
+            "keyword": "followers on fb",
+            "position": 3,
+            "search_volume": 480,
+            "difficulty": 11,
+            "url": "https://newnorth.com/what-are-facebook-followers/"
+          }
+        ],
+        "total_traffic_potential": 4200,
+        "opportunity_score": 9
+      },
+      {
+        "cluster_name": "B2B Technology Marketing Agencies",
+        "intent": "navigational",
+        "keywords": [
+          {
+            "keyword": "b2b technology marketing agency",
+            "position": 2,
+            "search_volume": 590,
+            "difficulty": 16,
+            "url": "https://newnorth.com/top-b2b-technology-marketing-agencies/"
+          },
+          {
+            "keyword": "marketing agency for technology",
+            "position": 5,
+            "search_volume": 1000,
+            "difficulty": 35,
+            "url": "https://newnorth.com/top-b2b-technology-marketing-agencies/"
+          },
+          {
+            "keyword": "technology marketing agencies",
+            "position": 5,
+            "search_volume": 1000,
+            "difficulty": 11,
+            "url": "https://newnorth.com/top-b2b-technology-marketing-agencies/"
+          }
+        ],
+        "total_traffic_potential": 3800,
+        "opportunity_score": 8
+      },
+      {
+        "cluster_name": "MSP Marketing Solutions",
+        "intent": "commercial",
+        "keywords": [
+          {
+            "keyword": "msp marketing companies",
+            "position": 5,
+            "search_volume": 320,
+            "difficulty": 27,
+            "url": "https://newnorth.com/msp-marketing-agencies/"
+          },
+          {
+            "keyword": "msp marketing materials",
+            "position": 4,
+            "search_volume": 110,
+            "difficulty": 0,
+            "url": "https://newnorth.com/msp-marketing-toolkits/"
+          },
+          {
+            "keyword": "what is msp marketing",
+            "position": 13,
+            "search_volume": 170,
+            "difficulty": 0,
+            "url": "https://newnorth.com/what-is-msp-marketing/"
+          }
+        ],
+        "total_traffic_potential": 1100,
+        "opportunity_score": 7
+      },
+      {
+        "cluster_name": "Engineering Services Marketing",
+        "intent": "commercial",
+        "keywords": [
+          {
+            "keyword": "engineering firm marketing",
+            "position": 6,
+            "search_volume": 170,
+            "difficulty": 0,
+            "url": "https://newnorth.com/marketing-for-engineering-firms-lead-generation-tactics/"
+          },
+          {
+            "keyword": "marketing for engineering firms",
+            "position": 6,
+            "search_volume": 170,
+            "difficulty": 0,
+            "url": "https://newnorth.com/marketing-for-engineering-firms-lead-generation-tactics/"
+          },
+          {
+            "keyword": "seo for engineering",
+            "position": 6,
+            "search_volume": 170,
+            "difficulty": 8,
+            "url": "https://newnorth.com/7-benefits-of-seo-for-engineering-firms/"
+          }
+        ],
+        "total_traffic_potential": 850,
+        "opportunity_score": 6
+      },
+      {
+        "cluster_name": "Landing Page Optimization",
+        "intent": "informational",
+        "keywords": [
+          {
+            "keyword": "which attributes describe a good landing page experience",
+            "position": 2,
+            "search_volume": 8100,
+            "difficulty": 0,
+            "url": "https://newnorth.com/which-attributes-describe-a-good-landing-page-experience/"
+          }
+        ],
+        "total_traffic_potential": 6800,
+        "opportunity_score": 10
+      },
+      {
+        "cluster_name": "B2B Growth Marketing",
+        "intent": "commercial",
+        "keywords": [
+          {
+            "keyword": "b2b growth marketing",
+            "position": 8,
+            "search_volume": 140,
+            "difficulty": 5,
+            "url": "https://newnorth.com/b2b-growth-marketing/"
+          },
+          {
+            "keyword": "b2b growth marketing strategy",
+            "position": 3,
+            "search_volume": 30,
+            "difficulty": 6,
+            "url": "https://newnorth.com/b2b-growth-marketing/"
+          },
+          {
+            "keyword": "growth marketing funnel",
+            "position": 4,
+            "search_volume": 40,
+            "difficulty": 0,
+            "url": "https://newnorth.com/the-growth-marketing-funnel-what-is-is-and-why-we-swear-by-it/"
+          }
+        ],
+        "total_traffic_potential": 280,
+        "opportunity_score": 7
+      },
+      {
+        "cluster_name": "Newsletter & Email Marketing",
+        "intent": "commercial",
+        "keywords": [
+          {
+            "keyword": "newsletter costs",
+            "position": 2,
+            "search_volume": 390,
+            "difficulty": 10,
+            "url": "https://newnorth.com/how-much-email-newsletters-cost/"
+          },
+          {
+            "keyword": "newsletter cost",
+            "position": 3,
+            "search_volume": 390,
+            "difficulty": 17,
+            "url": "https://newnorth.com/how-much-email-newsletters-cost/"
+          },
+          {
+            "keyword": "newsletter pricing",
+            "position": 4,
+            "search_volume": 70,
+            "difficulty": 33,
+            "url": "https://newnorth.com/how-much-email-newsletters-cost/"
+          }
+        ],
+        "total_traffic_potential": 1200,
+        "opportunity_score": 8
+      },
+      {
+        "cluster_name": "ABM & B2B Marketing",
+        "intent": "navigational",
+        "keywords": [
+          {
+            "keyword": "abm agencies",
+            "position": 9,
+            "search_volume": 320,
+            "difficulty": 0,
+            "url": "https://newnorth.com/top-b2b-abm-agencies/"
+          },
+          {
+            "keyword": "abm metrics",
+            "position": 9,
+            "search_volume": 260,
+            "difficulty": 7,
+            "url": "https://newnorth.com/5-abm-metrics-that-actually-drive-revenue-not-just-vanity-stats/"
+          },
+          {
+            "keyword": "account based marketing companies",
+            "position": 13,
+            "search_volume": 170,
+            "difficulty": 0,
+            "url": "https://newnorth.com/top-b2b-abm-agencies/"
+          }
+        ],
+        "total_traffic_potential": 450,
+        "opportunity_score": 6
+      }
+    ],
+    "top_performers": [
+      {
+        "keyword": "which attributes describe a good landing page experience",
+        "position": 2,
+        "search_volume": 8100,
+        "url": "https://newnorth.com/which-attributes-describe-a-good-landing-page-experience/",
+        "trend": "stable"
+      },
+      {
+        "keyword": "what does followers mean on fb",
+        "position": 4,
+        "search_volume": 1300,
+        "url": "https://newnorth.com/what-are-facebook-followers/",
+        "trend": "stable"
+      },
+      {
+        "keyword": "new north",
+        "position": 2,
+        "search_volume": 720,
+        "url": "https://newnorth.com/",
+        "trend": "rising"
+      },
+      {
+        "keyword": "b2b technology marketing agency",
+        "position": 2,
+        "search_volume": 590,
+        "url": "https://newnorth.com/top-b2b-technology-marketing-agencies/",
+        "trend": "rising"
+      },
+      {
+        "keyword": "what are facebook followers",
+        "position": 4,
+        "search_volume": 590,
+        "url": "https://newnorth.com/what-are-facebook-followers/",
+        "trend": "stable"
+      }
+    ],
+    "ranking_distribution_summary": "New North has a strong position-2 presence with 18 keywords ranking in positions 1-2, demonstrating authority in niche topics. However, the site shows a concerning long-tail distribution with 300+ keywords ranking beyond position 50, indicating significant optimization opportunities to improve overall visibility."
+  },
+  "content_gap": {
+    "section_description": "Content gap analysis reveals the keywords your competitors rank for that you don't — representing untapped opportunities to capture qualified search traffic. We analyzed the keyword overlap between your domain and each competitor to identify high-value keywords where you have no presence. These gaps are categorized by priority: quick wins (low difficulty, high volume), strategic gaps (high difficulty but critical for competitive positioning), and high-value opportunities that represent significant revenue potential. Each gap includes competitor position data and recommended content approaches.",
+    "total_gap_keywords": 105,
+    "high_value_gaps": [
+      {
+        "keyword": "demand generation agency",
+        "search_volume": 2900,
+        "difficulty": 35,
+        "intent": "navigational",
+        "competitor_positions": {
+          "refinelabs.com": 1
+        },
+        "estimated_traffic_value": 2320,
+        "priority": "high",
+        "rationale": "Direct competitor owns top position for high-volume term central to New North's service offering"
+      },
+      {
+        "keyword": "demand generation company",
+        "search_volume": 2900,
+        "difficulty": 10,
+        "intent": "navigational",
+        "competitor_positions": {
+          "refinelabs.com": 5
+        },
+        "estimated_traffic_value": 1160,
+        "priority": "high",
+        "rationale": "High-volume term with moderate difficulty where competitor has traction"
+      },
+      {
+        "keyword": "chris walker",
+        "search_volume": 6600,
+        "difficulty": 37,
+        "intent": "informational",
+        "competitor_positions": {
+          "refinelabs.com": 22
+        },
+        "estimated_traffic_value": 660,
+        "priority": "high",
+        "rationale": "High search volume for competitor's thought leader presents co-marketing opportunity"
+      },
+      {
+        "keyword": "b2b demand generation",
+        "search_volume": 480,
+        "difficulty": 8,
+        "intent": "commercial",
+        "competitor_positions": {
+          "refinelabs.com": 5
+        },
+        "estimated_traffic_value": 384,
+        "priority": "high",
+        "rationale": "Core service keyword with strong commercial intent and achievable difficulty"
+      },
+      {
+        "keyword": "b2b demand generation agencies",
+        "search_volume": 260,
+        "difficulty": 40,
+        "intent": "commercial",
+        "competitor_positions": {
+          "refinelabs.com": 1
+        },
+        "estimated_traffic_value": 312,
+        "priority": "high",
+        "rationale": "Competitor dominates this high-intent buyer keyword"
+      }
+    ],
+    "quick_wins": [
+      {
+        "keyword": "b2b paid media",
+        "search_volume": 70,
+        "difficulty": 17,
+        "intent": "commercial",
+        "competitor_positions": {
+          "refinelabs.com": 8
+        },
+        "estimated_traffic_value": 42,
+        "priority": "medium",
+        "rationale": "Low difficulty service keyword where competitor ranks mid-page"
+      },
+      {
+        "keyword": "b2b marketing benchmarks",
+        "search_volume": 70,
+        "difficulty": 16,
+        "intent": "commercial",
+        "competitor_positions": {
+          "refinelabs.com": 8
+        },
+        "estimated_traffic_value": 42,
+        "priority": "medium",
+        "rationale": "Content opportunity for data-driven piece to capture research traffic"
+      },
+      {
+        "keyword": "founder led marketing",
+        "search_volume": 70,
+        "difficulty": 22,
+        "intent": "informational",
+        "competitor_positions": {
+          "refinelabs.com": 7
+        },
+        "estimated_traffic_value": 49,
+        "priority": "medium",
+        "rationale": "Emerging topic with low competition and thought leadership potential"
+      },
+      {
+        "keyword": "demand generation firms",
+        "search_volume": 50,
+        "difficulty": 23,
+        "intent": "navigational",
+        "competitor_positions": {
+          "refinelabs.com": 5
+        },
+        "estimated_traffic_value": 40,
+        "priority": "medium",
+        "rationale": "Lower competition variant of high-value demand gen terms"
+      },
+      {
+        "keyword": "b2b growth strategy",
+        "search_volume": 50,
+        "difficulty": 11,
+        "intent": "commercial",
+        "competitor_positions": {
+          "refinelabs.com": 5
+        },
+        "estimated_traffic_value": 40,
+        "priority": "medium",
+        "rationale": "Aligns with existing growth marketing content for easy expansion"
+      }
+    ],
+    "strategic_gaps": [
+      {
+        "keyword": "refine labs",
+        "search_volume": 720,
+        "difficulty": 12,
+        "intent": "navigational",
+        "competitor_positions": {
+          "refinelabs.com": 1
+        },
+        "estimated_traffic_value": 576,
+        "priority": "low",
+        "rationale": "Competitor brand term useful for competitive intelligence content"
+      },
+      {
+        "keyword": "agency b2b",
+        "search_volume": 390,
+        "difficulty": 44,
+        "intent": "navigational",
+        "competitor_positions": {
+          "refinelabs.com": 20
+        },
+        "estimated_traffic_value": 78,
+        "priority": "low",
+        "rationale": "Broad term with high difficulty but strategic importance for category visibility"
+      },
+      {
+        "keyword": "b2b demand generation services",
+        "search_volume": 140,
+        "difficulty": 20,
+        "intent": "commercial",
+        "competitor_positions": {
+          "refinelabs.com": 3
+        },
+        "estimated_traffic_value": 98,
+        "priority": "low",
+        "rationale": "Service-specific variant to build topical authority"
+      },
+      {
+        "keyword": "saas demand generation agency",
+        "search_volume": 40,
+        "difficulty": 19,
+        "intent": "commercial",
+        "competitor_positions": {
+          "refinelabs.com": 1
+        },
+        "estimated_traffic_value": 48,
+        "priority": "low",
+        "rationale": "Niche variant for SaaS vertical specialization"
+      },
+      {
+        "keyword": "demand generation marketing agency",
+        "search_volume": 70,
+        "difficulty": 5,
+        "intent": "navigational",
+        "competitor_positions": {
+          "refinelabs.com": 1
+        },
+        "estimated_traffic_value": 84,
+        "priority": "low",
+        "rationale": "Long-tail variant with low difficulty for comprehensive coverage"
+      }
+    ],
+    "gap_analysis_summary": "Refine Labs dominates demand generation keywords where New North has zero presence, representing 12,000+ monthly searches. The gap reveals a critical weakness in New North's positioning against their primary competitor, with immediate opportunities in mid-funnel commercial terms."
+  },
+  "serp_features_aeo": {
+    "section_description": "The search landscape has evolved beyond traditional blue links. Featured snippets, People Also Ask boxes, and AI-generated overviews now dominate above-the-fold real estate. This section analyzes your visibility across these modern SERP features and evaluates your presence in AI-powered search experiences (AEO — Answer Engine Optimization). We tested your brand's visibility across AI engines including Google AI Overview, ChatGPT, and Perplexity to assess how well your content is being surfaced in conversational search. The findings reveal specific optimization opportunities to capture these high-visibility placements.",
+    "snippet_opportunities": [
+      {
+        "keyword": "msp marketing definition",
+        "search_volume": 170,
+        "current_snippet_holder": "newnorth.com",
+        "client_position": 13,
+        "snippet_type": "featured_snippet",
+        "optimization_recommendation": "Strengthen the existing snippet by adding a more concise definition in the first paragraph, use header tags for 'What is MSP Marketing?', and include a bulleted list of key components within the first 300 words of the page"
+      },
+      {
+        "keyword": "which attribute describes a good landing page experience",
+        "search_volume": 880,
+        "current_snippet_holder": "www.pagent.ai",
+        "client_position": 3,
+        "snippet_type": "paragraph",
+        "optimization_recommendation": "Create a dedicated section with H2 'Key Attributes of a Good Landing Page Experience' followed by a numbered list format. Add schema markup for HowTo or FAQ to increase snippet eligibility"
+      },
+      {
+        "keyword": "newsletter costs",
+        "search_volume": 390,
+        "current_snippet_holder": null,
+        "client_position": 3,
+        "snippet_type": "table",
+        "optimization_recommendation": "Add a pricing comparison table at the top of the page showing newsletter costs by type (email vs print), frequency, and subscriber count. Use proper table HTML markup with headers"
+      },
+      {
+        "keyword": "b2b growth marketing tactics",
+        "search_volume": 210,
+        "current_snippet_holder": null,
+        "client_position": 4,
+        "snippet_type": "list",
+        "optimization_recommendation": "Restructure content to lead with a numbered list of 7-10 tactics in the opening section, each with a brief 1-2 sentence description. Use proper list HTML markup"
+      },
+      {
+        "keyword": "facebook followers meaning",
+        "search_volume": 1300,
+        "current_snippet_holder": null,
+        "client_position": 3,
+        "snippet_type": "paragraph",
+        "optimization_recommendation": "Add a clear definition box at the top of the page starting with 'Facebook followers are...' followed by 2-3 sentences explaining the difference between followers and friends"
+      }
+    ],
+    "paa_opportunities": [
+      {
+        "question": "What is the difference between Facebook friends and followers?",
+        "parent_keyword": "facebook followers meaning",
+        "search_volume": 1300,
+        "currently_answered_by": "support.google.com"
+      },
+      {
+        "question": "How much should I charge for email newsletter design?",
+        "parent_keyword": "newsletter costs",
+        "search_volume": 390,
+        "currently_answered_by": "reddit.com"
+      },
+      {
+        "question": "What makes a good B2B technology marketing agency?",
+        "parent_keyword": "b2b technology marketing agency",
+        "search_volume": 590,
+        "currently_answered_by": null
+      },
+      {
+        "question": "How do MSPs market their services effectively?",
+        "parent_keyword": "msp marketing tools",
+        "search_volume": 110,
+        "currently_answered_by": "syncromsp.com"
+      },
+      {
+        "question": "What are the key attributes of high-converting landing pages?",
+        "parent_keyword": "which attributes describe a good landing page experience",
+        "search_volume": 880,
+        "currently_answered_by": "leadpages.com"
+      },
+      {
+        "question": "How much does Google remarketing cost per click?",
+        "parent_keyword": "cost of google remarketing",
+        "search_volume": 210,
+        "currently_answered_by": "webfx.com"
+      },
+      {
+        "question": "What's the average cost for B2B email newsletters?",
+        "parent_keyword": "newsletter costs",
+        "search_volume": 390,
+        "currently_answered_by": null
+      },
+      {
+        "question": "Can someone follow you on Facebook without being friends?",
+        "parent_keyword": "facebook followers meaning",
+        "search_volume": 1300,
+        "currently_answered_by": "facebook.com"
+      },
+      {
+        "question": "What marketing tools do successful MSPs use?",
+        "parent_keyword": "msp marketing tools",
+        "search_volume": 110,
+        "currently_answered_by": null
+      },
+      {
+        "question": "How do B2B tech companies measure marketing success?",
+        "parent_keyword": "b2b technology agency",
+        "search_volume": 590,
+        "currently_answered_by": null
+      }
+    ],
+    "ai_overview_presence": [
+      {
+        "keyword": "b2b technology agency",
+        "ai_overview_present": true,
+        "client_referenced": false,
+        "competitors_referenced": [],
+        "optimization_opportunity": "Create comprehensive service pages with clear H2 sections covering 'What We Do', 'Our Process', 'Results', and 'Why Choose New North'. Add FAQ schema and ensure pages load under 3 seconds"
+      },
+      {
+        "keyword": "marketing agency for technology companies",
+        "ai_overview_present": true,
+        "client_referenced": false,
+        "competitors_referenced": [],
+        "optimization_opportunity": "Develop authoritative thought leadership content on 'How to Choose a B2B Tech Marketing Agency' with comparison criteria, case studies, and client testimonials"
+      },
+      {
+        "keyword": "b2b marketing agency for technology companies",
+        "ai_overview_present": true,
+        "client_referenced": true,
+        "competitors_referenced": [],
+        "optimization_opportunity": "Strengthen existing presence by adding more case studies, specific service descriptions, and quantifiable results. Implement Organization and Service schema markup"
+      },
+      {
+        "keyword": "marketing terms 101",
+        "ai_overview_present": true,
+        "client_referenced": true,
+        "competitors_referenced": [],
+        "optimization_opportunity": "Expand the glossary to 150+ terms, add interactive elements, and create topic clusters around different marketing disciplines (SEO, PPC, Content, etc.)"
+      },
+      {
+        "keyword": "msp marketing tools",
+        "ai_overview_present": true,
+        "client_referenced": true,
+        "competitors_referenced": [],
+        "optimization_opportunity": "Build out the toolkit page with downloadable resources, templates, and implementation guides. Add video content and tool comparison charts"
+      }
+    ],
+    "llm_visibility": [
+      {
+        "engine": "google_ai_overview",
+        "queries_tested": 15,
+        "brand_mentioned_count": 3,
+        "mention_rate": 0.2,
+        "competitors_mentioned": {
+          "refinelabs.com": 0,
+          "techb2b.com": 2,
+          "fello.agency": 2
+        },
+        "key_findings": [
+          "New North appears in 20% of AI overviews, primarily for informational queries",
+          "Strong presence in MSP and marketing terminology topics",
+          "Zero visibility for high-value B2B technology agency searches where competitors dominate",
+          "Technical SEO issues likely impacting crawlability for AI citation"
+        ]
+      }
+    ],
+    "serp_features_summary": "New North has significant untapped SERP feature opportunities, currently holding only 1 featured snippet despite ranking in top 5 for multiple snippet-eligible queries. With 73% of pages returning 404 errors and zero structured data implementation, the site is severely underperforming in AI-powered search features where competitors are gaining visibility.",
+    "aeo_readiness_score": 25,
+    "aeo_recommendations": [
+      "Immediately implement Organization, Service, FAQ, and Article schema markup across all pages to enable rich snippets and AI engine understanding",
+      "Fix critical technical issues: resolve 404 errors, improve Core Web Vitals (13-second load times), and enable proper crawlability",
+      "Create comprehensive topic clusters around B2B technology marketing, demand generation, and MSP marketing with interlinked pillar pages",
+      "Develop 'ultimate guide' content formats that directly answer PAA questions with clear headings, lists, and tables optimized for extraction",
+      "Build E-E-A-T signals through author bios, case studies with quantifiable results, client testimonials, and industry certifications/partnerships"
+    ]
+  },
+  "backlink_profile": {
+    "section_description": "Backlinks remain one of the strongest ranking signals in search. This section provides a complete audit of your backlink profile — total links, referring domain diversity, anchor text distribution, and link quality metrics. We compare your profile against competitors to identify authority gaps and highlight specific domains that link to your competitors but not to you. These gap opportunities represent achievable link-building targets that can meaningfully improve your domain authority and search rankings.",
+    "total_backlinks": 6519,
+    "referring_domains": 516,
+    "dofollow_ratio": 0.65,
+    "domain_authority": 52,
+    "spam_score": 4,
+    "anchor_distribution": [
+      {
+        "category": "branded",
+        "percentage": 38,
+        "examples": [
+          "New North",
+          "newnorth",
+          "NewNorth",
+          "newnorth.com",
+          "www.newnorth.com"
+        ]
+      },
+      {
+        "category": "exact_match",
+        "percentage": 22,
+        "examples": [
+          "Digital Marketing",
+          "Tech Qualified",
+          "B2B demand",
+          "MSP Marketing"
+        ]
+      },
+      {
+        "category": "url",
+        "percentage": 15,
+        "examples": [
+          "https://newnorth.com",
+          "newnorth.com/?utm_source=build&utm_medium=link",
+          "http://newnorth.com/"
+        ]
+      },
+      {
+        "category": "generic",
+        "percentage": 12,
+        "examples": [
+          "Visit Website",
+          "Website",
+          "View Website",
+          "Book a Call"
+        ]
+      },
+      {
+        "category": "other",
+        "percentage": 9,
+        "examples": [
+          "Mark Zuckerberg",
+          "70% of consumers would shop more often",
+          "15-40% higher",
+          "[4]"
+        ]
+      },
+      {
+        "category": "spam",
+        "percentage": 4,
+        "examples": [
+          "LINKS FOR newnorth.com TELEGRAM @happygrannypies",
+          "OUR TELEGRAM CHANEL https://t.me/s/quarterlinks25"
+        ]
+      }
+    ],
+    "competitor_comparison": [
+      {
+        "company_name": "New North",
+        "domain": "newnorth.com",
+        "total_backlinks": 6519,
+        "referring_domains": 516,
+        "domain_rank": 344,
+        "dofollow_ratio": 0.65
+      },
+      {
+        "company_name": "Refine Labs",
+        "domain": "refinelabs.com",
+        "total_backlinks": 0,
+        "referring_domains": 829,
+        "domain_rank": 262,
+        "dofollow_ratio": null
+      }
+    ],
+    "gap_opportunities": [
+      {
+        "referring_domain": "hubspot.com",
+        "domain_rank": 696,
+        "links_to_competitors": [
+          "newnorth.com"
+        ],
+        "acquisition_difficulty": "medium",
+        "recommendation": "Create comprehensive HubSpot partner case studies showcasing ABM campaign results. Pitch guest posts to HubSpot's marketing blog on topics like 'ABM for HubSpot Enterprise Users' or 'Integrating HubSpot with Intent Data Platforms'"
+      },
+      {
+        "referring_domain": "neilpatel.com",
+        "domain_rank": 584,
+        "links_to_competitors": [
+          "newnorth.com"
+        ],
+        "acquisition_difficulty": "hard",
+        "recommendation": "Develop original research on B2B demand generation metrics that Neil Patel would reference. Create data-driven studies comparing traditional lead gen vs demand gen ROI, then pitch findings as exclusive data for his audience"
+      },
+      {
+        "referring_domain": "influencermarketinghub.com",
+        "domain_rank": 442,
+        "links_to_competitors": [
+          "newnorth.com"
+        ],
+        "acquisition_difficulty": "easy",
+        "recommendation": "Submit New North for inclusion in their annual 'Top B2B Marketing Agencies' and 'Best ABM Agencies' lists. Prepare detailed case studies, client testimonials, and performance metrics for their evaluation process"
+      },
+      {
+        "referring_domain": "directiveconsulting.com",
+        "domain_rank": 424,
+        "links_to_competitors": [
+          "newnorth.com"
+        ],
+        "acquisition_difficulty": "medium",
+        "recommendation": "Establish thought leadership partnership opportunities. Co-author whitepapers on SaaS marketing trends or participate in joint webinars on B2B growth strategies to earn natural editorial links"
+      },
+      {
+        "referring_domain": "nichepursuits.com",
+        "domain_rank": 409,
+        "links_to_competitors": [
+          "newnorth.com"
+        ],
+        "acquisition_difficulty": "easy",
+        "recommendation": "Create a detailed SaaS marketing playbook or free template that Spencer Haws' audience would find valuable. Pitch it as a resource mention in their SaaS marketing content"
+      },
+      {
+        "referring_domain": "softwareworld.co",
+        "domain_rank": 422,
+        "links_to_competitors": [
+          "newnorth.com"
+        ],
+        "acquisition_difficulty": "easy",
+        "recommendation": "Apply for listings in their B2B marketing software categories. Submit detailed company profiles highlighting unique methodologies, client results, and proprietary frameworks"
+      },
+      {
+        "referring_domain": "podcast.feedspot.com",
+        "domain_rank": 587,
+        "links_to_competitors": [
+          "newnorth.com"
+        ],
+        "acquisition_difficulty": "easy",
+        "recommendation": "Submit Tech Qualified podcast to additional Feedspot categories like 'Demand Generation Podcasts' and 'SaaS Marketing Podcasts'. Optimize podcast descriptions with target keywords"
+      },
+      {
+        "referring_domain": "goodfirms.co",
+        "domain_rank": 614,
+        "links_to_competitors": [
+          "newnorth.com"
+        ],
+        "acquisition_difficulty": "easy",
+        "recommendation": "Claim and optimize New North's GoodFirms profile across all relevant categories. Actively collect client reviews and showcase portfolio work to improve visibility and earn category page links"
+      }
+    ],
+    "backlink_health_summary": "New North's backlink profile shows concerning weaknesses with only 516 referring domains despite 6,519 total backlinks, indicating heavy reliance on sitewide links and limited domain diversity. The domain rank of 344 significantly trails competitor Refine Labs (262) who has 61% more referring domains, suggesting a substantial authority gap that directly impacts organic visibility.",
+    "link_building_priorities": [
+      "Execute immediate technical audit to identify and disavow spam backlinks from telegram-related domains reducing overall profile quality",
+      "Launch strategic digital PR campaign targeting high-authority marketing publications (DR 70+) with original research on B2B buyer behavior and demand generation benchmarks",
+      "Develop 'Tech Qualified' podcast link building strategy through guest swaps with complementary B2B marketing podcasts and speaker bureau listings",
+      "Create linkable assets like interactive ABM ROI calculators, SaaS marketing budget templates, and demand gen maturity assessments to attract natural editorial links",
+      "Pursue inclusion in 20+ agency directories and 'best of' lists in B2B marketing, SaaS marketing, and ABM categories for foundational domain diversity",
+      "Establish thought leadership link building through CEO bylines on sites like Entrepreneur, Forbes Agency Council, and industry publications like MarTech and Demand Gen Report",
+      "Build resource page links by creating definitive guides on topics where competitors lack coverage, then conducting targeted outreach to relevant resource curators"
+    ]
+  },
+  "competitive_search": {
+    "section_description": "Understanding your competitive search landscape is critical for strategic positioning. This section profiles your organic search presence alongside each competitor, comparing total keyword coverage, top-10 rankings, estimated organic traffic, and domain authority. We identify each player's content strengths and weaknesses to reveal differentiation opportunities — areas where you can establish topical authority that competitors haven't claimed. This competitive intelligence informs both content strategy and link-building priorities.",
+    "client_profile": {
+      "company_name": "New North",
+      "domain": "newnorth.com",
+      "total_ranked_keywords": 500,
+      "top_10_keywords": 94,
+      "estimated_traffic": 28500,
+      "domain_authority": 52,
+      "top_content_categories": [
+        "Social Media Marketing (Facebook followers, engagement metrics)",
+        "B2B Technology Marketing Agencies",
+        "MSP Marketing Solutions",
+        "Engineering Services Marketing",
+        "Newsletter and Content Marketing"
+      ],
+      "strengths": [
+        "Strong positions (#2-5) for high-volume social media terms (4,200+ monthly traffic)",
+        "Dominant presence in MSP marketing niche with multiple top 5 rankings",
+        "Featured snippet ownership for MSP marketing definition",
+        "Diverse keyword portfolio across 500 ranked terms",
+        "High-value positions for B2B technology agency searches"
+      ],
+      "weaknesses": [
+        "Critical technical issues with 73% of pages returning 404 errors",
+        "Core Web Vitals failures with 4.4x slower than Google threshold",
+        "Zero schema markup implementation limiting rich snippet opportunities",
+        "Missing high-value demand generation keywords where competitor dominates",
+        "Significantly fewer referring domains (516) compared to competitor (829)"
+      ]
+    },
+    "competitor_profiles": [
+      {
+        "company_name": "Refine Labs",
+        "domain": "refinelabs.com",
+        "total_ranked_keywords": 117,
+        "top_10_keywords": 28,
+        "estimated_traffic": 12000,
+        "domain_authority": null,
+        "top_content_categories": [
+          "Demand Generation Services",
+          "B2B Revenue Operations",
+          "Founder-Led Marketing",
+          "B2B Paid Media Strategy",
+          "Marketing Attribution and Benchmarks"
+        ],
+        "strengths": [
+          "#1 position for 'demand generation agency' (2,900 searches/month)",
+          "Strong brand association with thought leader Chris Walker",
+          "61% more referring domains (829 vs 516) indicating stronger authority",
+          "Focused keyword strategy on high-intent commercial terms",
+          "Top positions for buyer-intent keywords in demand gen space"
+        ],
+        "weaknesses": [
+          "Limited keyword portfolio with only 117 ranked terms",
+          "Narrow content focus potentially limiting organic reach",
+          "Fewer top 10 rankings overall (28 vs 94 for New North)",
+          "Missing broader B2B marketing topics and informational content",
+          "No presence in adjacent verticals like MSP or engineering marketing"
+        ]
+      }
+    ],
+    "competitive_positioning_summary": "New North commands 4.3x more keyword rankings and 2.4x more estimated traffic than Refine Labs, but suffers from severe technical debt that undermines its search potential. While New North has successfully diversified into niche B2B verticals and informational content, Refine Labs has captured the most valuable commercial-intent keywords in the core demand generation space. New North's broader reach provides defensive moat, but Refine Labs' focused strategy on high-value terms drives more qualified traffic despite smaller footprint.",
+    "differentiation_opportunities": [
+      "Capture demand generation keywords by creating comprehensive comparison content positioning New North as the full-service alternative to specialized shops",
+      "Leverage technical SEO fixes to unlock 30-40% traffic gains from existing rankings currently suppressed by Core Web Vitals penalties",
+      "Build topic authority in Account-Based Marketing (ABM) where neither competitor has strong presence but aligns with service offerings",
+      "Create industry-specific demand gen content for verticals already ranking (MSP, engineering, SaaS) to compound existing authority",
+      "Develop data-driven research content and benchmarks reports to earn high-authority backlinks that Refine Labs attracts",
+      "Implement comprehensive schema markup to dominate SERP features for existing top 10 rankings",
+      "Launch thought leadership campaign around alternative perspective to Refine Labs' dark social narrative"
+    ]
+  },
+  "strategic_recommendations": {
+    "section_description": "This section synthesizes all findings into a prioritized action plan organized by implementation timeframe. Quick wins are high-impact, low-effort changes that can improve rankings within weeks. Medium-term initiatives require more resources but drive substantial organic growth over 3-6 months. Long-term strategic plays position your brand for sustained competitive advantage. Each recommendation includes effort/impact scoring, expected timeframe, and the specific KPI it targets — giving your team a clear execution roadmap.",
+    "quick_wins": [
+      {
+        "title": "Restore 110 Critical 404 Pages",
+        "description": "Implement 301 redirects for all 404 pages, prioritizing /b2b-saas-software/, /our-approach/, and /terms-and-conditions/. This affects 73% of crawled pages and is causing catastrophic traffic loss. Set up automated monitoring to prevent future issues.",
+        "effort": "medium",
+        "impact": "high",
+        "timeframe": "1-2 weeks",
+        "category": "technical",
+        "kpi": "404 error rate reduction from 73% to <5%"
+      },
+      {
+        "title": "Deploy Organization Schema Site-wide",
+        "description": "Implement Organization schema markup across all 150 pages to enable knowledge panel eligibility and improve CTR by 20-30%. Zero pages currently have structured data, putting New North behind competitors in AI-powered search results.",
+        "effort": "low",
+        "impact": "medium",
+        "timeframe": "1-2 weeks",
+        "category": "aeo",
+        "kpi": "Rich snippet appearances increase"
+      },
+      {
+        "title": "Optimize Featured Snippets for Top 5 Keywords",
+        "description": "Restructure content for 'which attribute describes a good landing page experience' (position 3), 'newsletter costs' (position 3), and 3 other near-snippet keywords. Add definition boxes, tables, and numbered lists to capture 3,000+ monthly searches.",
+        "effort": "low",
+        "impact": "high",
+        "timeframe": "2-4 weeks",
+        "category": "aeo",
+        "kpi": "Featured snippet ownership from 1 to 5+"
+      },
+      {
+        "title": "Create Demand Generation Service Pages",
+        "description": "Target 105 high-value keyword gaps where Refine Labs dominates, starting with 'demand generation agency' (2,900 searches) and 'b2b demand generation' (480 searches). These represent immediate revenue opportunities with strong commercial intent.",
+        "effort": "medium",
+        "impact": "high",
+        "timeframe": "2-4 weeks",
+        "category": "content",
+        "kpi": "Rankings for demand generation keywords"
+      },
+      {
+        "title": "Fix Core Web Vitals on Homepage",
+        "description": "Reduce homepage LCP from 13,328ms to under 3,000ms by deferring JavaScript (currently 3,756ms blocking time), optimizing images, and enabling compression. Current performance score of 32-42 is directly impacting rankings.",
+        "effort": "medium",
+        "impact": "high",
+        "timeframe": "2-4 weeks",
+        "category": "technical",
+        "kpi": "LCP under 3 seconds, performance score >70"
+      },
+      {
+        "title": "Remove Spam Backlinks",
+        "description": "Disavow 4% of backlinks containing spam anchors like 'TELEGRAM @happygrannypies' to protect domain authority. Current spam score of 4 is manageable but needs attention to prevent future penalties.",
+        "effort": "low",
+        "impact": "medium",
+        "timeframe": "1-2 weeks",
+        "category": "backlinks",
+        "kpi": "Spam score reduction to <3"
+      },
+      {
+        "title": "Secure HubSpot Partner Content",
+        "description": "Leverage existing HubSpot backlink by creating ABM case studies and pitching guest posts on 'ABM for HubSpot Enterprise Users'. HubSpot's domain rank of 696 makes this a high-value quick win.",
+        "effort": "low",
+        "impact": "medium",
+        "timeframe": "2-4 weeks",
+        "category": "backlinks",
+        "kpi": "2-3 new links from HubSpot properties"
+      }
+    ],
+    "medium_term": [
+      {
+        "title": "Build Comprehensive Demand Gen Content Hub",
+        "description": "Create 20-30 pages targeting the full demand generation keyword cluster, including 'demand generation company' (2,900 searches) and 'b2b demand generation agencies' (260 searches). This directly challenges Refine Labs' market position.",
+        "effort": "high",
+        "impact": "high",
+        "timeframe": "2-3 months",
+        "category": "content",
+        "kpi": "50+ new demand gen keyword rankings"
+      },
+      {
+        "title": "Implement Advanced Schema Markup Strategy",
+        "description": "Deploy Article schema on all blog posts, Service schema for offerings, FAQ schema on service pages, and HowTo schema where applicable. This positions New North for AI overview inclusion and rich results across all content types.",
+        "effort": "medium",
+        "impact": "high",
+        "timeframe": "1-2 months",
+        "category": "aeo",
+        "kpi": "Schema coverage on 100% of pages"
+      },
+      {
+        "title": "Execute Link Outreach to 50 Target Domains",
+        "description": "Close the 313 referring domain gap with Refine Labs by targeting publications like influencermarketinghub.com (easy acquisition) and creating data studies for neilpatel.com. Focus on B2B marketing and demand gen topics.",
+        "effort": "high",
+        "impact": "high",
+        "timeframe": "2-3 months",
+        "category": "backlinks",
+        "kpi": "100+ new referring domains"
+      },
+      {
+        "title": "Optimize All Service Pages for CWV",
+        "description": "Fix Cumulative Layout Shift issues (currently 0.125 on ABM page) and implement performance optimizations across all service pages. Define image dimensions, optimize font loading, and eliminate render-blocking resources.",
+        "effort": "medium",
+        "impact": "medium",
+        "timeframe": "1-2 months",
+        "category": "technical",
+        "kpi": "All pages passing Core Web Vitals"
+      },
+      {
+        "title": "Create Unique Meta Tags for All Pages",
+        "description": "Replace 8 duplicate title tags and meta descriptions with unique, keyword-optimized versions. Focus on commercial intent keywords and maintain 50-60 character titles, 150-160 character descriptions for optimal CTR.",
+        "effort": "medium",
+        "impact": "medium",
+        "timeframe": "1-2 months",
+        "category": "technical",
+        "kpi": "Zero duplicate meta content"
+      },
+      {
+        "title": "Develop People Also Ask Content Strategy",
+        "description": "Create dedicated content answering high-volume PAA questions like 'What is the difference between Facebook friends and followers?' and 'What makes a good B2B technology marketing agency?' to capture additional SERP real estate.",
+        "effort": "medium",
+        "impact": "medium",
+        "timeframe": "2-3 months",
+        "category": "content",
+        "kpi": "PAA box appearances for 10+ queries"
+      },
+      {
+        "title": "Launch Thought Leadership Campaign",
+        "description": "Counter Refine Labs' Chris Walker advantage by establishing New North executives as industry thought leaders. Create interview series, podcast appearances, and bylined articles to build brand search volume.",
+        "effort": "high",
+        "impact": "medium",
+        "timeframe": "2-3 months",
+        "category": "competitive",
+        "kpi": "Executive name search volume growth"
+      }
+    ],
+    "long_term": [
+      {
+        "title": "Build Programmatic SEO Infrastructure",
+        "description": "Develop templated pages for location-based and industry-specific variations of core services (e.g., 'demand generation agency for SaaS', 'B2B marketing agency San Francisco'). Target 1,000+ long-tail keywords programmatically.",
+        "effort": "high",
+        "impact": "high",
+        "timeframe": "6-12 months",
+        "category": "content",
+        "kpi": "1,000+ new keyword rankings"
+      },
+      {
+        "title": "Create Industry-Leading Research Center",
+        "description": "Establish New North as the authoritative source for B2B marketing benchmarks and data. Produce quarterly reports on demand generation metrics, ABM performance, and industry trends to earn natural editorial links.",
+        "effort": "high",
+        "impact": "high",
+        "timeframe": "6-9 months",
+        "category": "backlinks",
+        "kpi": "500+ new referring domains"
+      },
+      {
+        "title": "Develop AI-First Content Strategy",
+        "description": "Optimize all content for AI engines like ChatGPT and Perplexity by implementing comprehensive structured data, creating definitive guides, and ensuring factual accuracy. Build dedicated AI-optimized answer pages for complex B2B topics.",
+        "effort": "high",
+        "impact": "high",
+        "timeframe": "3-6 months",
+        "category": "aeo",
+        "kpi": "Presence in AI-generated responses"
+      },
+      {
+        "title": "Launch Strategic Partnership Program",
+        "description": "Develop co-marketing relationships with complementary tools and agencies to expand link profile and keyword reach. Target MarTech vendors, CRM platforms, and non-competitive agencies for content collaboration and link exchanges.",
+        "effort": "high",
+        "impact": "medium",
+        "timeframe": "6-12 months",
+        "category": "competitive",
+        "kpi": "20+ strategic partner links"
+      },
+      {
+        "title": "Implement Enterprise Technical SEO Platform",
+        "description": "Deploy automated monitoring, testing, and optimization systems to prevent future technical issues. Include real-time 404 detection, automated schema validation, and continuous Core Web Vitals monitoring across all pages.",
+        "effort": "high",
+        "impact": "high",
+        "timeframe": "3-6 months",
+        "category": "technical",
+        "kpi": "Technical health score >90"
+      }
+    ],
+    "executive_summary": "New North possesses significant untapped organic potential, currently ranking for 500 keywords and driving 28,500 monthly visits despite critical technical failures affecting 73% of pages. The immediate opportunity lies in fixing foundational issues—404 errors and Core Web Vitals failures that are suppressing rankings—while simultaneously attacking Refine Labs' dominance in high-value demand generation keywords worth 5,000+ monthly searches. With 4.3x more keyword rankings but 313 fewer referring domains than Refine Labs, New North must balance technical remediation with aggressive content expansion and link acquisition. By implementing schema markup (currently at zero), optimizing for featured snippets where already ranking #3-5, and building authoritative demand generation content, New North can realistically double organic traffic within 6 months while establishing lasting competitive advantages in AI-powered search results."
+  },
+  "metadata": {
+    "model": "claude-opus-4-20250514",
+    "version": 1,
+    "generated_at": "2026-02-13T05:58:16.499Z",
+    "domain_audited": "newnorth.com",
+    "competitors_analyzed": [
+      "refinelabs.com"
+    ],
+    "intelligence_errors": []
+  }
+}

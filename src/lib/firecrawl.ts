@@ -1,4 +1,5 @@
 import Firecrawl from "@mendable/firecrawl-js";
+import { ApifyClient } from "apify-client";
 import { FirecrawlPage } from "../types/research-intelligence";
 
 const MAX_CHARS_PER_PAGE = 2000;
@@ -74,12 +75,58 @@ async function scrapeSingleUrl(
 }
 
 /**
+ * Fallback: scrape pages via Apify website-content-crawler.
+ * Uses the same target URLs but different proxy infrastructure.
+ */
+async function scrapeViaApify(
+  domain: string,
+  apifyApiKey: string
+): Promise<FirecrawlPage[]> {
+  const client = new ApifyClient({ token: apifyApiKey });
+  const baseUrl = normalizeUrl(domain);
+  const startUrls = PAGE_PATHS.map((path) => ({ url: `${baseUrl}${path}` }));
+
+  console.log(`[Apify fallback] Crawling ${domain} (${startUrls.length} URLs)`);
+
+  const run = await client.actor("apify/website-content-crawler").call(
+    {
+      startUrls,
+      maxCrawlPages: startUrls.length,
+      crawlerType: "cheerio",
+      maxConcurrency: 10,
+    },
+    { timeout: 180 }
+  );
+
+  const { items } = await client.dataset(run.defaultDatasetId).listItems();
+
+  const pages: FirecrawlPage[] = items
+    .map((item) => {
+      const page = item as Record<string, unknown>;
+      const markdown = (page.text as string) || (page.markdown as string) || "";
+      if (!markdown) return null;
+      return {
+        url: page.url as string,
+        title: page.metadata
+          ? (page.metadata as Record<string, unknown>).title as string | undefined
+          : undefined,
+        markdown: markdown.slice(0, MAX_CHARS_PER_PAGE),
+      };
+    })
+    .filter((p): p is FirecrawlPage => p !== null);
+
+  console.log(`[Apify fallback] Got ${pages.length} pages for ${domain}`);
+  return pages;
+}
+
+/**
  * Scrape targeted pages from a domain using Firecrawl.
- * Tries common marketing-relevant paths and returns whatever succeeds.
+ * Falls back to Apify website-content-crawler if Firecrawl returns nothing.
  */
 export async function scrapeWebsite(
   domain: string,
-  apiKey: string
+  apiKey: string,
+  apifyApiKey?: string
 ): Promise<FirecrawlPage[]> {
   const client = new Firecrawl({ apiKey });
   const baseUrl = normalizeUrl(domain);
@@ -98,6 +145,16 @@ export async function scrapeWebsite(
     )
     .map((r) => r.value)
     .filter((page): page is FirecrawlPage => page !== null);
+
+  // Fallback to Apify if Firecrawl got nothing
+  if (pages.length === 0 && apifyApiKey) {
+    console.warn(`[Firecrawl] Zero pages for ${domain}, trying Apify fallback...`);
+    try {
+      return await scrapeViaApify(domain, apifyApiKey);
+    } catch (err) {
+      console.warn(`[Apify fallback] Failed for ${domain}:`, err instanceof Error ? err.message : err);
+    }
+  }
 
   return pages;
 }

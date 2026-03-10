@@ -1,0 +1,1413 @@
+{
+  "type": "seo_audit",
+  "title": "Washington Speakers Bureau - SEO/AEO Audit",
+  "summary": "WSB can proceed with parallel technical and content workstreams given the generally healthy site foundation (96 health score, all pages returning 200 status codes). While Core Web Vitals performance requires attention (6-34/100 scores), this should not block immediate content initiatives targeting critical keyword gaps where competitors like BigSpeak dominate high-intent searches ('keynote speaker bureau', 'book keynote speaker'). The site shows strong branded search dominance and celebrity speaker fee rankings, but misses significant commercial opportunities in category searches worth 5,000+ monthly searches. With 145 speaker profiles lacking structured data and 17% of pages having duplicate metadata, quick technical wins can dramatically improve search visibility while the performance optimization project runs in parallel.",
+  "technical_seo": {
+    "section_description": "This section provides a comprehensive assessment of your website's technical health — the foundation upon which all SEO success is built. Our analysis combines data from multiple industry-leading intelligence platforms: DataForSEO (site crawl, keyword rankings, backlinks, SERP analysis, AI visibility), Moz (Domain Authority, Spam Score, page authority), Keywords Everywhere (search volume trends, CPC, related keywords), and Google PageSpeed Insights (Core Web Vitals). We crawled your site to identify critical issues affecting search engine accessibility, indexability, and user experience. The analysis covers crawlability, Core Web Vitals performance, structured data implementation, redirect chains, and page-level optimization scores. Each issue is prioritized by severity and accompanied by specific remediation steps.",
+    "health_score": 96,
+    "pages_crawled": 150,
+    "critical_issues": [
+      {
+        "issue": "Poor Core Web Vitals Performance",
+        "severity": "high",
+        "affected_pages": 6,
+        "description": "All tested pages show failing Performance scores (6-34/100) with extremely high LCP values (22-43 seconds in lab tests). While field data shows better real-world performance (LCP 1.3-1.6s), the lab tests indicate significant rendering bottlenecks that could impact user experience during peak traffic or on slower connections.",
+        "recommendation": "Conduct performance audit focusing on: 1) Optimize hero images and implement lazy loading, 2) Reduce JavaScript execution time (TBT averaging 1200ms+), 3) Implement critical CSS and defer non-critical resources, 4) Consider static generation or edge caching for speaker profile pages"
+      },
+      {
+        "issue": "Duplicate Title and Meta Description Tags",
+        "severity": "medium",
+        "affected_pages": 51,
+        "description": "25 pages have duplicate title tags and 26 have duplicate meta descriptions (17% of crawled pages). This typically occurs on paginated category pages (/page/2/, /page/3/) that inherit the same metadata as their parent category. This dilutes page uniqueness and can impact click-through rates from search results.",
+        "recommendation": "Implement dynamic title and description templates for paginated pages: append 'Page X' to titles and modify descriptions to reference the specific page content. For speaker profiles with similar bios, include unique value propositions or speaking topics in meta descriptions."
+      },
+      {
+        "issue": "Missing Person Schema Properties on Speaker Profiles",
+        "severity": "medium",
+        "affected_pages": 145,
+        "description": "While basic structured data is implemented (WebPage, BreadcrumbList), speaker profile pages lack Person schema with rich properties. Speaker profiles are the site's primary content assets and would benefit from detailed structured data including jobTitle, knowsAbout topics, affiliation, and sameAs social profiles.",
+        "recommendation": "Enhance speaker profiles with comprehensive Person schema: 1) Add jobTitle and hasOccupation for professional roles, 2) Include knowsAbout array for expertise topics, 3) Add sameAs links to Wikipedia/LinkedIn/Twitter profiles, 4) Consider SpeakableSpecification for voice search optimization of speaker bios"
+      },
+      {
+        "issue": "No H1 Tags on Key Pages",
+        "severity": "medium",
+        "affected_pages": 3,
+        "description": "3 pages lack H1 tags, which are fundamental for content hierarchy and SEO. While the count is low, if these are high-value pages (homepage, key category pages), this impacts semantic structure and accessibility.",
+        "recommendation": "Audit the 3 affected pages and implement proper H1 tags that clearly describe the page purpose. Ensure only one H1 per page and that it contains the primary keyword target."
+      },
+      {
+        "issue": "Broken Image Resources",
+        "severity": "low",
+        "affected_pages": 2,
+        "description": "2 broken resources detected (likely missing images or CSS/JS files). While not critical for SEO, broken images on speaker profiles could impact user trust and conversion rates.",
+        "recommendation": "Run a broken link checker to identify and fix the 2 broken resources. Implement image fallbacks and monitoring to prevent future occurrences, especially on high-value speaker profile pages."
+      }
+    ],
+    "schema_inventory": [
+      {
+        "schema_type": "WebSite",
+        "pages_count": 6,
+        "status": "implemented",
+        "recommendation": "Currently implemented on key pages. Enhance with potentialAction for sitelinks search box and add alternativeHeadline for brand variations."
+      },
+      {
+        "schema_type": "BreadcrumbList",
+        "pages_count": 6,
+        "status": "implemented",
+        "recommendation": "Well-implemented for navigation context. Ensure all deep pages include full breadcrumb trails, especially speaker profiles under topic categories."
+      },
+      {
+        "schema_type": "Person",
+        "pages_count": 0,
+        "status": "missing",
+        "recommendation": "Critical gap for a speakers bureau. Implement comprehensive Person markup on all speaker profiles with: name, image, jobTitle, worksFor, knowsAbout (expertise topics), sameAs (social/Wikipedia links), and description."
+      },
+      {
+        "schema_type": "Organization",
+        "pages_count": 0,
+        "status": "missing",
+        "recommendation": "Add Organization schema to homepage/about page for Washington Speakers Bureau with logo, contactPoint, address, and sameAs social profiles to establish entity authority."
+      },
+      {
+        "schema_type": "Service",
+        "pages_count": 0,
+        "status": "missing",
+        "recommendation": "Implement Service schema for speaker booking services with serviceType, areaServed, and hasOfferCatalog linking to speaker categories. This helps Google understand the business model."
+      },
+      {
+        "schema_type": "Event",
+        "pages_count": 0,
+        "status": "missing",
+        "recommendation": "For past speaking engagements or upcoming events, implement Event schema with performer (linking to Person), location, and date. This provides social proof and can trigger event rich results."
+      },
+      {
+        "schema_type": "SpeakableSpecification",
+        "pages_count": 0,
+        "status": "missing",
+        "recommendation": "Add SpeakableSpecification to speaker bio sections for voice search optimization. With the rise of AI assistants, this helps surface speaker information in voice queries."
+      }
+    ],
+    "core_web_vitals": [
+      {
+        "url": "https://wsb.com",
+        "lcp": 1641,
+        "fid": null,
+        "cls": 0,
+        "inp": 93,
+        "performance_score": 34,
+        "rating": "needs_improvement"
+      },
+      {
+        "url": "https://www.wsb.com/topics/business-speakers/page/2/",
+        "lcp": 1312,
+        "fid": null,
+        "cls": 3,
+        "inp": 102,
+        "performance_score": 15,
+        "rating": "poor"
+      },
+      {
+        "url": "https://www.wsb.com/speakers/",
+        "lcp": 1312,
+        "fid": null,
+        "cls": 3,
+        "inp": 102,
+        "performance_score": 29,
+        "rating": "poor"
+      },
+      {
+        "url": "https://www.wsb.com/speakers/page/2/",
+        "lcp": 1312,
+        "fid": null,
+        "cls": 3,
+        "inp": 102,
+        "performance_score": 23,
+        "rating": "poor"
+      },
+      {
+        "url": "https://www.wsb.com/custom-proposal-2/",
+        "lcp": 1312,
+        "fid": null,
+        "cls": 3,
+        "inp": 102,
+        "performance_score": 6,
+        "rating": "poor"
+      }
+    ],
+    "crawlability_summary": "Crawlability is excellent with 150/150 pages successfully crawled, proper HTTPS implementation, and no redirect chains detected. The sitemap structure is well-organized with separate XML files for speakers, topics, and pages, though one legacy sitemap from 2018 shows warnings and should be removed.",
+    "indexability_summary": "Indexation health is strong with zero non-indexable pages detected, 145/150 pages having proper canonical tags, and consistent URL structure. The 5 redirect pages are properly handled, and there are no noindex directives blocking important content.",
+    "mobile_readiness_summary": "Mobile foundations are solid with responsive design confirmed, though Core Web Vitals performance issues (especially high CLS of 3.0 on some pages) indicate layout shift problems on mobile devices. Accessibility scores of 79-87 suggest room for improvement in touch target sizes and mobile navigation.",
+    "technical_verdict": {
+      "recommendation": "parallel_workstreams",
+      "rationale": "The technical foundation is fundamentally sound with a 96/100 OnPage score, excellent crawlability, and proper indexation setup. However, Core Web Vitals performance issues and missing schema markup for the site's primary assets (speaker profiles) represent significant optimization opportunities. These issues won't block content creation but addressing them in parallel will maximize the impact of new content investments.",
+      "deep_audit_areas": [
+        "Core Web Vitals optimization focusing on LCP and CLS",
+        "Comprehensive schema markup implementation for Person entities",
+        "Performance profiling of speaker listing pages",
+        "Duplicate metadata resolution for paginated content"
+      ]
+    }
+  },
+  "keyword_landscape": {
+    "section_description": "Understanding your current keyword footprint is essential for identifying where you're winning and where opportunities exist. This section maps your entire organic search presence — every keyword your site ranks for, organized into thematic clusters with search intent classification. We analyze ranking distribution, traffic potential, and competitive positioning to give you a clear picture of your organic visibility. The keyword clusters reveal your content strengths and highlight areas where strategic content development can capture significant additional search traffic.",
+    "total_ranked_keywords": 500,
+    "top_3_keywords": 347,
+    "top_10_keywords": 500,
+    "top_50_keywords": 500,
+    "estimated_organic_traffic": 85000,
+    "keyword_clusters": [
+      {
+        "cluster_name": "Speaker Bureau & Agency",
+        "intent": "navigational",
+        "business_relevance": "core",
+        "relevance_rationale": "These are direct brand and service searches where users are specifically looking for WSB or speaker bureaus — the highest converting traffic possible",
+        "keywords": [
+          {
+            "keyword": "washington speakers bureau",
+            "position": 1,
+            "search_volume": 49500,
+            "difficulty": 12,
+            "url": "https://www.wsb.com/"
+          },
+          {
+            "keyword": "washington speaker bureau",
+            "position": 1,
+            "search_volume": 90,
+            "difficulty": 21,
+            "url": "https://www.wsb.com/"
+          },
+          {
+            "keyword": "dc speakers bureau",
+            "position": 1,
+            "search_volume": 50,
+            "difficulty": 4,
+            "url": "https://www.wsb.com/"
+          },
+          {
+            "keyword": "speakers bureau dc",
+            "position": 1,
+            "search_volume": 50,
+            "difficulty": 11,
+            "url": "https://www.wsb.com/"
+          },
+          {
+            "keyword": "washington speakers bureau staff",
+            "position": 1,
+            "search_volume": 30,
+            "difficulty": 5,
+            "url": "https://www.wsb.com/about/"
+          }
+        ],
+        "total_traffic_potential": 49720,
+        "opportunity_score": 10
+      },
+      {
+        "cluster_name": "Celebrity Speaker Fees & Booking",
+        "intent": "commercial",
+        "business_relevance": "core",
+        "relevance_rationale": "These are high-intent commercial searches from event planners researching speaker fees — direct revenue opportunities for WSB's commission-based business",
+        "keywords": [
+          {
+            "keyword": "adam grant speaking fee",
+            "position": 1,
+            "search_volume": 90,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/speakers/adam-grant/"
+          },
+          {
+            "keyword": "arthur brooks speaking fee",
+            "position": 1,
+            "search_volume": 70,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/speakers/arthur-brooks/"
+          },
+          {
+            "keyword": "doris kearns goodwin speaking fee",
+            "position": 1,
+            "search_volume": 70,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/speakers/doris-kearns-goodwin/"
+          },
+          {
+            "keyword": "ezra klein speaking fee",
+            "position": 1,
+            "search_volume": 70,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/speakers/ezra-klein/"
+          },
+          {
+            "keyword": "coach k speaking fee",
+            "position": 1,
+            "search_volume": 90,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/speakers/mike-krzyzewski/"
+          }
+        ],
+        "total_traffic_potential": 390,
+        "opportunity_score": 9
+      },
+      {
+        "cluster_name": "Speaker Category Pages",
+        "intent": "commercial",
+        "business_relevance": "core",
+        "relevance_rationale": "Category searches indicate buyers exploring speaker options by topic — these convert to bookings when matched with the right speakers",
+        "keywords": [
+          {
+            "keyword": "ai keynote speaker",
+            "position": 1,
+            "search_volume": 320,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/topics/artificial-intelligence/"
+          },
+          {
+            "keyword": "corporate culture speakers",
+            "position": 1,
+            "search_volume": 140,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/topics/corporate-culture/"
+          },
+          {
+            "keyword": "historical speakers",
+            "position": 1,
+            "search_volume": 90,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/topics/historian-speakers/"
+          },
+          {
+            "keyword": "entrepreneur speakers",
+            "position": 1,
+            "search_volume": 70,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/topics/business-speakers/entrepreneurs/"
+          },
+          {
+            "keyword": "football speakers",
+            "position": 1,
+            "search_volume": 170,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/topics/sports-motivational-speakers/football/"
+          }
+        ],
+        "total_traffic_potential": 790,
+        "opportunity_score": 9
+      },
+      {
+        "cluster_name": "Individual Speaker Profiles",
+        "intent": "transactional",
+        "business_relevance": "core",
+        "relevance_rationale": "Direct speaker name searches often indicate booking intent — these are warm leads actively researching specific speakers for events",
+        "keywords": [
+          {
+            "keyword": "frank abagnale speaker",
+            "position": 1,
+            "search_volume": 90,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/speakers/frank-abagnale/"
+          },
+          {
+            "keyword": "elizabeth smart speaker",
+            "position": 1,
+            "search_volume": 50,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/speakers/elizabeth-smart/"
+          },
+          {
+            "keyword": "liz murray speaker",
+            "position": 1,
+            "search_volume": 50,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/speakers/liz-murray/"
+          },
+          {
+            "keyword": "jonathan haidt speaker",
+            "position": 1,
+            "search_volume": 40,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/speakers/jonathan-haidt/"
+          },
+          {
+            "keyword": "ken burns speaker",
+            "position": 1,
+            "search_volume": 40,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/speakers/ken-burns/"
+          }
+        ],
+        "total_traffic_potential": 270,
+        "opportunity_score": 8
+      },
+      {
+        "cluster_name": "Orators & Public Speaking History",
+        "intent": "informational",
+        "business_relevance": "vanity",
+        "relevance_rationale": "These are educational searches about historical speakers — they generate traffic but searchers aren't looking to book speakers for events",
+        "keywords": [
+          {
+            "keyword": "famous orators",
+            "position": 1,
+            "search_volume": 170,
+            "difficulty": 10,
+            "url": "https://blog.wsb.com/powerful-lessons-for-speakers-from-15-great-orators"
+          },
+          {
+            "keyword": "great orators",
+            "position": 1,
+            "search_volume": 110,
+            "difficulty": 0,
+            "url": "https://blog.wsb.com/powerful-lessons-for-speakers-from-15-great-orators"
+          },
+          {
+            "keyword": "best orators",
+            "position": 1,
+            "search_volume": 140,
+            "difficulty": 2,
+            "url": "https://blog.wsb.com/powerful-lessons-for-speakers-from-15-great-orators"
+          },
+          {
+            "keyword": "best orators of all time",
+            "position": 1,
+            "search_volume": 140,
+            "difficulty": 13,
+            "url": "https://blog.wsb.com/powerful-lessons-for-speakers-from-15-great-orators"
+          },
+          {
+            "keyword": "oratory and speeches",
+            "position": 1,
+            "search_volume": 390,
+            "difficulty": 5,
+            "url": "https://blog.wsb.com/powerful-lessons-for-speakers-from-15-great-orators"
+          }
+        ],
+        "total_traffic_potential": 950,
+        "opportunity_score": 2
+      },
+      {
+        "cluster_name": "Celebrity Contact Information",
+        "intent": "informational",
+        "business_relevance": "adjacent",
+        "relevance_rationale": "While not direct booking intent, these searches indicate interest in reaching high-profile individuals — potential leads who may need professional representation",
+        "keywords": [
+          {
+            "keyword": "contact john brennan",
+            "position": 1,
+            "search_volume": 30,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/speakers/john-brennan/"
+          },
+          {
+            "keyword": "contact john kerry",
+            "position": 1,
+            "search_volume": 50,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/speakers/john-kerry/"
+          },
+          {
+            "keyword": "john brennan contact",
+            "position": 1,
+            "search_volume": 30,
+            "difficulty": 7,
+            "url": "https://www.wsb.com/speakers/john-brennan/"
+          },
+          {
+            "keyword": "john kerry contact",
+            "position": 1,
+            "search_volume": 50,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/speakers/john-kerry/"
+          }
+        ],
+        "total_traffic_potential": 160,
+        "opportunity_score": 5
+      },
+      {
+        "cluster_name": "Celebrity News & Trivia",
+        "intent": "informational",
+        "business_relevance": "vanity",
+        "relevance_rationale": "These are gossip/news searches about celebrities' personal lives — high traffic but zero booking intent or business value",
+        "keywords": [
+          {
+            "keyword": "how much does msnbc pay michael steele",
+            "position": 1,
+            "search_volume": 260,
+            "difficulty": 1,
+            "url": "https://www.wsb.com/speakers/michael-steele/"
+          },
+          {
+            "keyword": "msnbc legal contributors male",
+            "position": 1,
+            "search_volume": 480,
+            "difficulty": 12,
+            "url": "https://www.wsb.com/speakers/chuck-rosenberg/"
+          },
+          {
+            "keyword": "is mara liasson still on fox news",
+            "position": 1,
+            "search_volume": 30,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/speakers/mara-liasson/"
+          },
+          {
+            "keyword": "mary matalin now",
+            "position": 1,
+            "search_volume": 40,
+            "difficulty": 0,
+            "url": "https://www.wsb.com/speakers/mary-matalin/"
+          }
+        ],
+        "total_traffic_potential": 810,
+        "opportunity_score": 1
+      }
+    ],
+    "top_performers": [
+      {
+        "keyword": "washington speakers bureau",
+        "position": 1,
+        "search_volume": 49500,
+        "url": "https://www.wsb.com/",
+        "trend": "stable",
+        "business_relevance": "core"
+      },
+      {
+        "keyword": "ai keynote speaker",
+        "position": 1,
+        "search_volume": 320,
+        "url": "https://www.wsb.com/topics/artificial-intelligence/",
+        "trend": "rising",
+        "business_relevance": "core"
+      },
+      {
+        "keyword": "football speakers",
+        "position": 1,
+        "search_volume": 170,
+        "url": "https://www.wsb.com/topics/sports-motivational-speakers/football/",
+        "trend": "stable",
+        "business_relevance": "core"
+      },
+      {
+        "keyword": "corporate culture speakers",
+        "position": 1,
+        "search_volume": 140,
+        "url": "https://www.wsb.com/topics/corporate-culture/",
+        "trend": "stable",
+        "business_relevance": "core"
+      },
+      {
+        "keyword": "famous orators",
+        "position": 1,
+        "search_volume": 170,
+        "url": "https://blog.wsb.com/powerful-lessons-for-speakers-from-15-great-orators",
+        "trend": "stable",
+        "business_relevance": "vanity"
+      },
+      {
+        "keyword": "best orators of all time",
+        "position": 1,
+        "search_volume": 140,
+        "url": "https://blog.wsb.com/powerful-lessons-for-speakers-from-15-great-orators",
+        "trend": "rising",
+        "business_relevance": "vanity"
+      },
+      {
+        "keyword": "msnbc legal contributors male",
+        "position": 1,
+        "search_volume": 480,
+        "url": "https://www.wsb.com/speakers/chuck-rosenberg/",
+        "trend": "stable",
+        "business_relevance": "vanity"
+      },
+      {
+        "keyword": "adam grant speaking fee",
+        "position": 1,
+        "search_volume": 90,
+        "url": "https://www.wsb.com/speakers/adam-grant/",
+        "trend": "rising",
+        "business_relevance": "core"
+      }
+    ],
+    "ranking_distribution_summary": "WSB dominates position 1 rankings with 347 keywords in top 3 and all 500 sampled keywords in top 10. However, the keyword portfolio shows a concerning split: approximately 40% of rankings are business-relevant (speaker fees, bureau searches, category pages) while 60% are vanity traffic (historical orators, celebrity gossip) that generates pageviews but zero booking inquiries."
+  },
+  "content_gap": {
+    "section_description": "Content gap analysis reveals the keywords your competitors rank for that you don't — representing untapped opportunities to capture qualified search traffic. We analyzed the keyword overlap between your domain and each competitor to identify high-value keywords where you have no presence. These gaps are categorized by priority: quick wins (low difficulty, high volume), strategic gaps (high difficulty but critical for competitive positioning), and high-value opportunities that represent significant revenue potential. Each gap includes competitor position data and recommended content approaches.",
+    "total_gap_keywords": 800,
+    "high_value_gaps": [
+      {
+        "keyword": "keynote speaker bureau",
+        "search_volume": 210,
+        "difficulty": 59,
+        "intent": "transactional",
+        "competitor_positions": {
+          "bigspeak.com": 1
+        },
+        "estimated_traffic_value": 428,
+        "priority": "high",
+        "rationale": "Direct competitor BigSpeak owns this high-intent term that WSB should dominate given their market position"
+      },
+      {
+        "keyword": "best keynote speakers",
+        "search_volume": 260,
+        "difficulty": 0,
+        "intent": "commercial",
+        "competitor_positions": {
+          "bigspeak.com": 1
+        },
+        "estimated_traffic_value": 530,
+        "priority": "high",
+        "rationale": "High-volume category search where buyers are actively comparing speaker options — WSB's absence is a major miss"
+      },
+      {
+        "keyword": "business keynote speakers",
+        "search_volume": 320,
+        "difficulty": 0,
+        "intent": "commercial",
+        "competitor_positions": {
+          "bigspeak.com": 1
+        },
+        "estimated_traffic_value": 652,
+        "priority": "high",
+        "rationale": "Core business speaker category with strong commercial intent — critical for corporate event planners"
+      },
+      {
+        "keyword": "celebrity speaker fees",
+        "search_volume": 50,
+        "difficulty": 0,
+        "intent": "commercial",
+        "competitor_positions": {
+          "allamericanspeakers.com": 1
+        },
+        "estimated_traffic_value": 102,
+        "priority": "high",
+        "rationale": "Direct fee inquiry term that indicates booking budget research — high conversion potential"
+      },
+      {
+        "keyword": "book keynote speaker",
+        "search_volume": 170,
+        "difficulty": 0,
+        "intent": "transactional",
+        "competitor_positions": {
+          "bigspeak.com": 1
+        },
+        "estimated_traffic_value": 347,
+        "priority": "high",
+        "rationale": "Bottom-funnel transactional query where searchers are ready to book — immediate revenue opportunity"
+      }
+    ],
+    "quick_wins": [
+      {
+        "keyword": "african american speakers bureau",
+        "search_volume": 50,
+        "difficulty": 0,
+        "intent": "commercial",
+        "competitor_positions": {
+          "bigspeak.com": 1
+        },
+        "estimated_traffic_value": 102,
+        "priority": "medium",
+        "rationale": "Low difficulty diversity-focused search that aligns with DEI speaker demand"
+      },
+      {
+        "keyword": "anti racism speakers",
+        "search_volume": 50,
+        "difficulty": 0,
+        "intent": "transactional",
+        "competitor_positions": {
+          "allamericanspeakers.com": 1
+        },
+        "estimated_traffic_value": 102,
+        "priority": "medium",
+        "rationale": "Timely social justice topic with low competition — easy win for DEI-focused events"
+      },
+      {
+        "keyword": "faith based speakers",
+        "search_volume": 40,
+        "difficulty": 0,
+        "intent": "commercial",
+        "competitor_positions": {
+          "harrywalker.com": 1
+        },
+        "estimated_traffic_value": 82,
+        "priority": "medium",
+        "rationale": "Underserved niche with consistent demand from religious organizations and conferences"
+      },
+      {
+        "keyword": "career speakers",
+        "search_volume": 50,
+        "difficulty": 0,
+        "intent": "transactional",
+        "competitor_positions": {
+          "bigspeak.com": 1
+        },
+        "estimated_traffic_value": 102,
+        "priority": "medium",
+        "rationale": "Professional development category gap — universities and corporations regularly book career speakers"
+      },
+      {
+        "keyword": "chef speakers",
+        "search_volume": 50,
+        "difficulty": 0,
+        "intent": "transactional",
+        "competitor_positions": {
+          "harrywalker.com": 1
+        },
+        "estimated_traffic_value": 102,
+        "priority": "medium",
+        "rationale": "Culinary industry events and food conferences need specialized speakers — untapped vertical"
+      }
+    ],
+    "strategic_gaps": [
+      {
+        "keyword": "speakers for colleges",
+        "search_volume": 210,
+        "difficulty": 0,
+        "intent": "commercial",
+        "competitor_positions": {
+          "harrywalker.com": 1
+        },
+        "estimated_traffic_value": 428,
+        "priority": "low",
+        "rationale": "Higher education is a massive speaker market — WSB needs dedicated university-focused content"
+      },
+      {
+        "keyword": "public speaker agencies",
+        "search_volume": 140,
+        "difficulty": 0,
+        "intent": "navigational",
+        "competitor_positions": {
+          "harrywalker.com": 1
+        },
+        "estimated_traffic_value": 285,
+        "priority": "low",
+        "rationale": "Generic agency search where WSB should appear alongside competitors for consideration"
+      },
+      {
+        "keyword": "agents for speakers",
+        "search_volume": 480,
+        "difficulty": 0,
+        "intent": "commercial",
+        "competitor_positions": {
+          "caa.com": 1
+        },
+        "estimated_traffic_value": 978,
+        "priority": "low",
+        "rationale": "High-volume term targeting speakers seeking representation — potential new business channel"
+      },
+      {
+        "keyword": "celebrity motivational speakers",
+        "search_volume": 70,
+        "difficulty": 0,
+        "intent": "commercial",
+        "competitor_positions": {
+          "bigspeak.com": 1,
+          "harrywalker.com": 2
+        },
+        "estimated_traffic_value": 143,
+        "priority": "low",
+        "rationale": "Celebrity speaker category where WSB has strong inventory but no dedicated landing page"
+      },
+      {
+        "keyword": "hire an emcee",
+        "search_volume": 210,
+        "difficulty": 0,
+        "intent": "transactional",
+        "competitor_positions": {
+          "harrywalker.com": 2
+        },
+        "estimated_traffic_value": 428,
+        "priority": "low",
+        "rationale": "Adjacent service many speakers provide — opportunity to expand beyond keynotes"
+      }
+    ],
+    "gap_analysis_summary": "WSB has significant content gaps in high-intent commercial categories where competitors dominate, missing an estimated 5,000+ monthly searches worth $10,000+ in traffic value. The most critical gaps are transactional 'book speaker' queries and category pages for business, diversity, and specialty speakers where BigSpeak has built commanding positions."
+  },
+  "serp_features_aeo": {
+    "section_description": "The search landscape has evolved beyond traditional blue links. Featured snippets, People Also Ask boxes, and AI-generated overviews now dominate above-the-fold real estate. This section analyzes your visibility across these modern SERP features and evaluates your presence in AI-powered search experiences (AEO — Answer Engine Optimization). We tested your brand's visibility across AI engines including Google AI Overview, ChatGPT, and Perplexity to assess how well your content is being surfaced in conversational search. The findings reveal specific optimization opportunities to capture these high-visibility placements.",
+    "snippet_opportunities": [
+      {
+        "keyword": "best speaker agencies",
+        "search_volume": 170,
+        "current_snippet_holder": "AI Overview aggregating multiple sources",
+        "client_position": 1,
+        "snippet_type": "featured_snippet",
+        "optimization_recommendation": "Create a comprehensive comparison table of top speaker agencies with columns for specialties, notable speakers, and unique differentiators. Add structured data markup for the table and optimize meta description to directly answer 'what are the best speaker agencies'"
+      },
+      {
+        "keyword": "ai keynote speaker",
+        "search_volume": 720,
+        "current_snippet_holder": "AI Overview aggregating multiple sources",
+        "client_position": 1,
+        "snippet_type": "list",
+        "optimization_recommendation": "Restructure the AI speakers page with a numbered list format of 'Top 10 AI Keynote Speakers for 2024' with H3 headers for each speaker name, followed by 2-3 bullet points on their expertise. Add FAQ schema and speakable markup"
+      },
+      {
+        "keyword": "basketball motivational speaker",
+        "search_volume": 90,
+        "current_snippet_holder": "AI Overview aggregating multiple sources",
+        "client_position": 1,
+        "snippet_type": "list",
+        "optimization_recommendation": "Create a dedicated 'Basketball Motivational Speakers' hub page with categorized lists: NBA Champions, Olympic Athletes, Coaches. Include speaker fees ranges and booking CTAs. Implement HowTo schema for 'How to Book a Basketball Speaker'"
+      },
+      {
+        "keyword": "keynote speaker bureau",
+        "search_volume": 210,
+        "current_snippet_holder": null,
+        "client_position": null,
+        "snippet_type": "paragraph",
+        "optimization_recommendation": "Target this high-intent gap keyword by creating a pillar page 'What is a Keynote Speaker Bureau' with sections on services offered, how bureaus work, and why use a bureau vs direct booking. Optimize for definition-based snippet"
+      },
+      {
+        "keyword": "celebrity speaker fees",
+        "search_volume": 50,
+        "current_snippet_holder": null,
+        "client_position": null,
+        "snippet_type": "table",
+        "optimization_recommendation": "Develop a 'Celebrity Speaker Fee Guide' with a table showing fee ranges by celebrity tier (A-list: $100K+, B-list: $50-100K, etc). Include factors affecting fees and add FAQ schema for common fee questions"
+      }
+    ],
+    "paa_opportunities": [
+      {
+        "question": "How much does it cost to hire a keynote speaker?",
+        "parent_keyword": "keynote speaker fees",
+        "search_volume": 90,
+        "currently_answered_by": "bigspeak.com"
+      },
+      {
+        "question": "Who are the best AI speakers?",
+        "parent_keyword": "ai keynote speaker",
+        "search_volume": 720,
+        "currently_answered_by": "multiple sources"
+      },
+      {
+        "question": "What makes a good motivational speaker?",
+        "parent_keyword": "motivational speakers",
+        "search_volume": 1900,
+        "currently_answered_by": null
+      },
+      {
+        "question": "How do speaker bureaus make money?",
+        "parent_keyword": "speaker bureau",
+        "search_volume": 320,
+        "currently_answered_by": null
+      },
+      {
+        "question": "What percentage do speaker bureaus take?",
+        "parent_keyword": "speaker bureau fees",
+        "search_volume": 40,
+        "currently_answered_by": null
+      },
+      {
+        "question": "Who is the highest paid keynote speaker?",
+        "parent_keyword": "celebrity speaker fees",
+        "search_volume": 50,
+        "currently_answered_by": null
+      },
+      {
+        "question": "How to book a celebrity speaker?",
+        "parent_keyword": "book celebrity speaker",
+        "search_volume": 70,
+        "currently_answered_by": "allamericanspeakers.com"
+      },
+      {
+        "question": "What topics are trending for keynote speakers?",
+        "parent_keyword": "keynote speaker topics",
+        "search_volume": 110,
+        "currently_answered_by": null
+      },
+      {
+        "question": "How far in advance should you book a keynote speaker?",
+        "parent_keyword": "book keynote speaker",
+        "search_volume": 170,
+        "currently_answered_by": "bigspeak.com"
+      },
+      {
+        "question": "What is the difference between a motivational speaker and keynote speaker?",
+        "parent_keyword": "keynote vs motivational speaker",
+        "search_volume": 90,
+        "currently_answered_by": null
+      }
+    ],
+    "ai_overview_presence": [
+      {
+        "keyword": "adam grant speaking fee",
+        "ai_overview_present": true,
+        "client_referenced": true,
+        "competitors_referenced": [
+          "allamericanspeakers.com",
+          "aaespeakers.com",
+          "thinkingheads.com"
+        ],
+        "optimization_opportunity": "WSB is referenced but not prominently. Enhance Adam Grant's page with more specific fee range data, recent speaking engagement examples, and implement Event schema with offers markup"
+      },
+      {
+        "keyword": "ai keynote speaker",
+        "ai_overview_present": true,
+        "client_referenced": true,
+        "competitors_referenced": [
+          "bigspeak.com",
+          "crescendo.ai",
+          "lavinagency.com"
+        ],
+        "optimization_opportunity": "WSB is mentioned but BigSpeak dominates citations. Create individual AI speaker profile pages with Person schema, add 'Top AI Speakers 2024' content with expert curation rationale"
+      },
+      {
+        "keyword": "best speaker agencies",
+        "ai_overview_present": true,
+        "client_referenced": true,
+        "competitors_referenced": [
+          "leadingauthorities.com",
+          "bigspeak.com",
+          "harrywalker.com"
+        ],
+        "optimization_opportunity": "WSB is listed first but needs more authoritative signals. Publish thought leadership content on 'How to Choose a Speaker Bureau' and gather client testimonials with Review schema"
+      },
+      {
+        "keyword": "basketball motivational speaker",
+        "ai_overview_present": true,
+        "client_referenced": false,
+        "competitors_referenced": [
+          "sportsspeakers360.com",
+          "executivespeakers.com",
+          "teamwass.com"
+        ],
+        "optimization_opportunity": "WSB not referenced despite ranking #1 organically. Add more basketball speaker profiles, create sport-specific landing pages, implement SportsEvent schema"
+      },
+      {
+        "keyword": "arianna huffington speaking fee",
+        "ai_overview_present": true,
+        "client_referenced": true,
+        "competitors_referenced": [
+          "bookingentertainment.com"
+        ],
+        "optimization_opportunity": "WSB shows fee range ($70K+) which is good transparency. Add more context about what's included in fees, typical engagement formats, and similar speakers in that fee range"
+      }
+    ],
+    "llm_visibility": [
+      {
+        "engine": "google_ai_overview",
+        "queries_tested": 15,
+        "brand_mentioned_count": 0,
+        "mention_rate": 0,
+        "competitors_mentioned": {
+          "bigspeak.com": 4,
+          "allamericanspeakers.com": 2,
+          "harrywalker.com": 2,
+          "leadingauthorities.com": 1
+        },
+        "key_findings": [
+          "WSB appears in AI Overview reference links for 6/15 queries but never in the summary text itself",
+          "BigSpeak dominates AI visibility with structured content and comprehensive speaker lists",
+          "Fee transparency (like WSB's Huffington page) increases AI citation likelihood",
+          "AI Overviews favor sites with comprehensive topic hubs over individual speaker pages"
+        ]
+      }
+    ],
+    "serp_features_summary": "WSB has strong organic rankings but weak SERP feature presence, with AI Overviews frequently referencing competitors despite WSB's #1 positions. The site lacks structured data optimization and comprehensive content formats that win featured snippets and AI citations.",
+    "aeo_readiness_score": 35,
+    "aeo_recommendations": [
+      "Implement comprehensive structured data: Person schema on all speaker profiles with jobTitle, knowsAbout, and sameAs properties; Event and Offer schema for speaking engagements; FAQ schema on fee and booking pages",
+      "Create AI-optimized content hubs: 'Ultimate Guide to Speaker Fees by Category', 'How to Choose the Right Keynote Speaker', and topic-specific speaker lists with comparison tables",
+      "Develop citation-worthy resources: Annual 'State of the Speaking Industry' report with original data, speaker fee benchmarking tool, and ROI calculator for event planners",
+      "Enhance content depth on speaker profiles: Add 'Signature Topics', 'Recent Speaking Engagements', 'What's Included in Fee', and 'Similar Speakers' sections with internal linking",
+      "Build topical authority through Q&A content: Target all identified PAA questions with dedicated FAQ pages or blog posts, implement speakable markup for voice search optimization"
+    ]
+  },
+  "backlink_profile": {
+    "section_description": "Backlinks remain one of the strongest ranking signals in search. This section provides a complete audit of your backlink profile — total links, referring domain diversity, anchor text distribution, and link quality metrics. We compare your profile against competitors to identify authority gaps and highlight specific domains that link to your competitors but not to you. These gap opportunities represent achievable link-building targets that can meaningfully improve your domain authority and search rankings.",
+    "total_backlinks": 48306,
+    "referring_domains": 3859,
+    "dofollow_ratio": 0.9,
+    "domain_authority": null,
+    "spam_score": 6,
+    "anchor_distribution": [
+      {
+        "category": "branded",
+        "percentage": 45,
+        "examples": [
+          "Washington Speakers Bureau",
+          "WASHINGTON SPEAKERS BUREAU",
+          "WSB",
+          "washingtonspeakers",
+          "wsb.com"
+        ]
+      },
+      {
+        "category": "business_cta",
+        "percentage": 35,
+        "examples": [
+          "Invite Hugh to Speak",
+          "Book David to Speak",
+          "Speaking Requests",
+          "Mike Barnicle's Speaking Engagements",
+          "Details"
+        ]
+      },
+      {
+        "category": "url",
+        "percentage": 8,
+        "examples": [
+          "www.wsb.com",
+          "wsb.com",
+          "washingtonspeakers.com"
+        ]
+      },
+      {
+        "category": "generic",
+        "percentage": 7,
+        "examples": [
+          "Visit Website",
+          "Speaking",
+          "markets",
+          "2"
+        ]
+      },
+      {
+        "category": "partial_match",
+        "percentage": 3,
+        "examples": [
+          "John Heilemann Speaking Engagements, Schedule, & Fee",
+          "Katty Kay Speaking Engagements",
+          "George W. Bush Speaking Engagements"
+        ]
+      },
+      {
+        "category": "spam",
+        "percentage": 2,
+        "examples": [
+          "TELEGRAM @SEO_ANOMALY",
+          "MASSLINKER.COM",
+          "Backlinks for wsb.com"
+        ]
+      }
+    ],
+    "competitor_comparison": [
+      {
+        "company_name": "Washington Speakers Bureau",
+        "domain": "wsb.com",
+        "total_backlinks": 48306,
+        "referring_domains": 3859,
+        "domain_rank": 355,
+        "dofollow_ratio": 0.9
+      },
+      {
+        "company_name": "BigSpeak",
+        "domain": "bigspeak.com",
+        "total_backlinks": 10372,
+        "referring_domains": 3090,
+        "domain_rank": 294,
+        "dofollow_ratio": null
+      },
+      {
+        "company_name": "All American Speakers",
+        "domain": "allamericanspeakers.com",
+        "total_backlinks": 136878,
+        "referring_domains": 5782,
+        "domain_rank": 429,
+        "dofollow_ratio": null
+      },
+      {
+        "company_name": "The Harry Walker Agency",
+        "domain": "harrywalker.com",
+        "total_backlinks": 11753,
+        "referring_domains": 2424,
+        "domain_rank": 328,
+        "dofollow_ratio": null
+      },
+      {
+        "company_name": "Creative Artists Agency",
+        "domain": "caa.com",
+        "total_backlinks": 39554,
+        "referring_domains": 7081,
+        "domain_rank": 380,
+        "dofollow_ratio": null
+      }
+    ],
+    "gap_opportunities": [
+      {
+        "referring_domain": "en.wikipedia.org",
+        "domain_rank": 846,
+        "links_to_competitors": [
+          "wsb.com"
+        ],
+        "acquisition_difficulty": "medium",
+        "recommendation": "WSB already has strong Wikipedia presence with 12 high-authority links. Expand by identifying speakers exclusive to WSB who have Wikipedia pages but lack bureau links. Submit neutral edits adding WSB as their representation in the 'External links' or speaker representation sections."
+      },
+      {
+        "referring_domain": "harvard.edu",
+        "domain_rank": 689,
+        "links_to_competitors": [
+          "wsb.com"
+        ],
+        "acquisition_difficulty": "hard",
+        "recommendation": "Leverage existing Harvard connections (2 links found). Target Harvard Business School, Kennedy School, and other departments where WSB speakers are alumni or guest lecturers. Offer to sponsor speaker series or provide exclusive discounts for Harvard events."
+      },
+      {
+        "referring_domain": "hubspot.com",
+        "domain_rank": 694,
+        "links_to_competitors": [
+          "wsb.com"
+        ],
+        "acquisition_difficulty": "medium",
+        "recommendation": "HubSpot already links to WSB speaker Horst Schulze. Pitch additional customer service and leadership speakers for their blog's quote roundups and resource pages. Create exclusive thought leadership content featuring WSB speakers on topics like sales leadership and customer experience."
+      },
+      {
+        "referring_domain": "yellowpages.com",
+        "domain_rank": 696,
+        "links_to_competitors": [
+          "wsb.com"
+        ],
+        "acquisition_difficulty": "easy",
+        "recommendation": "WSB has multiple YellowPages listings but all are nofollow. Claim and optimize all location-based listings in major metropolitan areas where WSB operates. While links are nofollow, they provide local SEO value and referral traffic."
+      },
+      {
+        "referring_domain": "deloitte.com",
+        "domain_rank": 695,
+        "links_to_competitors": [
+          "wsb.com"
+        ],
+        "acquisition_difficulty": "hard",
+        "recommendation": "Deloitte's AI Institute links to WSB's AI content. Strengthen this relationship by featuring Deloitte executives who speak through WSB and co-creating thought leadership on AI, digital transformation, and future of work topics. Target similar Big 4 firms."
+      }
+    ],
+    "backlink_health_summary": "WSB's backlink profile is exceptionally strong with 3,859 referring domains and a healthy 90% dofollow ratio. The anchor text distribution is natural and business-appropriate, with 80% consisting of branded terms and legitimate business CTAs from speaker booking pages, indicating organic link growth rather than manipulation.",
+    "link_building_priorities": [
+      "Expand Wikipedia presence by identifying 50+ WSB-exclusive speakers with Wikipedia pages lacking bureau representation links",
+      "Develop university partnerships beyond Harvard — target top business schools where WSB speakers are professors or frequent guests",
+      "Create co-branded thought leadership campaigns with enterprise clients (Deloitte, McKinsey, Fortune 500) who book speakers",
+      "Build media relationships with business publications covering speaking industry — target exclusive data stories about speaking fees and trends",
+      "Develop speaker-generated link assets — help top speakers create linkable resources that naturally reference WSB as their bureau",
+      "Target industry association partnerships (MPI, PCMA, IAEE) for event planner resource pages and preferred vendor listings",
+      "Audit and reclaim broken links from the 2% spam anchors — disavow toxic domains while preserving legitimate business links"
+    ]
+  },
+  "competitive_search": {
+    "section_description": "Understanding your competitive search landscape is critical for strategic positioning. This section profiles your organic search presence alongside each competitor, comparing total keyword coverage, top-10 rankings, estimated organic traffic, and domain authority. We identify each player's content strengths and weaknesses to reveal differentiation opportunities — areas where you can establish topical authority that competitors haven't claimed. This competitive intelligence informs both content strategy and link-building priorities.",
+    "client_profile": {
+      "company_name": "Washington Speakers Bureau",
+      "domain": "wsb.com",
+      "total_ranked_keywords": "500+ (API sample)",
+      "top_10_keywords": 500,
+      "estimated_traffic": 85000,
+      "domain_authority": 57,
+      "top_content_categories": [
+        "Celebrity speaker profiles and fees",
+        "Sports personalities and motivational speakers",
+        "Political commentators and journalists",
+        "Famous orators and public speaking history",
+        "AI and technology thought leaders"
+      ],
+      "strengths": [
+        "Dominates brand searches with 23%+ CTR for 'washington speakers bureau' queries",
+        "Owns multiple #1 rankings for high-value celebrity speaker fee keywords",
+        "Strong content asset in 'famous orators' blog post driving 1,400+ clicks",
+        "Excellent speaker profile pages with individual URLs ranking for speaker names",
+        "High dofollow ratio (90%) in backlink profile indicating quality link acquisition"
+      ],
+      "weaknesses": [
+        "Poor Core Web Vitals with Performance scores 6-34/100 impacting user experience",
+        "Missing critical commercial keywords like 'keynote speaker bureau' and 'book keynote speaker'",
+        "17% of pages have duplicate title/meta tags diluting uniqueness",
+        "No Person schema on speaker profiles missing rich snippet opportunities",
+        "Spam score of 200% (Moz) indicates potential toxic backlink issues"
+      ]
+    },
+    "competitor_profiles": [
+      {
+        "company_name": "BigSpeak",
+        "domain": "bigspeak.com",
+        "total_ranked_keywords": "500+ (API sample)",
+        "top_10_keywords": 500,
+        "estimated_traffic": null,
+        "domain_authority": 54,
+        "top_content_categories": [
+          "Keynote speaker categories and bureaus",
+          "Business and leadership speakers",
+          "Diversity and inclusion speakers",
+          "Virtual speaker solutions",
+          "Speaker fee guides and resources"
+        ],
+        "strengths": [
+          "Owns critical commercial keywords like 'keynote speaker bureau' (#1)",
+          "Dominates category searches: 'best keynote speakers', 'business keynote speakers'",
+          "Strong presence in diversity speaker searches (African American, anti-racism)",
+          "Lower spam score (100%) indicating cleaner backlink profile",
+          "4,681 linking domains showing strong industry authority"
+        ],
+        "weaknesses": [
+          "Fewer total backlinks (10,372) compared to WSB's 48,306",
+          "Lower referring domains (3,090) than competitors",
+          "Missing high-traffic celebrity speaker name searches",
+          "Weaker brand recognition in navigational searches",
+          "Lower domain authority (54) than industry leaders"
+        ]
+      },
+      {
+        "company_name": "All American Speakers",
+        "domain": "allamericanspeakers.com",
+        "total_ranked_keywords": "500+ (API sample)",
+        "top_10_keywords": 500,
+        "estimated_traffic": null,
+        "domain_authority": 58,
+        "top_content_categories": [
+          "Celebrity speaker fees and pricing",
+          "Social justice and activism speakers",
+          "Entertainment industry speakers",
+          "Sports legends and athletes",
+          "Leadership and business experts"
+        ],
+        "strengths": [
+          "Massive backlink profile with 136,878 total links",
+          "Highest referring domains (5,782) among speaker bureaus",
+          "Strong in celebrity fee searches and pricing content",
+          "8,870 linking domains (Moz) showing exceptional reach",
+          "Competitive domain authority (58) on par with WSB"
+        ],
+        "weaknesses": [
+          "Lower domain rank (429) despite high backlink counts",
+          "100% spam score suggesting quality issues in link profile",
+          "Missing key transactional keywords owned by BigSpeak",
+          "Weaker brand presence in navigational searches",
+          "Less focused content strategy across too many categories"
+        ]
+      },
+      {
+        "company_name": "The Harry Walker Agency",
+        "domain": "harrywalker.com",
+        "total_ranked_keywords": "500+ (API sample)",
+        "top_10_keywords": 500,
+        "estimated_traffic": null,
+        "domain_authority": 58,
+        "top_content_categories": [
+          "Political leaders and former officials",
+          "Media personalities and journalists",
+          "Faith-based and inspirational speakers",
+          "Authors and thought leaders",
+          "International affairs experts"
+        ],
+        "strengths": [
+          "Premium positioning with high-profile political speakers",
+          "Strong domain rank (328) despite fewer backlinks",
+          "Presence in niche categories like faith-based speakers",
+          "Quality link profile with 2,424 referring domains",
+          "Equal domain authority (58) to market leaders"
+        ],
+        "weaknesses": [
+          "Lowest backlink count (11,753) among major competitors",
+          "Missing from many commercial intent keywords",
+          "Limited presence in business/corporate speaker searches",
+          "Fewer linking domains (4,413) than competitors",
+          "Narrow content focus may limit search visibility"
+        ]
+      },
+      {
+        "company_name": "Creative Artists Agency",
+        "domain": "caa.com",
+        "total_ranked_keywords": "500+ (API sample)",
+        "top_10_keywords": 500,
+        "estimated_traffic": null,
+        "domain_authority": 65,
+        "top_content_categories": [
+          "Entertainment industry representation",
+          "Celebrity talent management",
+          "Sports and athlete representation",
+          "Media and broadcast talent",
+          "Corporate speaking engagements"
+        ],
+        "strengths": [
+          "Highest domain authority (65) in competitive set",
+          "Most linking domains (11,559) indicating broad authority",
+          "Strong brand recognition beyond just speaker bureau space",
+          "7,081 referring domains showing diverse link sources",
+          "Cross-industry authority from entertainment roots"
+        ],
+        "weaknesses": [
+          "Extremely high spam score (300%) indicating toxic links",
+          "Not primarily a speaker bureau affecting relevance",
+          "Likely missing speaker-specific commercial keywords",
+          "Broader focus dilutes speaker bureau visibility",
+          "May not compete directly on speaker fee searches"
+        ]
+      }
+    ],
+    "competitive_positioning_summary": "WSB maintains strong organic visibility through celebrity speaker profiles and owns valuable brand searches, but BigSpeak has captured critical commercial intent keywords that drive buyer traffic. While WSB has superior backlink volume and strong individual speaker rankings, competitors dominate category searches where buyers compare options. The technical SEO issues (Core Web Vitals, duplicate content) create additional vulnerability as Google increasingly prioritizes user experience.",
+    "differentiation_opportunities": [
+      "Create a comprehensive 'Keynote Speaker Bureau Services' hub to capture missing commercial keywords",
+      "Develop speaker fee transparency content with ranges and factors to own 'celebrity speaker fees' searches",
+      "Build topical authority pages for underserved categories: 'AI Speakers', 'Sustainability Speakers', 'Web3 Speakers'",
+      "Implement comprehensive Person schema on all speaker profiles to dominate knowledge panels and voice search",
+      "Launch a 'Speaker Finder' tool with faceted search to capture 'find a speaker' and comparison queries",
+      "Create video content showcasing speaker highlights to capture YouTube/video carousel SERP features",
+      "Develop location-based landing pages for major markets: 'NYC Keynote Speakers', 'Chicago Business Speakers'"
+    ]
+  },
+  "strategic_recommendations": {
+    "section_description": "This section synthesizes all findings into a prioritized action plan organized by implementation timeframe. Quick wins are high-impact, low-effort changes that can improve rankings within weeks. Medium-term initiatives require more resources but drive substantial organic growth over 3-6 months. Long-term strategic plays position your brand for sustained competitive advantage. Each recommendation includes effort/impact scoring, expected timeframe, and the specific KPI it targets — giving your team a clear execution roadmap.",
+    "quick_wins": [
+      {
+        "title": "Capture High-Value Keyword Gaps with Hub Pages",
+        "description": "Create dedicated hub pages for 'keynote speaker bureau' and 'book keynote speaker' where competitors dominate. These transactional queries have low difficulty (0) and direct booking intent, representing immediate revenue opportunities.",
+        "effort": "low",
+        "impact": "high",
+        "timeframe": "2-4 weeks",
+        "category": "content",
+        "kpi": "30+ transactional keyword rankings"
+      },
+      {
+        "title": "Fix Duplicate Metadata on 51 Pages",
+        "description": "Implement dynamic title/description templates for paginated pages to eliminate duplicate metadata affecting 17% of crawled content. This quick fix improves page uniqueness and SERP click-through rates.",
+        "effort": "low",
+        "impact": "medium",
+        "timeframe": "1-2 weeks",
+        "category": "technical",
+        "kpi": "0% duplicate metadata rate"
+      },
+      {
+        "title": "Add Person Schema to Speaker Profiles",
+        "description": "Enhance 145 speaker profile pages with comprehensive Person schema including jobTitle, knowsAbout expertise, and sameAs social links. This positions WSB to capture rich snippets and voice search queries for speaker names.",
+        "effort": "medium",
+        "impact": "high",
+        "timeframe": "2-4 weeks",
+        "category": "aeo",
+        "kpi": "145+ pages with rich snippets eligibility"
+      },
+      {
+        "title": "Create Speaker Fee Ranges Content",
+        "description": "Develop a 'Celebrity Speaker Fee Guide' targeting the gap keyword 'celebrity speaker fees' with a table showing tier-based pricing. Add FAQ schema to capture featured snippets for fee-related searches where competitors currently win.",
+        "effort": "low",
+        "impact": "high",
+        "timeframe": "1-2 weeks",
+        "category": "content",
+        "kpi": "5+ fee-related featured snippets"
+      },
+      {
+        "title": "Optimize AI Speaker Content for Featured Snippets",
+        "description": "Restructure the AI speakers page (currently #1) with numbered list format and H3 headers to capture the featured snippet. With 720 monthly searches, owning the snippet would significantly increase CTR from current position.",
+        "effort": "low",
+        "impact": "high",
+        "timeframe": "1-2 weeks",
+        "category": "aeo",
+        "kpi": "Featured snippet for 'ai keynote speaker'"
+      }
+    ],
+    "medium_term": [
+      {
+        "title": "Launch Comprehensive Performance Optimization Project",
+        "description": "Address failing Core Web Vitals (6-34/100 Performance scores) through image optimization, JavaScript reduction, and critical CSS implementation. Poor performance impacts rankings and user experience, especially during high-traffic booking periods.",
+        "effort": "high",
+        "impact": "high",
+        "timeframe": "2-3 months",
+        "category": "technical",
+        "kpi": "75+ Performance score on all pages"
+      },
+      {
+        "title": "Build Topic Authority with Category Landing Pages",
+        "description": "Create optimized landing pages for gap categories where BigSpeak dominates: 'Business Keynote Speakers', 'Diversity Speakers', 'Virtual Speakers'. Target 10-15 category terms with combined 2,000+ monthly searches.",
+        "effort": "medium",
+        "impact": "high",
+        "timeframe": "1-2 months",
+        "category": "content",
+        "kpi": "15+ category keyword rankings"
+      },
+      {
+        "title": "Implement AEO-Optimized FAQ Content Strategy",
+        "description": "Develop FAQ sections targeting 20+ People Also Ask opportunities like 'How much does it cost to hire a keynote speaker?' where competitors currently dominate. Use FAQ and HowTo schema to maximize SERP real estate.",
+        "effort": "medium",
+        "impact": "high",
+        "timeframe": "1-2 months",
+        "category": "aeo",
+        "kpi": "20+ PAA box appearances"
+      },
+      {
+        "title": "Execute Wikipedia Link Building Campaign",
+        "description": "Identify WSB-exclusive speakers with Wikipedia pages lacking bureau links. Submit neutral edits adding WSB as representation source. Target 20-30 high-authority Wikipedia links to match competitor presence.",
+        "effort": "medium",
+        "impact": "medium",
+        "timeframe": "2-3 months",
+        "category": "backlinks",
+        "kpi": "20+ Wikipedia referring pages"
+      },
+      {
+        "title": "Disavow Toxic Backlinks Inflating Spam Score",
+        "description": "Conduct backlink audit to identify and disavow spam links contributing to 200% Moz spam score (vs competitors at 100%). Focus on removing manipulative anchor text links that could trigger algorithmic penalties.",
+        "effort": "medium",
+        "impact": "medium",
+        "timeframe": "1-2 months",
+        "category": "backlinks",
+        "kpi": "Spam score below 150%"
+      }
+    ],
+    "long_term": [
+      {
+        "title": "Develop Programmatic Speaker Profile SEO",
+        "description": "Build scalable system to automatically optimize 500+ speaker profiles with unique content, dynamic schema, and topical authority signals. This creates a competitive moat against bureaus with fewer exclusive speakers.",
+        "effort": "high",
+        "impact": "high",
+        "timeframe": "6-9 months",
+        "category": "content",
+        "kpi": "500+ optimized speaker pages"
+      },
+      {
+        "title": "Create Industry Event Partnership Link Program",
+        "description": "Establish systematic partnerships with conference organizers to earn contextual backlinks from event sites featuring WSB speakers. Target 100+ high-authority event domains annually.",
+        "effort": "high",
+        "impact": "high",
+        "timeframe": "6-12 months",
+        "category": "backlinks",
+        "kpi": "100+ event site referring domains"
+      },
+      {
+        "title": "Build Thought Leadership Content Hub",
+        "description": "Launch editorial content program featuring exclusive insights from WSB speakers on trending topics. This builds topical authority beyond transactional keywords and captures upper-funnel event planner research.",
+        "effort": "high",
+        "impact": "medium",
+        "timeframe": "3-6 months",
+        "category": "content",
+        "kpi": "50+ thought leadership articles"
+      }
+    ],
+    "executive_summary": "WSB can proceed with parallel technical and content workstreams given the generally healthy site foundation (96 health score, all pages returning 200 status codes). While Core Web Vitals performance requires attention (6-34/100 scores), this should not block immediate content initiatives targeting critical keyword gaps where competitors like BigSpeak dominate high-intent searches ('keynote speaker bureau', 'book keynote speaker'). The site shows strong branded search dominance and celebrity speaker fee rankings, but misses significant commercial opportunities in category searches worth 5,000+ monthly searches. With 145 speaker profiles lacking structured data and 17% of pages having duplicate metadata, quick technical wins can dramatically improve search visibility while the performance optimization project runs in parallel."
+  },
+  "metadata": {
+    "model": "claude-opus-4-20250514",
+    "version": 1,
+    "generated_at": "2026-02-14T21:36:20.879Z",
+    "domain_audited": "wsb.com",
+    "competitors_analyzed": [
+      "bigspeak.com",
+      "allamericanspeakers.com",
+      "harrywalker.com",
+      "caa.com"
+    ],
+    "intelligence_errors": [],
+    "data_sources": [
+      {
+        "key": "dataforseo",
+        "name": "DataForSEO",
+        "description": "Provided site crawl & technical analysis, keyword rankings & content gaps, backlink profile & competitor link analysis, SERP feature analysis, AI engine visibility testing",
+        "active": true
+      },
+      {
+        "key": "moz",
+        "name": "Moz",
+        "description": "Provided Domain Authority, Spam Score & linking domain metrics, top pages by page authority for client and competitors",
+        "active": true
+      },
+      {
+        "key": "keywords_everywhere",
+        "name": "Keywords Everywhere",
+        "description": "Provided 12-month search volume trends & CPC data",
+        "active": true
+      },
+      {
+        "key": "google_pagespeed",
+        "name": "Google PageSpeed Insights",
+        "description": "Provided Core Web Vitals and performance scores for 6 URL(s)",
+        "active": true
+      },
+      {
+        "key": "google_search_console",
+        "name": "Google Search Console",
+        "description": "Provided 500 search queries with real click data, 100 top pages by clicks, 5 sitemaps (2025-11-13 to 2026-02-11)",
+        "active": true
+      }
+    ],
+    "pages_crawled": 150
+  }
+}

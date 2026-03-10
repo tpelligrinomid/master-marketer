@@ -24,26 +24,39 @@ import { extractJson } from "../src/lib/json-utils";
 const MODEL = "claude-opus-4-6";
 const MAX_TOKENS = 32000;
 
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 5000;
+
 async function callClaude(
   client: Anthropic,
   system: string,
   user: string
 ): Promise<string> {
-  const stream = client.messages.stream({
-    model: MODEL,
-    max_tokens: MAX_TOKENS,
-    system,
-    messages: [{ role: "user", content: user }],
-  });
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const stream = client.messages.stream({
+        model: MODEL,
+        max_tokens: MAX_TOKENS,
+        system,
+        messages: [{ role: "user", content: user }],
+      });
 
-  const response = await stream.finalMessage();
+      const response = await stream.finalMessage();
 
-  const textContent = response.content.find((c) => c.type === "text");
-  if (!textContent || textContent.type !== "text") {
-    throw new Error("No text response from Claude");
+      const textContent = response.content.find((c) => c.type === "text");
+      if (!textContent || textContent.type !== "text") {
+        throw new Error("No text response from Claude");
+      }
+
+      return textContent.text;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`[Claude] Attempt ${attempt}/${MAX_RETRIES} failed: ${msg}`);
+      if (attempt === MAX_RETRIES) throw err;
+      await new Promise((r) => setTimeout(r, RETRY_DELAY_MS * attempt));
+    }
   }
-
-  return textContent.text;
+  throw new Error("Unreachable");
 }
 
 function countWords(text: string): number {
@@ -91,6 +104,7 @@ function assembleFullDocument(
 
 export const generateResearch = task({
   id: "generate-research",
+  machine: "large-1x", // 4 vCPU, 8 GB RAM — parallel intelligence + large Claude responses
   maxDuration: 2700, // 45 minutes — needed for deep prompt targets
   retry: {
     maxAttempts: 1,

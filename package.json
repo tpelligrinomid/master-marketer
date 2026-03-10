@@ -1,6 +1,6 @@
 {
   "name": "master-marketer-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AI-powered B2B marketing assistant API",
   "main": "dist/src/index.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "deploy": "git push && npx trigger.dev@latest deploy"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.71.2",
+    "@anthropic-ai/sdk": "0.71.2",
     "@mendable/firecrawl-js": "^4.11.4",
     "@mozilla/readability": "^0.6.0",
     "@supabase/supabase-js": "^2.93.1",

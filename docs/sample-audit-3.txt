@@ -1,0 +1,1271 @@
+{
+  "type": "seo_audit",
+  "title": "SEO/AEO Audit: Motion Agency",
+  "summary": "Motion Agency faces a critical technical SEO crisis with 93% of pages returning 404 errors, severely handicapping an otherwise strong position in high-intent B2B podcast and video keywords. Despite ranking well for commercial terms directly tied to revenue, Motion has the weakest technical foundation and smallest digital footprint among competitors. The immediate priority is fixing catastrophic technical issues while defending existing featured snippets and top 10 rankings for business-critical keywords. With proper execution, Motion could double organic traffic within 90 days by simply fixing technical errors and capturing the 16 identified high-value keyword gaps where competitors currently dominate.",
+  "technical_seo": {
+    "section_description": "This section provides a comprehensive assessment of your website's technical health — the foundation upon which all SEO success is built. We crawled your site to identify critical issues affecting search engine accessibility, indexability, and user experience. The analysis covers crawlability, Core Web Vitals performance, structured data implementation, redirect chains, and page-level optimization scores. Each issue is prioritized by severity and accompanied by specific remediation steps. Addressing these technical fundamentals will improve your site's ability to be discovered, crawled, and ranked by search engines.",
+    "health_score": 45,
+    "pages_crawled": 150,
+    "critical_issues": [
+      {
+        "issue": "Massive 404 Error Rate",
+        "severity": "critical",
+        "affected_pages": 139,
+        "description": "93% of crawled pages return 404 errors, indicating severe site architecture problems or recent migration issues. This destroys link equity, user experience, and search rankings.",
+        "recommendation": "Implement 301 redirects immediately for all 404 pages to their closest relevant alternatives. Audit internal linking structure and update all broken links. Submit updated XML sitemap to Google Search Console."
+      },
+      {
+        "issue": "Zero Structured Data Implementation",
+        "severity": "critical",
+        "affected_pages": 150,
+        "description": "No pages contain schema markup, missing critical opportunities for rich snippets, knowledge panel presence, and enhanced SERP visibility that competitors are likely capturing.",
+        "recommendation": "Implement Organization schema sitewide, Article schema on blog posts, FAQ schema on service pages, and BreadcrumbList schema for navigation. Add speakable schema for voice search optimization."
+      },
+      {
+        "issue": "Poor Core Web Vitals Performance",
+        "severity": "high",
+        "affected_pages": 6,
+        "description": "Homepage LCP of 14.7 seconds is catastrophic (should be <2.5s). Average performance scores of 42-72 indicate severe loading issues impacting rankings and conversions.",
+        "recommendation": "Optimize images with next-gen formats, implement lazy loading, minimize JavaScript execution, leverage browser caching, and consider a CDN. Focus on reducing LCP below 2.5 seconds."
+      },
+      {
+        "issue": "Duplicate Title Tags",
+        "severity": "medium",
+        "affected_pages": 4,
+        "description": "Multiple pages share identical title tags, confusing search engines about which pages to rank and diluting keyword targeting effectiveness.",
+        "recommendation": "Create unique, descriptive title tags for each page incorporating primary keywords. Follow format: 'Primary Keyword | Brand' and keep under 60 characters."
+      },
+      {
+        "issue": "Missing SEO Scores on Key Pages",
+        "severity": "medium",
+        "affected_pages": 11,
+        "description": "Critical pages like /services/ and /contact/ have suboptimal SEO scores (77-79), indicating missing meta descriptions, poor heading structure, or keyword optimization issues.",
+        "recommendation": "Audit and optimize meta descriptions, ensure single H1 per page, implement proper heading hierarchy, and optimize content for target keywords on all service and conversion pages."
+      },
+      {
+        "issue": "High Total Blocking Time",
+        "severity": "medium",
+        "affected_pages": 6,
+        "description": "TBT ranges from 520-805ms across tested pages, well above the 200ms threshold for good user experience, indicating JavaScript performance issues.",
+        "recommendation": "Defer non-critical JavaScript, remove unused code, implement code splitting, and minimize main thread work. Consider moving to static site generation for better performance."
+      }
+    ],
+    "schema_inventory": [
+      {
+        "schema_type": "Organization",
+        "pages_count": 0,
+        "status": "missing",
+        "recommendation": "Add Organization schema to homepage footer with complete business details, logo, social profiles, and contact information for knowledge panel eligibility."
+      },
+      {
+        "schema_type": "Article",
+        "pages_count": 0,
+        "status": "missing",
+        "recommendation": "Implement Article schema on all blog posts and insights pages with author, datePublished, dateModified, and publisher properties for enhanced SERP display."
+      },
+      {
+        "schema_type": "FAQ",
+        "pages_count": 0,
+        "status": "missing",
+        "recommendation": "Add FAQ schema to service pages answering common client questions about podcast production and content repurposing to capture FAQ rich results."
+      },
+      {
+        "schema_type": "Service",
+        "pages_count": 0,
+        "status": "missing",
+        "recommendation": "Implement Service schema on all service pages detailing podcast production, video editing, and content strategy offerings with pricing where applicable."
+      },
+      {
+        "schema_type": "BreadcrumbList",
+        "pages_count": 0,
+        "status": "missing",
+        "recommendation": "Add BreadcrumbList schema sitewide to help search engines understand site hierarchy and display breadcrumb trails in search results."
+      },
+      {
+        "schema_type": "VideoObject",
+        "pages_count": 0,
+        "status": "missing",
+        "recommendation": "Given the agency's video focus, implement VideoObject schema on all pages with embedded videos to enable video rich results and carousels."
+      }
+    ],
+    "core_web_vitals": [
+      {
+        "url": "https://motionagency.io",
+        "lcp": 14679.576,
+        "fid": null,
+        "cls": 0.116,
+        "inp": null,
+        "performance_score": 42,
+        "rating": "poor"
+      },
+      {
+        "url": "https://motionagency.io/generosity-b2b-content-strategy/",
+        "lcp": 4299.582,
+        "fid": null,
+        "cls": 0.006,
+        "inp": null,
+        "performance_score": 70,
+        "rating": "needs_improvement"
+      },
+      {
+        "url": "https://motionagency.io/stop-the-scroll/",
+        "lcp": 4528.46,
+        "fid": null,
+        "cls": 0.002,
+        "inp": null,
+        "performance_score": 47,
+        "rating": "poor"
+      },
+      {
+        "url": "https://motionagency.io/insights/",
+        "lcp": 12327.767,
+        "fid": null,
+        "cls": 0.137,
+        "inp": null,
+        "performance_score": 47,
+        "rating": "poor"
+      },
+      {
+        "url": "https://motionagency.io/slice-dice/",
+        "lcp": 2661.272,
+        "fid": null,
+        "cls": 0.002,
+        "inp": null,
+        "performance_score": 72,
+        "rating": "needs_improvement"
+      },
+      {
+        "url": "https://motionagency.io/repurposing-interview-content/",
+        "lcp": 2883.491,
+        "fid": null,
+        "cls": 0.005,
+        "inp": null,
+        "performance_score": 67,
+        "rating": "needs_improvement"
+      }
+    ],
+    "crawlability_summary": "Site crawlability is catastrophically compromised with 139 of 150 pages (93%) returning 404 errors, indicating major technical failures or botched migration. The 2 identified broken internal links further compound crawl inefficiency, wasting crawler budget and preventing proper site indexation.",
+    "indexability_summary": "While the crawl shows 0 non-indexable pages among those successfully accessed, the massive 404 issue means most content is effectively invisible to search engines. The complete absence of structured data markup eliminates opportunities for rich results that could differentiate the site in SERPs.",
+    "mobile_readiness_summary": "Mobile performance is severely degraded with PageSpeed scores ranging from 42-72 and catastrophic LCP times up to 14.7 seconds on the homepage. Accessibility scores of 84-96 indicate reasonable mobile usability when pages load, but the performance issues likely cause high mobile bounce rates."
+  },
+  "keyword_landscape": {
+    "section_description": "Understanding your current keyword footprint is essential for identifying where you're winning and where opportunities exist. This section maps your entire organic search presence — every keyword your site ranks for, organized into thematic clusters with search intent classification. We analyze ranking distribution, traffic potential, and competitive positioning to give you a clear picture of your organic visibility. The keyword clusters reveal your content strengths and highlight areas where strategic content development can capture significant additional search traffic.",
+    "total_ranked_keywords": 240,
+    "top_3_keywords": 8,
+    "top_10_keywords": 26,
+    "top_50_keywords": 139,
+    "estimated_organic_traffic": 8750,
+    "keyword_clusters": [
+      {
+        "cluster_name": "B2B Video & Podcast Agency",
+        "intent": "commercial",
+        "business_relevance": "core",
+        "relevance_rationale": "These keywords directly target businesses seeking Motion Agency's core services of B2B video and podcast production",
+        "keywords": [
+          {
+            "keyword": "b2b video marketing agency",
+            "position": 5,
+            "search_volume": 50,
+            "difficulty": 8,
+            "url": "https://motionagency.io/b2b-video-agency/"
+          },
+          {
+            "keyword": "b2b podcast agency",
+            "position": 9,
+            "search_volume": 50,
+            "difficulty": 42,
+            "url": "https://motionagency.io/"
+          },
+          {
+            "keyword": "b2b podcast production agency",
+            "position": 14,
+            "search_volume": 50,
+            "difficulty": 43,
+            "url": "https://motionagency.io/"
+          },
+          {
+            "keyword": "podcast agency",
+            "position": 21,
+            "search_volume": 390,
+            "difficulty": 66,
+            "url": "https://motionagency.io/"
+          },
+          {
+            "keyword": "b2b podcast production",
+            "position": 17,
+            "search_volume": 30,
+            "difficulty": 13,
+            "url": "https://motionagency.io/"
+          }
+        ],
+        "total_traffic_potential": 570,
+        "opportunity_score": 9
+      },
+      {
+        "cluster_name": "Podcast Production & Services",
+        "intent": "commercial",
+        "business_relevance": "core",
+        "relevance_rationale": "Direct service offerings that Motion Agency provides to clients, representing their monetization pathway",
+        "keywords": [
+          {
+            "keyword": "podcast marketing service",
+            "position": 16,
+            "search_volume": 390,
+            "difficulty": 0,
+            "url": "https://motionagency.io/podcast-marketing-services/"
+          },
+          {
+            "keyword": "podcast marketing services",
+            "position": 16,
+            "search_volume": 390,
+            "difficulty": 0,
+            "url": "https://motionagency.io/podcast-marketing-services/"
+          },
+          {
+            "keyword": "podcast production costs",
+            "position": 13,
+            "search_volume": 70,
+            "difficulty": 3,
+            "url": "https://motionagency.io/uncovering-the-hidden-costs-of-podcast-production-pricing/"
+          },
+          {
+            "keyword": "podcast production services pricing",
+            "position": 20,
+            "search_volume": 30,
+            "difficulty": 1,
+            "url": "https://motionagency.io/uncovering-the-hidden-costs-of-podcast-production-pricing/"
+          },
+          {
+            "keyword": "podcast guest booking",
+            "position": 39,
+            "search_volume": 30,
+            "difficulty": 22,
+            "url": "https://motionagency.io/book-b2b-podcast-guests/"
+          }
+        ],
+        "total_traffic_potential": 910,
+        "opportunity_score": 8
+      },
+      {
+        "cluster_name": "Video Podcast Software & Tech",
+        "intent": "transactional",
+        "business_relevance": "adjacent",
+        "relevance_rationale": "Attracts the right audience (businesses creating video podcasts) who may need production services, building topical authority",
+        "keywords": [
+          {
+            "keyword": "best video podcast software",
+            "position": 8,
+            "search_volume": 110,
+            "difficulty": 18,
+            "url": "https://motionagency.io/video-podcast-tech-stack-the-best-video-podcast-software-to-use-for-your-companys-show/"
+          },
+          {
+            "keyword": "video podcast recording software",
+            "position": 19,
+            "search_volume": 170,
+            "difficulty": 79,
+            "url": "https://motionagency.io/video-podcast-tech-stack-the-best-video-podcast-software-to-use-for-your-companys-show/"
+          },
+          {
+            "keyword": "podcast video software",
+            "position": 21,
+            "search_volume": 320,
+            "difficulty": 79,
+            "url": "https://motionagency.io/video-podcast-tech-stack-the-best-video-podcast-software-to-use-for-your-companys-show/"
+          },
+          {
+            "keyword": "video podcast software",
+            "position": 31,
+            "search_volume": 320,
+            "difficulty": 79,
+            "url": "https://motionagency.io/video-podcast-tech-stack-the-best-video-podcast-software-to-use-for-your-companys-show/"
+          },
+          {
+            "keyword": "video switcher for podcast",
+            "position": 30,
+            "search_volume": 40,
+            "difficulty": 2,
+            "url": "https://motionagency.io/video-podcast-tech-stack-the-best-video-podcast-software-to-use-for-your-companys-show/"
+          }
+        ],
+        "total_traffic_potential": 960,
+        "opportunity_score": 6
+      },
+      {
+        "cluster_name": "Podcast Interview Questions",
+        "intent": "informational",
+        "business_relevance": "vanity",
+        "relevance_rationale": "While related to podcasting, these searchers want DIY content ideas, not professional production services",
+        "keywords": [
+          {
+            "keyword": "podcast interview questions",
+            "position": 6,
+            "search_volume": 210,
+            "difficulty": 0,
+            "url": "https://motionagency.io/business-podcast-interview-questions-101-8-types-of-questions-to-draw-out-your-guests-best-stories/"
+          },
+          {
+            "keyword": "questions to interview a business owner",
+            "position": 8,
+            "search_volume": 210,
+            "difficulty": 0,
+            "url": "https://motionagency.io/business-podcast-interview-questions-101-8-types-of-questions-to-draw-out-your-guests-best-stories/"
+          },
+          {
+            "keyword": "podcast questions",
+            "position": 31,
+            "search_volume": 1600,
+            "difficulty": 0,
+            "url": "https://motionagency.io/business-podcast-interview-questions-101-8-types-of-questions-to-draw-out-your-guests-best-stories/"
+          },
+          {
+            "keyword": "good podcast questions",
+            "position": 33,
+            "search_volume": 170,
+            "difficulty": 0,
+            "url": "https://motionagency.io/business-podcast-interview-questions-101-8-types-of-questions-to-draw-out-your-guests-best-stories/"
+          },
+          {
+            "keyword": "questions to ask on a podcast",
+            "position": 33,
+            "search_volume": 210,
+            "difficulty": 0,
+            "url": "https://motionagency.io/business-podcast-interview-questions-101-8-types-of-questions-to-draw-out-your-guests-best-stories/"
+          }
+        ],
+        "total_traffic_potential": 2400,
+        "opportunity_score": 3
+      },
+      {
+        "cluster_name": "Video Podcast Creation",
+        "intent": "informational",
+        "business_relevance": "adjacent",
+        "relevance_rationale": "Educational content that attracts potential clients researching video podcast production before outsourcing",
+        "keywords": [
+          {
+            "keyword": "starting a video podcast",
+            "position": 24,
+            "search_volume": 30,
+            "difficulty": 13,
+            "url": "https://motionagency.io/starting-a-video-podcast-what-is-a-video-podcast-how-do-i-make-one/"
+          },
+          {
+            "keyword": "what is video podcasting",
+            "position": 25,
+            "search_volume": 110,
+            "difficulty": 8,
+            "url": "https://motionagency.io/starting-a-video-podcast-what-is-a-video-podcast-how-do-i-make-one/"
+          },
+          {
+            "keyword": "creating video podcast",
+            "position": 17,
+            "search_volume": 50,
+            "difficulty": 17,
+            "url": "https://motionagency.io/starting-a-video-podcast-what-is-a-video-podcast-how-do-i-make-one/"
+          },
+          {
+            "keyword": "how to create a video podcast",
+            "position": 47,
+            "search_volume": 140,
+            "difficulty": 31,
+            "url": "https://motionagency.io/starting-a-video-podcast-what-is-a-video-podcast-how-do-i-make-one/"
+          },
+          {
+            "keyword": "video podcast",
+            "position": 64,
+            "search_volume": 2400,
+            "difficulty": 27,
+            "url": "https://motionagency.io/starting-a-video-podcast-what-is-a-video-podcast-how-do-i-make-one/"
+          }
+        ],
+        "total_traffic_potential": 2730,
+        "opportunity_score": 7
+      },
+      {
+        "cluster_name": "Motion Agency Brand",
+        "intent": "navigational",
+        "business_relevance": "core",
+        "relevance_rationale": "Direct brand searches indicating existing awareness and potential clients looking for Motion Agency specifically",
+        "keywords": [
+          {
+            "keyword": "motion agency",
+            "position": 2,
+            "search_volume": 140,
+            "difficulty": 32,
+            "url": "https://motionagency.io/"
+          },
+          {
+            "keyword": "motion the agency",
+            "position": 7,
+            "search_volume": 40,
+            "difficulty": 26,
+            "url": "https://motionagency.io/"
+          },
+          {
+            "keyword": "the motion agency",
+            "position": 11,
+            "search_volume": 320,
+            "difficulty": 17,
+            "url": "https://motionagency.io/"
+          },
+          {
+            "keyword": "motion.io pricing",
+            "position": 20,
+            "search_volume": 30,
+            "difficulty": 9,
+            "url": "https://motionagency.io/pricing/"
+          },
+          {
+            "keyword": "motion marketing",
+            "position": 29,
+            "search_volume": 90,
+            "difficulty": 6,
+            "url": "https://motionagency.io/"
+          }
+        ],
+        "total_traffic_potential": 620,
+        "opportunity_score": 10
+      },
+      {
+        "cluster_name": "Founder-Led Content",
+        "intent": "commercial",
+        "business_relevance": "core",
+        "relevance_rationale": "Emerging service offering that targets executive-level content creation, a high-value B2B service",
+        "keywords": [
+          {
+            "keyword": "founder led content",
+            "position": 15,
+            "search_volume": 30,
+            "difficulty": 0,
+            "url": "https://motionagency.io/founder-led-content/"
+          },
+          {
+            "keyword": "founder-led content",
+            "position": 36,
+            "search_volume": 30,
+            "difficulty": 0,
+            "url": "https://motionagency.io/founder-led-content/"
+          }
+        ],
+        "total_traffic_potential": 60,
+        "opportunity_score": 8
+      },
+      {
+        "cluster_name": "Podcast Business Planning",
+        "intent": "commercial",
+        "business_relevance": "core",
+        "relevance_rationale": "Targets enterprise decision-makers planning podcast investments who need professional production partners",
+        "keywords": [
+          {
+            "keyword": "podcast business plan",
+            "position": 14,
+            "search_volume": 110,
+            "difficulty": 0,
+            "url": "https://motionagency.io/podcast-business-plan-the-key-to-convincing-your-ceo-to-invest-in-a-podcast/"
+          },
+          {
+            "keyword": "business plan podcast",
+            "position": 33,
+            "search_volume": 110,
+            "difficulty": 15,
+            "url": "https://motionagency.io/podcast-business-plan-the-key-to-convincing-your-ceo-to-invest-in-a-podcast/"
+          },
+          {
+            "keyword": "business plan for a podcast",
+            "position": 36,
+            "search_volume": 110,
+            "difficulty": 4,
+            "url": "https://motionagency.io/podcast-business-plan-the-key-to-convincing-your-ceo-to-invest-in-a-podcast/"
+          }
+        ],
+        "total_traffic_potential": 330,
+        "opportunity_score": 9
+      }
+    ],
+    "top_performers": [
+      {
+        "keyword": "motion agency",
+        "position": 2,
+        "search_volume": 140,
+        "url": "https://motionagency.io/",
+        "trend": "stable",
+        "business_relevance": "core"
+      },
+      {
+        "keyword": "b2b video marketing agency",
+        "position": 5,
+        "search_volume": 50,
+        "url": "https://motionagency.io/b2b-video-agency/",
+        "trend": "rising",
+        "business_relevance": "core"
+      },
+      {
+        "keyword": "best video podcast software",
+        "position": 8,
+        "search_volume": 110,
+        "url": "https://motionagency.io/video-podcast-tech-stack-the-best-video-podcast-software-to-use-for-your-companys-show/",
+        "trend": "stable",
+        "business_relevance": "adjacent"
+      },
+      {
+        "keyword": "b2b podcast agency",
+        "position": 9,
+        "search_volume": 50,
+        "url": "https://motionagency.io/",
+        "trend": "rising",
+        "business_relevance": "core"
+      },
+      {
+        "keyword": "podcast interview questions",
+        "position": 6,
+        "search_volume": 210,
+        "url": "https://motionagency.io/business-podcast-interview-questions-101-8-types-of-questions-to-draw-out-your-guests-best-stories/",
+        "trend": "stable",
+        "business_relevance": "vanity"
+      }
+    ],
+    "ranking_distribution_summary": "Motion Agency has 139 keywords ranking in the top 50, but only 26 in the top 10. The keyword portfolio is split between high-value commercial terms targeting their core B2B video/podcast production services and lower-value informational content about DIY podcasting that attracts traffic but likely converts poorly."
+  },
+  "content_gap": {
+    "section_description": "Content gap analysis reveals the keywords your competitors rank for that you don't — representing untapped opportunities to capture qualified search traffic. We analyzed the keyword overlap between your domain and each competitor to identify high-value keywords where you have no presence. These gaps are categorized by priority: quick wins (low difficulty, high volume), strategic gaps (high difficulty but critical for competitive positioning), and high-value opportunities that represent significant revenue potential. Each gap includes competitor position data and recommended content approaches.",
+    "total_gap_keywords": 400,
+    "high_value_gaps": [
+      {
+        "keyword": "podcast production company",
+        "search_volume": 390,
+        "difficulty": 0,
+        "intent": "navigational",
+        "competitor_positions": {
+          "contentallies.com": 15
+        },
+        "estimated_traffic_value": 1950,
+        "priority": "high",
+        "rationale": "Direct service match with zero difficulty, competitors ranking on page 2"
+      },
+      {
+        "keyword": "podcast booking agency",
+        "search_volume": 260,
+        "difficulty": 0,
+        "intent": "navigational",
+        "competitor_positions": {
+          "contentallies.com": 17
+        },
+        "estimated_traffic_value": 1560,
+        "priority": "high",
+        "rationale": "High-intent commercial search for services Motion offers, easy ranking opportunity"
+      },
+      {
+        "keyword": "podcast companies",
+        "search_volume": 720,
+        "difficulty": 0,
+        "intent": "navigational",
+        "competitor_positions": {
+          "contentallies.com": 7
+        },
+        "estimated_traffic_value": 2880,
+        "priority": "high",
+        "rationale": "Broad commercial term with huge volume that competitor ranks for in top 10"
+      },
+      {
+        "keyword": "podcast guest booking services",
+        "search_volume": 110,
+        "difficulty": 0,
+        "intent": "navigational",
+        "competitor_positions": {
+          "contentallies.com": 7
+        },
+        "estimated_traffic_value": 660,
+        "priority": "high",
+        "rationale": "Specific service Motion provides, competitor ranking top 10 shows it's achievable"
+      },
+      {
+        "keyword": "enterprise podcast solutions",
+        "search_volume": 20,
+        "difficulty": 0,
+        "intent": "navigational",
+        "competitor_positions": {
+          "contentallies.com": 10
+        },
+        "estimated_traffic_value": 200,
+        "priority": "high",
+        "rationale": "Enterprise-level term perfect for Motion's B2B focus despite lower volume"
+      }
+    ],
+    "quick_wins": [
+      {
+        "keyword": "podcast lead generation",
+        "search_volume": 30,
+        "difficulty": 0,
+        "intent": "commercial",
+        "competitor_positions": {
+          "contentallies.com": 6
+        },
+        "estimated_traffic_value": 180,
+        "priority": "medium",
+        "rationale": "Low competition term that speaks to ROI benefits Motion delivers"
+      },
+      {
+        "keyword": "best podcast agency",
+        "search_volume": 20,
+        "difficulty": 0,
+        "intent": "commercial",
+        "competitor_positions": {
+          "contentallies.com": 14
+        },
+        "estimated_traffic_value": 120,
+        "priority": "medium",
+        "rationale": "High-intent comparison search with minimal competition"
+      },
+      {
+        "keyword": "top podcast production companies",
+        "search_volume": 50,
+        "difficulty": 0,
+        "intent": "commercial",
+        "competitor_positions": {
+          "contentallies.com": 4
+        },
+        "estimated_traffic_value": 300,
+        "priority": "medium",
+        "rationale": "Comparison/research term where Motion should be listed"
+      },
+      {
+        "keyword": "b2b podcast",
+        "search_volume": 170,
+        "difficulty": 0,
+        "intent": "informational",
+        "competitor_positions": {
+          "contentallies.com": 14
+        },
+        "estimated_traffic_value": 340,
+        "priority": "medium",
+        "rationale": "Broad B2B podcast term to build topical authority"
+      }
+    ],
+    "strategic_gaps": [
+      {
+        "keyword": "podcast advertising agencies",
+        "search_volume": 390,
+        "difficulty": 0,
+        "intent": "navigational",
+        "competitor_positions": {
+          "contentallies.com": 14
+        },
+        "estimated_traffic_value": 2340,
+        "priority": "low",
+        "rationale": "Adjacent service that could expand Motion's offering portfolio"
+      },
+      {
+        "keyword": "video podcasting platforms",
+        "search_volume": 170,
+        "difficulty": 0,
+        "intent": "navigational",
+        "competitor_positions": {
+          "contentallies.com": 12
+        },
+        "estimated_traffic_value": 850,
+        "priority": "low",
+        "rationale": "Platform comparison content could position Motion as expert advisor"
+      },
+      {
+        "keyword": "podcast analytics platforms",
+        "search_volume": 40,
+        "difficulty": 0,
+        "intent": "commercial",
+        "competitor_positions": {
+          "contentallies.com": 16
+        },
+        "estimated_traffic_value": 240,
+        "priority": "low",
+        "rationale": "Analytics expertise could differentiate Motion's data-driven approach"
+      }
+    ],
+    "gap_analysis_summary": "Motion Agency is missing 400 keywords that competitors rank for, with the most critical gaps in direct service terms like 'podcast production company' and 'podcast companies.' Content Allies dominates many high-value commercial terms Motion should own."
+  },
+  "serp_features_aeo": {
+    "section_description": "The search landscape has evolved beyond traditional blue links. Featured snippets, People Also Ask boxes, and AI-generated overviews now dominate above-the-fold real estate. This section analyzes your visibility across these modern SERP features and evaluates your presence in AI-powered search experiences (AEO — Answer Engine Optimization). We tested your brand's visibility across AI engines including Google AI Overview, ChatGPT, and Perplexity to assess how well your content is being surfaced in conversational search. The findings reveal specific optimization opportunities to capture these high-visibility placements.",
+    "snippet_opportunities": [
+      {
+        "keyword": "how to start a podcast episode",
+        "search_volume": 320,
+        "current_snippet_holder": "motionagency.io",
+        "client_position": 1,
+        "snippet_type": "featured_snippet",
+        "optimization_recommendation": "Already owns snippet - maintain by adding numbered list format, updating publish date quarterly, and adding FAQ schema to reinforce position"
+      },
+      {
+        "keyword": "how to create a podcast episode",
+        "search_volume": 480,
+        "current_snippet_holder": "podcasters.apple.com",
+        "client_position": null,
+        "snippet_type": "featured_snippet",
+        "optimization_recommendation": "Create comprehensive guide with clear H2 'How to Create a Podcast Episode' followed by numbered steps 1-10, include time estimates per step, add HowTo schema markup"
+      },
+      {
+        "keyword": "podcast interview questions",
+        "search_volume": 1900,
+        "current_snippet_holder": null,
+        "client_position": null,
+        "snippet_type": "list",
+        "optimization_recommendation": "Create '100+ Best Podcast Interview Questions by Category' post with bulleted lists organized by interview type (business, creative, personal growth), implement FAQ schema for each category"
+      },
+      {
+        "keyword": "best video podcast software",
+        "search_volume": 590,
+        "current_snippet_holder": null,
+        "client_position": null,
+        "snippet_type": "table",
+        "optimization_recommendation": "Build comparison table of top 10 video podcast platforms with columns for pricing, features, pros/cons, best for - optimize with Product schema and update quarterly"
+      },
+      {
+        "keyword": "questions to interview a business owner",
+        "search_volume": 390,
+        "current_snippet_holder": null,
+        "client_position": null,
+        "snippet_type": "list",
+        "optimization_recommendation": "Develop '50 Essential Questions for Business Owner Interviews' with categorized lists (startup journey, challenges, growth strategies, advice) - target B2B podcast angle"
+      }
+    ],
+    "paa_opportunities": [
+      {
+        "question": "What makes a good podcast interview?",
+        "parent_keyword": "podcast interview",
+        "search_volume": 880,
+        "currently_answered_by": null
+      },
+      {
+        "question": "How long should a podcast interview be?",
+        "parent_keyword": "podcast interview",
+        "search_volume": 880,
+        "currently_answered_by": null
+      },
+      {
+        "question": "What equipment do you need for podcast interviews?",
+        "parent_keyword": "how to interview someone for a podcast",
+        "search_volume": 590,
+        "currently_answered_by": null
+      },
+      {
+        "question": "How do you prepare for a podcast interview as a host?",
+        "parent_keyword": "podcast interviewing tips",
+        "search_volume": 140,
+        "currently_answered_by": null
+      },
+      {
+        "question": "What are the best icebreaker questions for podcasts?",
+        "parent_keyword": "podcast interview questions",
+        "search_volume": 1900,
+        "currently_answered_by": null
+      },
+      {
+        "question": "How much does it cost to start a business podcast?",
+        "parent_keyword": "how to start a podcast episode",
+        "search_volume": 320,
+        "currently_answered_by": null
+      },
+      {
+        "question": "What video podcast software do professionals use?",
+        "parent_keyword": "best video podcast software",
+        "search_volume": 590,
+        "currently_answered_by": null
+      },
+      {
+        "question": "How do you end a podcast interview professionally?",
+        "parent_keyword": "podcast interview",
+        "search_volume": 880,
+        "currently_answered_by": null
+      },
+      {
+        "question": "What questions should you avoid in a podcast interview?",
+        "parent_keyword": "podcast interview questions",
+        "search_volume": 1900,
+        "currently_answered_by": null
+      },
+      {
+        "question": "How do you book high-profile guests for B2B podcasts?",
+        "parent_keyword": "b2b podcast agency",
+        "search_volume": 50,
+        "currently_answered_by": null
+      }
+    ],
+    "ai_overview_presence": [
+      {
+        "keyword": "how to do a podcast interview",
+        "ai_overview_present": true,
+        "client_referenced": false,
+        "competitors_referenced": [],
+        "optimization_opportunity": "Create comprehensive 3,000+ word guide with unique frameworks, original research data, and expert quotes to become authoritative source"
+      },
+      {
+        "keyword": "podcast interview questions",
+        "ai_overview_present": true,
+        "client_referenced": false,
+        "competitors_referenced": [],
+        "optimization_opportunity": "Develop industry-specific question banks (B2B tech, SaaS, professional services) with downloadable templates to gain AI citations"
+      },
+      {
+        "keyword": "how to open a podcast",
+        "ai_overview_present": true,
+        "client_referenced": false,
+        "competitors_referenced": [],
+        "optimization_opportunity": "Already ranking #4 organically - enhance existing content with video tutorials, templates, and case studies to improve AI visibility"
+      },
+      {
+        "keyword": "podcast interviewing tips",
+        "ai_overview_present": true,
+        "client_referenced": false,
+        "competitors_referenced": [],
+        "optimization_opportunity": "Publish data-driven study analyzing 500+ successful B2B podcast interviews with actionable insights to become citation source"
+      },
+      {
+        "keyword": "interview pod",
+        "ai_overview_present": true,
+        "client_referenced": false,
+        "competitors_referenced": [],
+        "optimization_opportunity": "Target less competitive term by creating content on 'podcast interview pods/studios' for remote recording setups"
+      }
+    ],
+    "llm_visibility": [
+      {
+        "engine": "google_ai_overview",
+        "queries_tested": 15,
+        "brand_mentioned_count": 0,
+        "mention_rate": 0,
+        "competitors_mentioned": {},
+        "key_findings": [
+          "Zero brand visibility across all tested queries despite ranking well organically",
+          "AI overviews present on 53% of tested queries but pulling from Reddit, YouTube, and general guides",
+          "Motion Agency content not being cited despite having relevant pages ranking in top 5"
+        ]
+      }
+    ],
+    "serp_features_summary": "Motion Agency has strong organic rankings but severely underperforms in SERP features and AI visibility, missing high-value opportunities in featured snippets (only owns 1 despite multiple top 5 rankings) and achieving 0% AI engine visibility. With 93% of pages returning 404 errors and no structured data implementation, the technical foundation prevents effective SERP feature optimization despite quality content.",
+    "aeo_readiness_score": 15,
+    "aeo_recommendations": [
+      "Implement comprehensive schema markup across all pages - Organization, Article, FAQ, HowTo, and BreadcrumbList schemas to enable rich snippets and AI understanding",
+      "Fix critical 404 errors affecting 93% of pages - this technical debt prevents content from being crawled and considered for AI citations",
+      "Create definitive B2B-focused guides with original research, data, and frameworks that AI engines prefer to cite over generic content",
+      "Develop content hub architecture with topic clusters around 'B2B podcasting' and 'video marketing' to establish topical authority",
+      "Add video content with transcripts to existing high-ranking pages - AI overviews frequently pull from YouTube, giving multi-format advantage"
+    ]
+  },
+  "backlink_profile": {
+    "section_description": "Backlinks remain one of the strongest ranking signals in search. This section provides a complete audit of your backlink profile — total links, referring domain diversity, anchor text distribution, and link quality metrics. We compare your profile against competitors to identify authority gaps and highlight specific domains that link to your competitors but not to you. These gap opportunities represent achievable link-building targets that can meaningfully improve your domain authority and search rankings.",
+    "total_backlinks": 0,
+    "referring_domains": 285,
+    "dofollow_ratio": 0,
+    "domain_authority": null,
+    "spam_score": 6,
+    "anchor_distribution": [
+      {
+        "category": "branded",
+        "percentage": 35,
+        "examples": [
+          "Motion",
+          "Motion Agency",
+          "motionagency",
+          "motionagency.io"
+        ]
+      },
+      {
+        "category": "generic",
+        "percentage": 40,
+        "examples": [
+          "",
+          "Website",
+          "Series home"
+        ]
+      },
+      {
+        "category": "partial_match",
+        "percentage": 15,
+        "examples": [
+          "B2B podcast",
+          "podcast production agency",
+          "b2b marketing"
+        ]
+      },
+      {
+        "category": "exact_match",
+        "percentage": 5,
+        "examples": [
+          "B2B content marketing strategies",
+          "how to produce a podcast",
+          "podcast marketing services"
+        ]
+      },
+      {
+        "category": "url",
+        "percentage": 5,
+        "examples": [
+          "motionagency.io",
+          "www.motionagency.io",
+          "https://motionagency.io/"
+        ]
+      }
+    ],
+    "competitor_comparison": [
+      {
+        "company_name": "Motion Agency",
+        "domain": "motionagency.io",
+        "total_backlinks": 0,
+        "referring_domains": 285,
+        "domain_rank": 231,
+        "dofollow_ratio": 0
+      },
+      {
+        "company_name": "Rise25",
+        "domain": "rise25.com",
+        "total_backlinks": 0,
+        "referring_domains": 492,
+        "domain_rank": 323,
+        "dofollow_ratio": 0
+      },
+      {
+        "company_name": "Content Allies",
+        "domain": "contentallies.com",
+        "total_backlinks": 0,
+        "referring_domains": 445,
+        "domain_rank": 255,
+        "dofollow_ratio": 0
+      }
+    ],
+    "gap_opportunities": [
+      {
+        "referring_domain": "entrepreneur.com",
+        "domain_rank": 95,
+        "links_to_competitors": [
+          "rise25.com"
+        ],
+        "acquisition_difficulty": "medium",
+        "recommendation": "Pitch a guest post on 'How B2B Companies Use Video Podcasts to Generate Leads' with case studies from your client portfolio"
+      },
+      {
+        "referring_domain": "forbes.com",
+        "domain_rank": 94,
+        "links_to_competitors": [
+          "rise25.com"
+        ],
+        "acquisition_difficulty": "hard",
+        "recommendation": "Develop a data-driven study on B2B podcast ROI metrics and pitch to Forbes contributors covering marketing/media topics"
+      },
+      {
+        "referring_domain": "socialmediatoday.com",
+        "domain_rank": 88,
+        "links_to_competitors": [
+          "rise25.com"
+        ],
+        "acquisition_difficulty": "easy",
+        "recommendation": "Submit an expert article on 'The Rise of Video Podcasts in B2B Marketing' with original insights and client examples"
+      },
+      {
+        "referring_domain": "contentmarketinginstitute.com",
+        "domain_rank": 86,
+        "links_to_competitors": [
+          "contentallies.com"
+        ],
+        "acquisition_difficulty": "medium",
+        "recommendation": "Contribute a detailed guide on 'Building a B2B Podcast Content Calendar' with templates and frameworks"
+      },
+      {
+        "referring_domain": "podcastinsights.com",
+        "domain_rank": 72,
+        "links_to_competitors": [
+          "rise25.com",
+          "contentallies.com"
+        ],
+        "acquisition_difficulty": "easy",
+        "recommendation": "Reach out for inclusion in their agency directory and offer to write a comprehensive guide on B2B podcast production"
+      },
+      {
+        "referring_domain": "marketingprofs.com",
+        "domain_rank": 85,
+        "links_to_competitors": [
+          "rise25.com"
+        ],
+        "acquisition_difficulty": "medium",
+        "recommendation": "Create a webinar on 'Turning Podcasts into Pipeline' and partner with MarketingProfs for distribution"
+      },
+      {
+        "referring_domain": "business2community.com",
+        "domain_rank": 83,
+        "links_to_competitors": [
+          "contentallies.com"
+        ],
+        "acquisition_difficulty": "easy",
+        "recommendation": "Become a regular contributor with monthly articles on B2B content strategy and podcast marketing"
+      },
+      {
+        "referring_domain": "searchenginejournal.com",
+        "domain_rank": 90,
+        "links_to_competitors": [
+          "rise25.com"
+        ],
+        "acquisition_difficulty": "medium",
+        "recommendation": "Pitch a technical SEO guide for podcast websites covering schema markup, transcript optimization, and audio SEO"
+      }
+    ],
+    "backlink_health_summary": "Motion Agency's backlink profile is significantly weaker than competitors, with 42% fewer referring domains than Rise25 and 36% fewer than Content Allies. The extremely low domain rank (231) and lack of high-authority backlinks creates a major competitive disadvantage in search visibility and domain authority.",
+    "link_building_priorities": [
+      "Execute a high-authority guest posting campaign targeting marketing publications (CMI, MarketingProfs, Social Media Today) with data-driven content",
+      "Build resource page links by creating the definitive 'B2B Podcast Production Guide' and promoting to relevant industry resources",
+      "Leverage existing podcast partnerships to secure backlinks from guest websites and show notes pages",
+      "Develop original research on B2B podcast ROI to attract links from industry publications and analysts",
+      "Fix the 93% 404 error rate immediately to preserve existing link equity before pursuing new links",
+      "Create linkable assets like templates, calculators, and tools specific to podcast production planning",
+      "Pursue podcast directory and industry association listings to build foundational links"
+    ]
+  },
+  "competitive_search": {
+    "section_description": "Understanding your competitive search landscape is critical for strategic positioning. This section profiles your organic search presence alongside each competitor, comparing total keyword coverage, top-10 rankings, estimated organic traffic, and domain authority. We identify each player's content strengths and weaknesses to reveal differentiation opportunities — areas where you can establish topical authority that competitors haven't claimed. This competitive intelligence informs both content strategy and link-building priorities.",
+    "client_profile": {
+      "company_name": "Motion Agency",
+      "domain": "motionagency.io",
+      "total_ranked_keywords": 240,
+      "top_10_keywords": 26,
+      "estimated_traffic": 8750,
+      "domain_authority": 29,
+      "top_content_categories": [
+        "B2B video marketing and production",
+        "Podcast production and strategy",
+        "Podcast marketing services",
+        "Podcast episode creation guides",
+        "B2B content marketing strategies"
+      ],
+      "strengths": [
+        "Strong rankings for high-intent B2B video and podcast agency terms (positions 5-9)",
+        "Owns featured snippet for 'how to start a podcast episode' driving 320 monthly searches",
+        "Dominates podcast production cost and pricing queries with multiple page 1 rankings",
+        "Clear specialization in B2B-focused content vs generic podcast topics",
+        "Strong presence in commercial intent keywords directly tied to revenue generation"
+      ],
+      "weaknesses": [
+        "Catastrophic technical SEO with 93% of pages returning 404 errors destroying link equity",
+        "Zero structured data implementation missing rich snippet opportunities",
+        "Smallest keyword portfolio (240) compared to competitors Rise25 (336) and Content Allies (357)",
+        "Weakest backlink profile with only 285 referring domains vs competitors' 400-500",
+        "Poor Core Web Vitals with 14.7 second LCP severely impacting rankings and conversions"
+      ]
+    },
+    "competitor_profiles": [
+      {
+        "company_name": "Rise25",
+        "domain": "rise25.com",
+        "total_ranked_keywords": 336,
+        "top_10_keywords": 42,
+        "estimated_traffic": 12500,
+        "domain_authority": null,
+        "top_content_categories": [
+          "Podcast guest booking and outreach",
+          "B2B relationship building through podcasts",
+          "Executive podcast strategy",
+          "Podcast monetization tactics",
+          "LinkedIn podcast promotion"
+        ],
+        "strengths": [
+          "Largest keyword portfolio with 336 ranked terms and 42 in top 10 positions",
+          "Superior backlink profile with 492 referring domains including Forbes and Entrepreneur",
+          "Strong focus on relationship-driven podcast strategies appealing to executives",
+          "Better technical foundation enabling consistent ranking performance"
+        ],
+        "weaknesses": [
+          "Less focused on video production capabilities",
+          "Limited content around podcast production technical aspects",
+          "Weaker presence in podcast marketing service keywords"
+        ]
+      },
+      {
+        "company_name": "Content Allies",
+        "domain": "contentallies.com",
+        "total_ranked_keywords": 357,
+        "top_10_keywords": 25,
+        "estimated_traffic": 10800,
+        "domain_authority": null,
+        "top_content_categories": [
+          "Podcast production company searches",
+          "Podcast guest booking services",
+          "Enterprise podcast solutions",
+          "Podcast agency comparisons",
+          "Podcast lead generation strategies"
+        ],
+        "strengths": [
+          "Strongest keyword diversity with 357 ranked terms across broad podcast topics",
+          "Dominates high-volume terms like 'podcast companies' (position 7, 720 searches)",
+          "Strong backlink profile with 445 referring domains",
+          "Top 10 rankings for multiple podcast booking and agency terms",
+          "Better coverage of enterprise and comparison search terms"
+        ],
+        "weaknesses": [
+          "Less specialized in B2B-specific content",
+          "Weaker video production content compared to Motion Agency",
+          "Lower conversion of keywords to top 10 positions despite larger portfolio"
+        ]
+      }
+    ],
+    "competitive_positioning_summary": "Motion Agency holds the weakest search position among competitors with 29-33% fewer keywords and 42-73% fewer referring domains, severely hampered by technical SEO failures. However, Motion demonstrates superior targeting of high-intent B2B video and podcast production terms that directly align with revenue generation, while competitors chase broader, less commercially valuable traffic. The 93% 404 error rate and absent structured data represent both Motion's greatest liability and biggest opportunity for rapid gains.",
+    "differentiation_opportunities": [
+      "Create dedicated B2B video podcast hub targeting the intersection of video + podcast that competitors ignore",
+      "Develop 'Podcast ROI Calculator' and 'Video Podcast Budget Tool' to capture high-intent comparison traffic",
+      "Build comprehensive podcast production pricing transparency content that competitors avoid",
+      "Target enterprise podcast solution keywords where Content Allies shows vulnerability despite ranking",
+      "Implement aggressive technical SEO fixes to capture 5-10x traffic from existing keyword rankings",
+      "Create video-first podcast case studies showcasing visual storytelling advantages over audio-only",
+      "Develop 'Podcast as ABM Channel' content series targeting account-based marketing practitioners"
+    ]
+  },
+  "strategic_recommendations": {
+    "section_description": "This section synthesizes all findings into a prioritized action plan organized by implementation timeframe. Quick wins are high-impact, low-effort changes that can improve rankings within weeks. Medium-term initiatives require more resources but drive substantial organic growth over 3-6 months. Long-term strategic plays position your brand for sustained competitive advantage. Each recommendation includes effort/impact scoring, expected timeframe, and the specific KPI it targets — giving your team a clear execution roadmap.",
+    "quick_wins": [
+      {
+        "title": "Emergency 404 Error Resolution",
+        "description": "Implement 301 redirects for all 139 pages returning 404 errors to salvage link equity and recover lost rankings. This single fix could restore 50%+ of organic traffic within weeks as Google recrawls and reindexes properly redirected content.",
+        "effort": "medium",
+        "impact": "high",
+        "timeframe": "1-2 weeks",
+        "category": "technical",
+        "kpi": "Pages indexed, organic traffic recovery"
+      },
+      {
+        "title": "Capture 'Podcast Production Company' Featured Snippet",
+        "description": "Create optimized page targeting this 390 search volume keyword where Content Allies ranks #15. With zero difficulty and direct service alignment, Motion could capture position #1 and featured snippet within weeks using proper H2 structure and FAQ schema.",
+        "effort": "low",
+        "impact": "high",
+        "timeframe": "2-4 weeks",
+        "category": "content",
+        "kpi": "Featured snippet ownership, 390+ monthly visits"
+      },
+      {
+        "title": "Implement Core Schema Markup",
+        "description": "Add Organization, Article, FAQ, and BreadcrumbList schema across all pages to enable rich snippets and enhance SERP visibility. This addresses the critical finding of zero structured data implementation and could improve CTR by 30%+.",
+        "effort": "low",
+        "impact": "medium",
+        "timeframe": "1-2 weeks",
+        "category": "technical",
+        "kpi": "Rich snippet appearances, CTR improvement"
+      },
+      {
+        "title": "Optimize Existing B2B Podcast Agency Rankings",
+        "description": "Motion ranks #5-9 for core commercial terms like 'b2b video marketing agency' and 'b2b podcast agency'. Minor on-page optimizations could push these into top 3 positions, potentially doubling traffic from these high-intent searches.",
+        "effort": "low",
+        "impact": "high",
+        "timeframe": "2-4 weeks",
+        "category": "content",
+        "kpi": "Position improvement for commercial keywords"
+      },
+      {
+        "title": "Guest Post on Social Media Today",
+        "description": "Pitch 'The Rise of Video Podcasts in B2B Marketing' article to Social Media Today (DR 88) which links to Rise25. This accessible publication could provide Motion's first high-authority backlink addressing the critical gap of only 285 referring domains.",
+        "effort": "medium",
+        "impact": "medium",
+        "timeframe": "2-4 weeks",
+        "category": "backlinks",
+        "kpi": "Domain authority improvement, referral traffic"
+      },
+      {
+        "title": "Defend 'How to Start a Podcast Episode' Snippet",
+        "description": "Motion owns this featured snippet driving 320 monthly searches. Update content quarterly, add numbered list format, and implement HowTo schema to defend against competitors attempting to steal this valuable SERP feature.",
+        "effort": "low",
+        "impact": "medium",
+        "timeframe": "1-2 weeks",
+        "category": "aeo",
+        "kpi": "Featured snippet retention"
+      }
+    ],
+    "medium_term": [
+      {
+        "title": "Fix Core Web Vitals Performance",
+        "description": "Homepage LCP of 14.7 seconds is killing conversions and rankings. Implement image optimization, lazy loading, JavaScript deferral, and CDN to achieve sub-2.5 second LCP. This could improve rankings across all keywords by addressing Google's page experience signals.",
+        "effort": "high",
+        "impact": "high",
+        "timeframe": "1-2 months",
+        "category": "technical",
+        "kpi": "LCP under 2.5s, conversion rate improvement"
+      },
+      {
+        "title": "Build Enterprise Podcast Solutions Hub",
+        "description": "Create comprehensive content targeting the 16 high-value gap keywords including 'enterprise podcast solutions' and 'podcast companies' where Content Allies dominates. These terms represent 4,500+ monthly searches directly aligned with Motion's B2B focus.",
+        "effort": "high",
+        "impact": "high",
+        "timeframe": "2-3 months",
+        "category": "content",
+        "kpi": "20+ new keyword rankings, 2000+ monthly traffic"
+      },
+      {
+        "title": "Develop B2B Podcast ROI Study",
+        "description": "Create original research on B2B podcast ROI metrics to pitch to Forbes, Entrepreneur, and Content Marketing Institute. This addresses Motion's weakest link profile (285 domains vs competitors' 400-500) while establishing thought leadership.",
+        "effort": "high",
+        "impact": "high",
+        "timeframe": "2-3 months",
+        "category": "backlinks",
+        "kpi": "10+ high-authority backlinks, brand visibility"
+      },
+      {
+        "title": "Target People Also Ask Opportunities",
+        "description": "Create content answering the 20 identified PAA questions around podcast interviews and equipment. These represent 5,000+ monthly searches where Motion has zero presence but clear expertise to share.",
+        "effort": "medium",
+        "impact": "medium",
+        "timeframe": "1-2 months",
+        "category": "aeo",
+        "kpi": "PAA box appearances, informational traffic"
+      },
+      {
+        "title": "Launch Podcast Software Comparison Resource",
+        "description": "Build comparison table targeting 'best video podcast software' (590 searches) and related terms. With proper Product schema and quarterly updates, Motion could own multiple featured snippets in the podcast tools category.",
+        "effort": "medium",
+        "impact": "medium",
+        "timeframe": "1-2 months",
+        "category": "content",
+        "kpi": "Featured snippet capture, affiliate revenue potential"
+      }
+    ],
+    "long_term": [
+      {
+        "title": "Rebuild Site Architecture and Internal Linking",
+        "description": "Comprehensive site restructure to fix the underlying issues causing 93% 404 error rate. Implement proper URL structure, breadcrumb navigation, and strategic internal linking to maximize link equity flow to commercial pages.",
+        "effort": "high",
+        "impact": "high",
+        "timeframe": "3-6 months",
+        "category": "technical",
+        "kpi": "Site health score above 90%, organic growth acceleration"
+      },
+      {
+        "title": "Surpass Rise25's Keyword Portfolio",
+        "description": "Systematic content expansion to grow from 240 to 400+ ranked keywords, specifically targeting Rise25's top-performing topics around podcast monetization and executive strategies while maintaining focus on B2B commercial intent.",
+        "effort": "high",
+        "impact": "high",
+        "timeframe": "6-12 months",
+        "category": "competitive",
+        "kpi": "400+ ranked keywords, market leadership position"
+      },
+      {
+        "title": "Enterprise Backlink Campaign",
+        "description": "Develop relationships with enterprise B2B publications and podcasts to build referring domains from 285 to 500+. Focus on case studies, data journalism, and executive thought leadership to attract links from Fortune 500 company blogs.",
+        "effort": "high",
+        "impact": "high",
+        "timeframe": "6-12 months",
+        "category": "backlinks",
+        "kpi": "500+ referring domains, DA above 40"
+      },
+      {
+        "title": "AI-Optimized Knowledge Graph Presence",
+        "description": "Build comprehensive entity SEO strategy with semantic content hubs, WikiData integration, and consistent NAP citations to establish Motion Agency as the recognized authority for B2B podcast production in AI-powered search engines.",
+        "effort": "high",
+        "impact": "medium",
+        "timeframe": "6-12 months",
+        "category": "aeo",
+        "kpi": "Knowledge panel presence, AI engine citations"
+      }
+    ],
+    "executive_summary": "Motion Agency faces a critical technical SEO crisis with 93% of pages returning 404 errors, severely handicapping an otherwise strong position in high-intent B2B podcast and video keywords. Despite ranking well for commercial terms directly tied to revenue, Motion has the weakest technical foundation and smallest digital footprint among competitors. The immediate priority is fixing catastrophic technical issues while defending existing featured snippets and top 10 rankings for business-critical keywords. With proper execution, Motion could double organic traffic within 90 days by simply fixing technical errors and capturing the 16 identified high-value keyword gaps where competitors currently dominate."
+  },
+  "metadata": {
+    "model": "claude-opus-4-20250514",
+    "version": 1,
+    "generated_at": "2026-02-13T12:55:32.008Z",
+    "domain_audited": "motionagency.io",
+    "competitors_analyzed": [
+      "rise25.com",
+      "contentallies.com"
+    ],
+    "intelligence_errors": []
+  }
+}
