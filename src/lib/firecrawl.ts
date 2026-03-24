@@ -105,13 +105,14 @@ async function scrapeViaApify(
       const page = item as Record<string, unknown>;
       const markdown = (page.text as string) || (page.markdown as string) || "";
       if (!markdown) return null;
+      const title = page.metadata
+        ? ((page.metadata as Record<string, unknown>).title as string | undefined)
+        : undefined;
       return {
         url: page.url as string,
-        title: page.metadata
-          ? (page.metadata as Record<string, unknown>).title as string | undefined
-          : undefined,
+        ...(title !== undefined && { title }),
         markdown: markdown.slice(0, MAX_CHARS_PER_PAGE),
-      };
+      } as FirecrawlPage;
     })
     .filter((p): p is FirecrawlPage => p !== null);
 
