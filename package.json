@@ -7,9 +7,9 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/src/index.js",
-    "trigger:dev": "npx trigger.dev@latest dev",
-    "trigger:deploy": "npx trigger.dev@latest deploy",
-    "deploy": "git push && npx trigger.dev@latest deploy"
+    "trigger:dev": "npx trigger.dev@4.3.3 dev",
+    "trigger:deploy": "npx trigger.dev@4.3.3 deploy",
+    "deploy": "git push && npx trigger.dev@4.3.3 deploy"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.71.2",
