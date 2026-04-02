@@ -35,25 +35,47 @@ export const generateContentIdeas = task({
 
     const { system, user } = buildContentIdeasPrompt(input);
 
-    const stream = client.messages.stream({
-      model: MODEL,
-      max_tokens: MAX_TOKENS,
-      system,
-      messages: [{ role: "user", content: user }],
-    });
+    let responseText: string | undefined;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const stream = client.messages.stream({
+          model: MODEL,
+          max_tokens: MAX_TOKENS,
+          system,
+          messages: [{ role: "user", content: user }],
+        });
 
-    const response = await stream.finalMessage();
+        const response = await stream.finalMessage();
 
-    const textContent = response.content.find((c) => c.type === "text");
-    if (!textContent || textContent.type !== "text") {
-      throw new Error("No text response from Claude");
+        const textContent = response.content.find((c) => c.type === "text");
+        if (!textContent || textContent.type !== "text") {
+          throw new Error("No text response from Claude");
+        }
+
+        responseText = textContent.text;
+        break;
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        const isRetryable = msg.includes("terminated") || msg.includes("ECONNRESET") || msg.includes("socket hang up") || msg.includes("overloaded");
+        if (isRetryable && attempt < 3) {
+          const delay = attempt * 15_000;
+          console.warn(`[ContentIdeas] Claude call attempt ${attempt} failed (${msg}), retrying in ${delay / 1000}s...`);
+          await new Promise((r) => setTimeout(r, delay));
+          continue;
+        }
+        throw err;
+      }
+    }
+
+    if (!responseText) {
+      throw new Error("No response from Claude after retries");
     }
 
     // Parse JSON output
     metadata.set("phase", "parsing");
     metadata.set("progress", "Parsing generated ideas...");
 
-    const parsed = extractJson(textContent.text) as { ideas: ContentIdea[] };
+    const parsed = extractJson(responseText) as { ideas: ContentIdea[] };
 
     const output: ContentIdeasOutput = {
       ideas: parsed.ideas,

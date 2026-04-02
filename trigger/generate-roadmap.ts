@@ -18,23 +18,39 @@ const MAX_TOKENS = 32000;
 async function callClaude(
   client: Anthropic,
   system: string,
-  user: string
+  user: string,
+  retries = 3
 ): Promise<string> {
-  const stream = client.messages.stream({
-    model: MODEL,
-    max_tokens: MAX_TOKENS,
-    system,
-    messages: [{ role: "user", content: user }],
-  });
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const stream = client.messages.stream({
+        model: MODEL,
+        max_tokens: MAX_TOKENS,
+        system,
+        messages: [{ role: "user", content: user }],
+      });
 
-  const response = await stream.finalMessage();
+      const response = await stream.finalMessage();
 
-  const textContent = response.content.find((c) => c.type === "text");
-  if (!textContent || textContent.type !== "text") {
-    throw new Error("No text response from Claude");
+      const textContent = response.content.find((c) => c.type === "text");
+      if (!textContent || textContent.type !== "text") {
+        throw new Error("No text response from Claude");
+      }
+
+      return textContent.text;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      const isRetryable = msg.includes("terminated") || msg.includes("ECONNRESET") || msg.includes("socket hang up") || msg.includes("overloaded");
+      if (isRetryable && attempt < retries) {
+        const delay = attempt * 15_000; // 15s, 30s backoff
+        console.warn(`[Roadmap] Claude call attempt ${attempt} failed (${msg}), retrying in ${delay / 1000}s...`);
+        await new Promise((r) => setTimeout(r, delay));
+        continue;
+      }
+      throw err;
+    }
   }
-
-  return textContent.text;
+  throw new Error("callClaude: unreachable");
 }
 
 const FALLBACK_ZERO_SCORES = {
