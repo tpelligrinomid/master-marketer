@@ -9,6 +9,7 @@ import { AbmPlanInputSchema } from "../types/abm-plan-input";
 import { ContentPieceInputSchema } from "../types/content-piece-input";
 import { ContentIdeasInputSchema } from "../types/content-ideas-input";
 import { CompetitiveDigestInputSchema } from "../types/competitive-digest-input";
+import { BriefInputSchema } from "../types/brief-input";
 import { jobStore } from "../lib/job-store";
 import { getEnv } from "../config/env";
 import { playlistExtractHandler } from "./handlers/playlist-extract";
@@ -366,8 +367,50 @@ export const competitiveDigestHandler = async (req: Request, res: Response, next
   }
 };
 
+export const briefHandler = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { callbackUrl, callbackMetadata } = extractWebhookFields(req.body);
+    const body = stripWebhookFields(req.body);
+
+    const parseResult = BriefInputSchema.safeParse(body);
+    if (!parseResult.success) {
+      console.error("[generate/brief] Validation failed:", JSON.stringify(parseResult.error.flatten()));
+      res.status(400).json({
+        error: "Invalid input",
+        details: parseResult.error.flatten(),
+      });
+      return;
+    }
+
+    const input = parseResult.data;
+    const jobId = uuidv4();
+
+    const triggerPayload = {
+      ...input,
+      _callback: buildCallbackPayload(callbackUrl, callbackMetadata),
+      _jobId: jobId,
+    };
+
+    const handle = await tasks.trigger("generate-brief", triggerPayload);
+    jobStore.create(jobId, handle.id);
+
+    res.status(202).json({
+      jobId,
+      triggerRunId: handle.id,
+      status: "accepted",
+      message:
+        "Brief generation started. Results will be delivered to callback_url when complete. You can also poll GET /api/jobs/:jobId for status.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // POST /research
 router.post("/research", researchHandler);
+
+// POST /brief
+router.post("/brief", briefHandler);
 
 // POST /seo-audit
 router.post("/seo-audit", seoAuditHandler);
