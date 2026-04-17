@@ -32,7 +32,7 @@ const KnowledgeBaseSchema = z.object({
 
 export const ResearchInputSchema = z.object({
   client: CompanySchema,
-  competitors: z.array(CompanySchema).min(1).max(4),
+  competitors: z.array(CompanySchema).min(1).max(5),
   context: ResearchContextSchema.optional(),
   rag_context: z.string().optional(), // legacy: meeting transcripts, discovery notes
   knowledge_base: KnowledgeBaseSchema.optional(), // structured discovery data from MiD App

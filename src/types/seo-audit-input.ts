@@ -25,7 +25,7 @@ export const SeoAuditInputSchema = z.object({
     domain: z.string().min(1),
   }),
 
-  competitors: z.array(CompetitorSchema).min(1).max(4),
+  competitors: z.array(CompetitorSchema).min(1).max(5),
 
   /** Optional focus areas for keyword research */
   seed_topics: z.array(z.string()).optional(),
