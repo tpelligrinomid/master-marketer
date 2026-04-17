@@ -83,7 +83,8 @@ export async function getKeywordMetrics(
     params
   );
 
-  return (response.data || []).map((item) => ({
+  const data = Array.isArray(response.data) ? response.data : [];
+  return data.map((item) => ({
     keyword: item.keyword,
     search_volume: item.vol,
     cpc: parseFloat(item.cpc?.value) || 0,
@@ -109,7 +110,8 @@ export async function getRelatedKeywords(
     { keyword, country, currency: "USD", num: 50 }
   );
 
-  return (response.data || [])
+  const data = Array.isArray(response.data) ? response.data : [];
+  return data
     .filter((item) => item?.keyword)
     .map((item) => ({
       keyword: item.keyword,
@@ -132,7 +134,8 @@ export async function getPasfKeywords(
     { keyword, country, currency: "USD", num: 50 }
   );
 
-  return (response.data || [])
+  const data = Array.isArray(response.data) ? response.data : [];
+  return data
     .filter((item) => item?.keyword)
     .map((item) => ({
       keyword: item.keyword,
