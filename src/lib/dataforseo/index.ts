@@ -15,6 +15,8 @@ export {
   getDomainIntersection,
   getCompetitorDomains,
   getSearchIntent,
+  getKeywordOverview,
+  getRelatedKeywords,
 } from "./labs";
 export {
   getBacklinkSummary,

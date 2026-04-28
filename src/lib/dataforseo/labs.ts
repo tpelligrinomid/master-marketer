@@ -4,6 +4,8 @@ import {
   ContentGapKeyword,
   CompetitorDomain,
   SearchIntentResult,
+  KeywordOverview,
+  RelatedKeyword,
 } from "../../types/seo-audit-intelligence";
 
 interface RankedKeywordRawItem {
@@ -264,4 +266,132 @@ export async function getSearchIntent(
     intent: item.keyword_intent?.label || "unknown",
     secondary_intent: item.secondary_keyword_intent?.label,
   }));
+}
+
+interface KeywordOverviewRawItem {
+  keyword?: string;
+  keyword_info?: {
+    search_volume?: number;
+    cpc?: number;
+    competition_level?: string;
+  };
+  keyword_properties?: {
+    keyword_difficulty?: number;
+  };
+  search_intent_info?: {
+    main_intent?: string;
+    foreign_intent?: string[];
+  };
+  clickstream_keyword_info?: {
+    search_volume?: number;
+  };
+}
+
+interface KeywordOverviewResult {
+  items?: KeywordOverviewRawItem[];
+}
+
+/**
+ * Get keyword overview (volume, difficulty, CPC, intent) for a single keyword.
+ * Wraps `dataforseo_labs/google/keyword_overview/live`.
+ */
+export async function getKeywordOverview(
+  client: DataForSeoClient,
+  keyword: string,
+  locationCode: number = 2840
+): Promise<KeywordOverview | null> {
+  const response = await client.request<KeywordOverviewResult>(
+    "POST",
+    "dataforseo_labs/google/keyword_overview/live",
+    [
+      {
+        keywords: [keyword],
+        location_code: locationCode,
+        language_code: "en",
+        include_serp_info: false,
+        include_clickstream_data: true,
+      },
+    ]
+  );
+
+  const result = client.extractFirstResult(response);
+  const item = result?.items?.[0];
+  if (!item) return null;
+
+  const mainIntent = item.search_intent_info?.main_intent;
+  const foreignIntents = item.search_intent_info?.foreign_intent;
+
+  return {
+    keyword: item.keyword || keyword,
+    search_volume: item.keyword_info?.search_volume ?? 0,
+    keyword_difficulty: item.keyword_properties?.keyword_difficulty,
+    cpc: item.keyword_info?.cpc,
+    competition_level: item.keyword_info?.competition_level,
+    main_intent: mainIntent,
+    secondary_intent: foreignIntents && foreignIntents.length > 0 ? foreignIntents[0] : undefined,
+    clickstream_search_volume: item.clickstream_keyword_info?.search_volume,
+  };
+}
+
+interface RelatedKeywordRawItem {
+  keyword_data?: {
+    keyword?: string;
+    keyword_info?: {
+      search_volume?: number;
+      cpc?: number;
+    };
+    keyword_properties?: {
+      keyword_difficulty?: number;
+    };
+    search_intent_info?: {
+      main_intent?: string;
+    };
+  };
+  depth?: number;
+  related_keywords?: string[];
+}
+
+interface RelatedKeywordsResult {
+  items?: RelatedKeywordRawItem[];
+}
+
+/**
+ * Get related keywords for a seed keyword.
+ * Wraps `dataforseo_labs/google/related_keywords/live`.
+ */
+export async function getRelatedKeywords(
+  client: DataForSeoClient,
+  keyword: string,
+  locationCode: number = 2840,
+  limit: number = 30
+): Promise<RelatedKeyword[]> {
+  const response = await client.request<RelatedKeywordsResult>(
+    "POST",
+    "dataforseo_labs/google/related_keywords/live",
+    [
+      {
+        keyword,
+        location_code: locationCode,
+        language_code: "en",
+        limit,
+        depth: 1,
+        include_seed_keyword: false,
+      },
+    ]
+  );
+
+  const result = client.extractFirstResult(response);
+  const out: RelatedKeyword[] = [];
+  for (const item of result?.items || []) {
+    const kd = item.keyword_data;
+    if (!kd?.keyword) continue;
+    out.push({
+      keyword: kd.keyword,
+      search_volume: kd.keyword_info?.search_volume ?? 0,
+      keyword_difficulty: kd.keyword_properties?.keyword_difficulty,
+      cpc: kd.keyword_info?.cpc,
+      intent: kd.search_intent_info?.main_intent,
+    });
+  }
+  return out;
 }

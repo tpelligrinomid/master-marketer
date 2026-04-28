@@ -3,6 +3,7 @@ import healthRoutes from "./health.routes";
 import intakeRoutes from "./intake.routes";
 import jobsRoutes from "./jobs.routes";
 import generateRoutes from "./generate.routes";
+import seoRoutes from "./seo.routes";
 
 // TODO: Enable when implemented
 // import projectsRoutes from "./projects.routes";
@@ -16,6 +17,7 @@ router.use("/health", healthRoutes);
 router.use("/intake", intakeRoutes);
 router.use("/jobs", jobsRoutes);
 router.use("/generate", generateRoutes);
+router.use("/v1/seo", seoRoutes);
 
 // TODO: Enable when implemented
 // router.use("/projects", projectsRoutes);

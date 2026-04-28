@@ -119,6 +119,25 @@ export interface SearchIntentResult {
   secondary_intent?: string;
 }
 
+export interface KeywordOverview {
+  keyword: string;
+  search_volume: number;
+  keyword_difficulty?: number;
+  cpc?: number;
+  competition_level?: string;
+  main_intent?: string;
+  secondary_intent?: string;
+  clickstream_search_volume?: number;
+}
+
+export interface RelatedKeyword {
+  keyword: string;
+  search_volume: number;
+  keyword_difficulty?: number;
+  cpc?: number;
+  intent?: string;
+}
+
 // ─────────────────────────────────────────────
 // Backlinks API types
 // ─────────────────────────────────────────────
