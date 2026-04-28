@@ -1,7 +1,9 @@
 import { task, metadata } from "@trigger.dev/sdk/v3";
+import Firecrawl from "@mendable/firecrawl-js";
+import TurndownService from "turndown";
 import { BlogScrapeInput } from "../src/types/blog-scrape-input";
 import { BlogScrapeOutput } from "../src/types/blog-scrape-output";
-import { extractArticle } from "../src/lib/html-to-markdown";
+import { extractArticle, ExtractedArticle } from "../src/lib/html-to-markdown";
 import { extractYouTubeContent } from "../src/lib/youtube-extract";
 
 // YouTube URL detection
@@ -20,6 +22,73 @@ interface ScrapePayload extends BlogScrapeInput {
   _apiKey?: string;
   _apifyApiKey?: string;
   _youtubeApiKey?: string;
+}
+
+/**
+ * Scrape a URL via Firecrawl (renders JavaScript).
+ * Used as a fallback when plain fetch returns too little content,
+ * which typically means the site is a client-rendered SPA.
+ */
+async function scrapeViaFirecrawl(
+  url: string,
+  apiKey: string
+): Promise<ExtractedArticle> {
+  const client = new Firecrawl({ apiKey });
+  const result = await client.scrape(url, {
+    formats: ["markdown", "html"],
+  });
+
+  const r = result as {
+    markdown?: string;
+    html?: string;
+    metadata?: {
+      title?: string;
+      ogTitle?: string;
+      description?: string;
+      ogDescription?: string;
+      author?: string;
+      publishedTime?: string;
+      "article:published_time"?: string;
+    };
+  };
+
+  let markdown = r.markdown || "";
+
+  // If Firecrawl returned HTML but no markdown, convert it ourselves.
+  if (!markdown && r.html) {
+    const turndown = new TurndownService({
+      headingStyle: "atx",
+      codeBlockStyle: "fenced",
+    });
+    markdown = turndown.turndown(r.html);
+  }
+
+  markdown = markdown.replace(/\n{3,}/g, "\n\n").trim();
+
+  const wordCount = markdown.split(/\s+/).filter((w) => w.length > 0).length;
+
+  const meta = r.metadata || {};
+  const title = meta.title || meta.ogTitle || url;
+  const metaDescription = meta.description || meta.ogDescription || undefined;
+  const author = meta.author || undefined;
+
+  const rawDate = meta.publishedTime || meta["article:published_time"];
+  let publishedDate: string | undefined;
+  if (rawDate) {
+    const d = new Date(rawDate);
+    if (!isNaN(d.getTime())) {
+      publishedDate = d.toISOString().slice(0, 10);
+    }
+  }
+
+  return {
+    title,
+    content_markdown: markdown,
+    author,
+    published_date: publishedDate,
+    meta_description: metaDescription,
+    word_count: wordCount,
+  };
 }
 
 async function callbackWithRetry(
@@ -112,35 +181,64 @@ export const scrapeBlogUrl = task({
       // Step 1: Fetch the URL
       metadata.set("progress", `Fetching ${url}`);
 
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+      const firecrawlApiKey = process.env.FIRECRAWL_API_KEY;
+      let article: ExtractedArticle | null = null;
+      let fetchError: string | null = null;
 
-      let response: Response;
       try {
-        response = await fetch(url, {
-          headers: { "User-Agent": USER_AGENT },
-          signal: controller.signal,
-          redirect: "follow",
-        });
-      } finally {
-        clearTimeout(timeout);
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+        let response: Response;
+        try {
+          response = await fetch(url, {
+            headers: { "User-Agent": USER_AGENT },
+            signal: controller.signal,
+            redirect: "follow",
+          });
+        } finally {
+          clearTimeout(timeout);
+        }
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status} ${response.statusText}`);
+        }
+
+        const contentType = response.headers.get("content-type") || "";
+        if (!contentType.includes("text/html") && !contentType.includes("application/xhtml")) {
+          throw new Error(`Non-HTML content type: ${contentType}`);
+        }
+
+        const html = await response.text();
+
+        metadata.set("progress", "Extracting article content");
+        article = extractArticle(html, url);
+      } catch (err) {
+        fetchError = err instanceof Error ? err.message : String(err);
+        console.warn(`[scrape-blog-url] Direct fetch failed for ${url}: ${fetchError}`);
       }
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status} ${response.statusText}`);
+      // Fallback to Firecrawl when direct fetch produced too little content
+      // (likely a client-rendered SPA) or failed outright.
+      if ((!article || article.word_count < MIN_WORD_COUNT) && firecrawlApiKey) {
+        const reason = article
+          ? `only ${article.word_count} words from direct fetch`
+          : `direct fetch failed (${fetchError})`;
+        console.log(`[scrape-blog-url] Falling back to Firecrawl for ${url} — ${reason}`);
+        metadata.set("progress", "Rendering page via Firecrawl");
+
+        try {
+          article = await scrapeViaFirecrawl(url, firecrawlApiKey);
+        } catch (err) {
+          const fcError = err instanceof Error ? err.message : String(err);
+          console.warn(`[scrape-blog-url] Firecrawl fallback failed for ${url}: ${fcError}`);
+          // Keep prior `article` (may still be the short one) so the validation below reports word count.
+        }
       }
 
-      const contentType = response.headers.get("content-type") || "";
-      if (!contentType.includes("text/html") && !contentType.includes("application/xhtml")) {
-        throw new Error(`Non-HTML content type: ${contentType}`);
+      if (!article) {
+        throw new Error(fetchError || "Failed to fetch URL");
       }
-
-      const html = await response.text();
-
-      // Step 2-4: Parse HTML, extract article, convert to markdown
-      metadata.set("progress", "Extracting article content");
-
-      const article = extractArticle(html, url);
 
       // Step 5: Validate content
       if (article.word_count < MIN_WORD_COUNT) {
