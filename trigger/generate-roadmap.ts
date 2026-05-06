@@ -66,7 +66,11 @@ export const generateRoadmap = task({
   id: "generate-roadmap",
   maxDuration: 1800, // 30 minutes — 4 calls vs research's 7+
   retry: {
-    maxAttempts: 1,
+    maxAttempts: 5,
+    minTimeoutInMs: 5000,
+    maxTimeoutInMs: 120000,
+    factor: 2,
+    randomize: true,
   },
   run: async (
     payload: RoadmapInput & { _callback?: TaskCallback; _jobId?: string }

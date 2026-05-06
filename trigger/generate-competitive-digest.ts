@@ -17,7 +17,11 @@ export const generateCompetitiveDigest = task({
   id: "generate-competitive-digest",
   maxDuration: 900, // 15 minutes
   retry: {
-    maxAttempts: 1,
+    maxAttempts: 5,
+    minTimeoutInMs: 5000,
+    maxTimeoutInMs: 120000,
+    factor: 2,
+    randomize: true,
   },
   run: async (
     payload: CompetitiveDigestInput & {

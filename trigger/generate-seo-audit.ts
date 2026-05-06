@@ -150,7 +150,11 @@ export const generateSeoAudit = task({
   id: "generate-seo-audit",
   maxDuration: 2700, // 45 minutes — crawl polling + 6 Claude calls
   retry: {
-    maxAttempts: 1,
+    maxAttempts: 5,
+    minTimeoutInMs: 5000,
+    maxTimeoutInMs: 120000,
+    factor: 2,
+    randomize: true,
   },
   run: async (
     payload: SeoAuditInput & { _callback?: TaskCallback; _jobId?: string }

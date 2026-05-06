@@ -18,10 +18,11 @@ const MAX_TOKENS = 4096;
 export const analyzeMeetingNotes = task({
   id: "analyze-meeting-notes",
   retry: {
-    maxAttempts: 3,
-    minTimeoutInMs: 1000,
-    maxTimeoutInMs: 30000,
+    maxAttempts: 5,
+    minTimeoutInMs: 5000,
+    maxTimeoutInMs: 120000,
     factor: 2,
+    randomize: true,
   },
   run: async (payload: MeetingNotesInput & { _callback?: TaskCallback; _jobId?: string }): Promise<MeetingNotesOutput> => {
     const { _callback, _jobId, ...rawInput } = payload;

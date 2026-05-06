@@ -107,7 +107,11 @@ export const generateResearch = task({
   machine: "large-1x", // 4 vCPU, 8 GB RAM — parallel intelligence + large Claude responses
   maxDuration: 2700, // 45 minutes — needed for deep prompt targets
   retry: {
-    maxAttempts: 1,
+    maxAttempts: 5,
+    minTimeoutInMs: 5000,
+    maxTimeoutInMs: 120000,
+    factor: 2,
+    randomize: true,
   },
   run: async (payload: ResearchInput & { _callback?: TaskCallback; _jobId?: string }): Promise<ResearchOutput> => {
     const { _callback, _jobId, ...rawInput } = payload;

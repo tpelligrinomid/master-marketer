@@ -51,7 +51,13 @@ export const generateBrief = task({
   id: "generate-brief",
   machine: "large-1x",
   maxDuration: 1800,
-  retry: { maxAttempts: 1 },
+  retry: {
+    maxAttempts: 5,
+    minTimeoutInMs: 5000,
+    maxTimeoutInMs: 120000,
+    factor: 2,
+    randomize: true,
+  },
   run: async (
     payload: BriefInput & { _callback?: TaskCallback; _jobId?: string }
   ): Promise<BriefOutput> => {

@@ -13,7 +13,11 @@ export const generateContentPiece = task({
   id: "generate-content-piece",
   maxDuration: 600, // 10 minutes
   retry: {
-    maxAttempts: 1,
+    maxAttempts: 5,
+    minTimeoutInMs: 5000,
+    maxTimeoutInMs: 120000,
+    factor: 2,
+    randomize: true,
   },
   run: async (
     payload: ContentPieceInput & { _callback?: TaskCallback; _jobId?: string }

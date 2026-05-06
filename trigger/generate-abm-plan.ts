@@ -256,7 +256,11 @@ export const generateAbmPlan = task({
   id: "generate-abm-plan",
   maxDuration: 2400, // 40 minutes — 4 Claude calls
   retry: {
-    maxAttempts: 1,
+    maxAttempts: 5,
+    minTimeoutInMs: 5000,
+    maxTimeoutInMs: 120000,
+    factor: 2,
+    randomize: true,
   },
   run: async (
     payload: AbmPlanInput & { _callback?: TaskCallback; _jobId?: string }

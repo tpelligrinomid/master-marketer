@@ -13,7 +13,11 @@ export const generateContentIdeas = task({
   id: "generate-content-ideas",
   maxDuration: 300, // 5 minutes
   retry: {
-    maxAttempts: 1,
+    maxAttempts: 5,
+    minTimeoutInMs: 5000,
+    maxTimeoutInMs: 120000,
+    factor: 2,
+    randomize: true,
   },
   run: async (
     payload: ContentIdeasInput & { _callback?: TaskCallback; _jobId?: string }

@@ -15,10 +15,11 @@ const MAX_TOKENS = 8192;
 export const analyzeDeliverable = task({
   id: "analyze-deliverable",
   retry: {
-    maxAttempts: 3,
-    minTimeoutInMs: 1000,
-    maxTimeoutInMs: 30000,
+    maxAttempts: 5,
+    minTimeoutInMs: 5000,
+    maxTimeoutInMs: 120000,
     factor: 2,
+    randomize: true,
   },
   run: async (payload: DeliverableIntakeInput & { _callback?: TaskCallback; _jobId?: string }): Promise<DeliverableOutput> => {
     const { _callback, _jobId, ...rawInput } = payload;
