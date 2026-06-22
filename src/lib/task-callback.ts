@@ -45,8 +45,11 @@ export async function deliverTaskResult(
   if (status === "completed" && output) {
     const out = output as Record<string, unknown>;
     payload.output = {
-      content_raw: out.full_document_markdown || out.content_body || "",
-      content_structured: out,
+      content_raw: out.content_raw || out.full_document_markdown || out.content_body || "",
+      // Markdown-first generators (e.g. messaging-plan) set content_structured
+      // to null explicitly. Everything else echoes the full output object,
+      // preserving existing behavior.
+      content_structured: out.content_structured === null ? null : out,
     };
   }
 
