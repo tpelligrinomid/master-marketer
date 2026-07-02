@@ -33,7 +33,7 @@ export const ContentPlanInputSchema = z.object({
       company_name: z.string().min(1),
       domain: z.string().min(1),
     })
-  ).min(1).max(4),
+  ).min(1).max(10),
 
   /** Full roadmap output (GeneratedRoadmapOutput shape) — passthrough */
   roadmap: z.object({}).passthrough(),
