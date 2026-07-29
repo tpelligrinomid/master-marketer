@@ -51,8 +51,19 @@ function formatOnPageData(intel: SeoIntelligencePackage): string {
     if (issueChecks.length > 0) {
       parts.push(`\n## Page-Level Issue Checks (issue → page count)`);
       parts.push(`NOTE: "low_content_rate" measures content-to-HTML ratio, NOT content quality or depth. Modern sites with rich templates, navigation, and interactive elements will naturally show high "low_content_rate" counts — this is a template architecture characteristic, not necessarily a content problem. Do NOT report this as "thin content" or a content quality issue unless the actual word counts on pages are genuinely low (under 100 words of unique content). Similarly, "is_render_blocking" counts pages with render-blocking resources — common on any site with CSS/JS, and severity should be proportional to actual CWV impact.`);
+      parts.push(`NOTE: "no_image_alt" counts pages with images whose alt attribute is missing OR EMPTY (alt=""). An empty alt is the CORRECT, accessibility-compliant treatment for decorative images, so a high count here does NOT mean the site is neglecting alt text — most sites legitimately have many decorative images. Do NOT report this as "X% of pages are missing alt text" or assign it high severity on the count alone. Frame it as an audit task ("review images on these templates to confirm decorative vs meaningful"), cap severity at medium, and never recommend simply "add alt text everywhere" — that would wrongly change correct empty alts on decorative images.`);
       for (const [check, count] of issueChecks) {
         parts.push(`- ${check}: ${count}`);
+      }
+    }
+
+    // Real URLs per issue — the evidence a developer needs to verify a finding
+    if (intel.issue_evidence && Object.keys(intel.issue_evidence).length > 0) {
+      parts.push(`\n## Issue Evidence URLs (check → actual pages exhibiting it)`);
+      parts.push(`These URLs were returned by filtering the crawl on each check, so they genuinely exhibit that issue. When you report an issue that corresponds to one of these checks, populate evidence_urls from THIS list and nowhere else. Do NOT substitute URLs from the crawled-pages sample above — those pages were not tested for the issue and citing them produces findings that fail verification.`);
+      for (const [check, urls] of Object.entries(intel.issue_evidence)) {
+        parts.push(`- ${check}:`);
+        for (const url of urls) parts.push(`    ${url}`);
       }
     }
 
@@ -587,17 +598,78 @@ function buildContextBlock(input: SeoAuditInput): string {
   return parts.join("\n");
 }
 
+/**
+ * Shorten long string values and cap array lengths, preserving object structure.
+ *
+ * Blunt tail-truncation of the serialized JSON silently drops whole sections —
+ * Call 1's schema findings sit past the 3k mark, so later calls never saw them
+ * and re-derived a schema story from their own priors. Trimming values instead
+ * keeps every key visible within a similar budget.
+ */
+function compactForDigest(value: unknown, maxStringLen = 200, maxArrayItems = 12): unknown {
+  if (typeof value === "string") {
+    return value.length > maxStringLen ? `${value.slice(0, maxStringLen)}…` : value;
+  }
+  if (Array.isArray(value)) {
+    const trimmed = value.slice(0, maxArrayItems).map((v) => compactForDigest(v, maxStringLen, maxArrayItems));
+    if (value.length > maxArrayItems) trimmed.push(`…and ${value.length - maxArrayItems} more`);
+    return trimmed;
+  }
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value)) {
+      out[k] = compactForDigest(v, maxStringLen, maxArrayItems);
+    }
+    return out;
+  }
+  return value;
+}
+
 function summarizePriorResults(accumulated: Record<string, unknown>): string {
   const keys = Object.keys(accumulated);
   if (keys.length === 0) return "";
 
   const parts = ["# Prior Results (from earlier calls — maintain coherence)\n"];
+  parts.push(
+    `These are the conclusions already published in this report. Later sections MUST NOT contradict them. Long text fields are shortened with "…" but every finding is present — if a section here says something was found, treat that as established fact rather than reasoning from your own priors.\n`
+  );
   for (const key of keys) {
-    const value = accumulated[key];
-    const json = JSON.stringify(value, null, 2);
-    const truncated = json.length > 3000 ? json.slice(0, 3000) + "\n... (truncated)" : json;
+    const json = JSON.stringify(compactForDigest(accumulated[key]), null, 2);
+    const truncated = json.length > 12000 ? `${json.slice(0, 12000)}\n... (truncated)` : json;
     parts.push(`## ${key}\n\`\`\`json\n${truncated}\n\`\`\`\n`);
   }
+
+  return parts.join("\n");
+}
+
+/**
+ * Compact structured-data status for prompts other than the technical one.
+ *
+ * Call 3 (SERP/AEO) grades AEO readiness partly on structured data but never
+ * received any, so it asserted schema was absent while the technical section
+ * reported the opposite.
+ */
+function formatSchemaStatusForAeo(intel: SeoIntelligencePackage): string {
+  const cov = intel.schema_coverage;
+  if (!cov) return "";
+
+  const parts = ["# Structured Data Status (measured — carried over from the technical analysis)\n"];
+  parts.push(`- Pages checked: ${cov.pages_checked}`);
+  parts.push(`- Pages WITH schema markup: ${cov.pages_with_schema}${cov.coverage_pct !== null ? ` (${cov.coverage_pct}%)` : ""}`);
+  parts.push(`- Pages WITHOUT schema markup: ${cov.pages_without_schema}`);
+  parts.push(`- Pages with schema markup ERRORS: ${cov.pages_with_schema_errors}`);
+
+  if (intel.microdata?.length) {
+    const types = new Set<string>();
+    for (const item of intel.microdata) for (const t of item.types) types.add(t);
+    if (types.size) {
+      parts.push(`- Schema types observed on sampled pages: ${[...types].join(", ")}`);
+    }
+  }
+
+  parts.push(
+    `\nCRITICAL: Use these numbers for any statement about structured data. If coverage shows schema is present on most or all pages, you may NOT say the site "lacks structured data", has an "absence of schema", or that missing markup explains weak AI-engine visibility — that would contradict the technical section of this same report. When schema exists but carries errors, the accurate framing is that markup is present but invalid, so engines may not be able to use it. Recommendations must be about adding SPECIFIC TYPES to specific templates or fixing validation errors, never about absent structured data.`
+  );
 
   return parts.join("\n");
 }
@@ -696,11 +768,11 @@ Guidelines:
   - Never state a count or percentage you cannot point to a specific figure for in the data above. If a figure is not provided, describe the finding qualitatively instead of inventing a number.
   - NEVER present a sample size as a site-wide total. If 6 pages were inspected and 4 had schema, that is "4 of 6 pages inspected" — it is NOT "4 pages on the site," and you may NOT divide it by pages_crawled.
   - Set evidence_basis to "measured" ONLY for counts taken from a full-crawl figure (crawl summary, issue checks, schema coverage). Use "sampled" for anything derived from the inspected-page lists.
-  - Populate evidence_urls from URLs that actually appear in the data above. Never construct, guess, or pattern-match a URL.
+  - Populate evidence_urls from the Issue Evidence URLs block (or, for schema findings, the schema coverage URL lists). Never construct, guess, or pattern-match a URL, and never pull an "example" URL from the crawled-pages sample — those pages were not tested for the issue you are reporting. If no evidence URLs exist for a finding, return an empty array rather than plausible-looking substitutes.
   - affected_pages must never be drawn from the Positive Signals list.
 - CRITICAL — SCHEMA INVENTORY ACCURACY: Read the Structured Data section carefully — it has TWO distinct parts. "Coverage" is measured across the full crawl and is the only valid basis for how many pages have schema. "Schema Types" is sampled from a few pages and is only valid for saying which types are in use. You must CAREFULLY review what is ALREADY IMPLEMENTED before recommending anything as "missing."
   - If coverage shows most or all pages already carry schema, you may NOT claim the site lacks structured data. Frame schema work as adding specific TYPES to specific templates.
-  - Set pages_count_basis to "sampled" whenever pages_count comes from the sampled type breakdown.
+  - CRITICAL — PER-TYPE COUNTS ARE ALWAYS "sampled". The coverage figure counts pages carrying ANY schema; it is type-agnostic. There is no per-type site-wide measurement anywhere in this data. So pages_count on a schema_inventory entry must ALWAYS be pages_count_basis "sampled" — never "measured" — and you may NOT assign the site-wide coverage number to an individual type. If BreadcrumbList appeared on 12 of 12 sampled pages, pages_count is 12 (of 12 sampled), NOT the coverage total.
   - If the data shows "Person" schema on speaker/author/team profile pages, that IS the correct schema type — there is no "Speaker" type in Schema.org. Do NOT recommend adding a non-existent schema type. Instead, acknowledge the implementation and suggest enrichment properties (e.g., hasOccupation, Event schema for events, SpeakableSpecification for voice).
   - Status should be "implemented" when the type exists in the crawl data, even if it could be enriched. Use "incomplete" only if required properties are clearly missing. Use "missing" only for types with ZERO presence in the crawl data that would genuinely benefit the site.
   - The recommendation field for "implemented" schemas should acknowledge the existing implementation and suggest specific property enrichments — NOT imply the schema is absent.
@@ -837,11 +909,14 @@ export function buildSerpAeoPrompt(
   const serpData = formatSerpData(intel);
   const aeoData = formatAeoData(intel);
   const kePasfData = formatKePasfForSerp(intel);
+  const schemaStatus = formatSchemaStatusForAeo(intel);
   const priorResults = summarizePriorResults(accumulated);
 
   const user = `${context}
 
 ${priorResults}
+
+${schemaStatus}
 
 ${serpData}
 
@@ -907,6 +982,7 @@ Guidelines:
 - Include 5-10 snippet opportunities where client could win featured snippets
 - Include 10-15 PAA questions worth targeting
 - Score AEO readiness based on: structured data implementation, content comprehensiveness, brand visibility in AI engines, and citation-worthy content
+- CRITICAL — STRUCTURED DATA CLAIMS MUST MATCH THE MEASURED COVERAGE ABOVE: score the structured-data component from the Structured Data Status block, not from assumption. If schema is present across the site, that component scores WELL and the recommendation is about enriching specific types or fixing validation errors — not about adding absent markup. A recommendation asserting the site lacks structured data when coverage shows otherwise directly contradicts the technical section of this same report and will be caught by the client's developers.
 - Each LLM visibility entry should aggregate data by engine
 
 Return ONLY the JSON object. No other text.`;

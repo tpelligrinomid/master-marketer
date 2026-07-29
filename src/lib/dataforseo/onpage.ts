@@ -30,6 +30,10 @@ const NON_ISSUE_CHECKS = new Set([
   "seo_friendly_url_dynamic_check",
   "seo_friendly_url_keywords_check",
   "seo_friendly_url_relative_length_check",
+  // Descriptive, not a defect: nearly every site embeds a consent manager,
+  // analytics frame, or video. Reporting "iframes present on N pages" as an
+  // issue produces a finding with no action behind it.
+  "has_iframes",
 ]);
 
 /** True when a check name represents an actual defect. */
@@ -255,6 +259,56 @@ export async function getSchemaCoverage(
     sample_urls_without_schema: withoutSchema.urls,
     sample_urls_with_schema_errors: withErrors.urls,
   };
+}
+
+/**
+ * Fetch the actual URLs exhibiting each named issue check.
+ *
+ * Without this, the model has only aggregate counts and picks "example" URLs
+ * out of the general crawled-pages list — plausible-looking attributions that
+ * a developer will click and find clean. Same `checks.<name>` filter as
+ * getSchemaCoverage, one query per check.
+ */
+export async function getIssueEvidence(
+  client: DataForSeoClient,
+  taskId: string,
+  checkNames: string[],
+  urlsPerCheck: number = 10
+): Promise<Record<string, string[]>> {
+  const entries = await Promise.all(
+    checkNames.map(async (check): Promise<[string, string[]]> => {
+      try {
+        const response = await client.request<PagesFilterResult>("POST", "on_page/pages", [
+          {
+            id: taskId,
+            limit: urlsPerCheck,
+            filters: [
+              ["resource_type", "=", "html"],
+              "and",
+              ["status_code", "<", 400],
+              "and",
+              [`checks.${check}`, "=", true],
+            ],
+          },
+        ]);
+
+        const result = client.extractFirstResult(response);
+        return [check, (result?.items || []).map((i) => i.url || "").filter(Boolean)];
+      } catch (err) {
+        console.warn(
+          `[OnPage] Evidence URLs for check "${check}" failed:`,
+          err instanceof Error ? err.message : err
+        );
+        return [check, []];
+      }
+    })
+  );
+
+  const evidence: Record<string, string[]> = {};
+  for (const [check, urls] of entries) {
+    if (urls.length) evidence[check] = urls;
+  }
+  return evidence;
 }
 
 interface OnPagePageResult {

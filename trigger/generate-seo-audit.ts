@@ -19,8 +19,11 @@ import {
 import { gatherAllSeoIntelligence, GatherSeoConfig } from "../src/lib/gather-seo-intelligence";
 import { extractJson } from "../src/lib/json-utils";
 
-const MODEL = "claude-opus-4-6";
-const MAX_TOKENS = 32000;
+const MODEL = "claude-opus-5";
+// Raised from 32000 with the Opus 5 upgrade: unlike 4.6, Opus 5 thinks by
+// default and max_tokens caps thinking + response text together, so the old
+// budget risked truncating these large JSON payloads mid-object.
+const MAX_TOKENS = 64000;
 
 function buildDataSources(intel: SeoIntelligencePackage): DataSource[] {
   const sources: DataSource[] = [];

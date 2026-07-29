@@ -395,6 +395,8 @@ export interface SeoIntelligencePackage {
   microdata?: MicrodataItem[];
   /** Measured schema coverage across the whole crawl (not a sample extrapolation) */
   schema_coverage?: SchemaCoverage;
+  /** check name → real URLs exhibiting it, so findings cite evidence instead of guesses */
+  issue_evidence?: Record<string, string[]>;
   lighthouse_results?: LighthouseResult[];
 
   // SERP + AEO data

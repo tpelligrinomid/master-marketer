@@ -9,6 +9,7 @@ export {
   getNonIndexable,
   getMicrodata,
   getSchemaCoverage,
+  getIssueEvidence,
   getLighthouseResults,
   isIssueCheck,
 } from "./onpage";

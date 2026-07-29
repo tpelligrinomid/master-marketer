@@ -28,6 +28,7 @@ import {
   getNonIndexable,
   getMicrodata,
   getSchemaCoverage,
+  getIssueEvidence,
   getLighthouseResults,
   getRankedKeywords,
   getDomainIntersection,
@@ -795,6 +796,7 @@ export async function gatherAllSeoIntelligence(
   let nonIndexable: NonIndexableItem[] | undefined;
   let microdata: MicrodataItem[] | undefined;
   let schemaCoverage: SchemaCoverage | undefined;
+  let issueEvidence: Record<string, string[]> | undefined;
   let lighthouseResults: LighthouseResult[] | undefined;
   let pagespeedResults: PageSpeedResult[] | undefined;
 
@@ -842,6 +844,26 @@ export async function gatherAllSeoIntelligence(
         console.log(
           `[SEO] Schema coverage: ${coverage.pages_with_schema}/${coverage.pages_checked} pages ` +
           `(${coverage.coverage_pct ?? "?"}%), ${coverage.pages_with_schema_errors} with markup errors`
+        );
+      }
+
+      // Real URLs for the most prevalent issues, so findings can cite evidence
+      // rather than the model picking plausible-looking URLs from the crawl list.
+      const topIssueChecks = Object.entries(summary?.issue_checks || {})
+        .filter(([, count]) => count > 0)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 10)
+        .map(([check]) => check);
+
+      if (topIssueChecks.length) {
+        issueEvidence = await getIssueEvidence(dfsClient, crawlTaskId, topIssueChecks).catch(
+          (err) => {
+            errors.push(`Issue evidence URLs failed: ${err.message}`);
+            return undefined;
+          }
+        );
+        console.log(
+          `[SEO] Issue evidence: URLs fetched for ${Object.keys(issueEvidence || {}).length}/${topIssueChecks.length} checks`
         );
       }
 
@@ -940,6 +962,7 @@ export async function gatherAllSeoIntelligence(
     non_indexable: nonIndexable,
     microdata: microdata,
     schema_coverage: schemaCoverage,
+    issue_evidence: issueEvidence,
     lighthouse_results: lighthouseResults,
     serp_results: serpResults,
     llm_mentions: aeoResult.llmMentions,
