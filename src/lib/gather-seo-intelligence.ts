@@ -13,6 +13,7 @@ import {
   RedirectChainItem,
   NonIndexableItem,
   MicrodataItem,
+  SchemaCoverage,
   LighthouseResult,
   KeywordsEverywhereData,
 } from "../types/seo-audit-intelligence";
@@ -26,6 +27,7 @@ import {
   getRedirectChains,
   getNonIndexable,
   getMicrodata,
+  getSchemaCoverage,
   getLighthouseResults,
   getRankedKeywords,
   getDomainIntersection,
@@ -563,25 +565,19 @@ async function detectJsonLdSchemaTypes(url: string): Promise<{ url: string; type
 }
 
 /**
- * Detect JSON-LD schema on sample pages and merge with DataForSEO microdata.
- * Picks homepage + a few diverse crawled pages to get a representative sample.
+ * Pick a diverse sample of URLs to inspect for schema TYPES.
+ * One page per top-level path section, so the type breakdown covers the
+ * different page templates rather than repeatedly sampling one section.
  */
-async function supplementMicrodataWithJsonLd(
-  existingMicrodata: MicrodataItem[] | undefined,
+function pickSchemaSampleUrls(
   clientDomain: string,
   crawledPages: OnPagePageData[] | undefined,
-  errors: string[]
-): Promise<MicrodataItem[]> {
-  const merged = [...(existingMicrodata || [])];
-  const existingUrls = new Set(merged.map((m) => m.url));
-
-  // Pick sample URLs: homepage + up to 4 diverse pages from the crawl
+  maxUrls: number = 20
+): string[] {
   const sampleUrls = new Set<string>();
   sampleUrls.add(`https://${clientDomain}`);
-  sampleUrls.add(`https://www.${clientDomain}`);
 
   if (crawledPages?.length) {
-    // Pick pages from different URL paths for diversity
     const pathBuckets = new Map<string, string>();
     for (const page of crawledPages) {
       if (page.status_code !== 200 || page.is_redirect) continue;
@@ -596,9 +592,32 @@ async function supplementMicrodataWithJsonLd(
     }
     for (const url of pathBuckets.values()) {
       sampleUrls.add(url);
-      if (sampleUrls.size >= 6) break;
+      if (sampleUrls.size >= maxUrls) break;
     }
   }
+
+  return [...sampleUrls].slice(0, maxUrls);
+}
+
+/**
+ * Detect JSON-LD schema on sample pages and merge with DataForSEO microdata.
+ *
+ * This is a TYPE detector on a sample of pages — it says which schemas are in
+ * use, never how many pages have schema. Site-wide counts come from
+ * getSchemaCoverage(). Conflating the two is what produced "only 4 of 150
+ * pages have structured data" on a site that marks up every page.
+ */
+async function supplementMicrodataWithJsonLd(
+  existingMicrodata: MicrodataItem[] | undefined,
+  clientDomain: string,
+  crawledPages: OnPagePageData[] | undefined,
+  errors: string[]
+): Promise<MicrodataItem[]> {
+  const merged = [...(existingMicrodata || [])];
+  const existingUrls = new Set(merged.map((m) => m.url));
+
+  const sampleUrls = new Set<string>(pickSchemaSampleUrls(clientDomain, crawledPages));
+  sampleUrls.add(`https://www.${clientDomain}`);
 
   const results = await Promise.allSettled(
     [...sampleUrls].map((url) => detectJsonLdSchemaTypes(url))
@@ -609,7 +628,7 @@ async function supplementMicrodataWithJsonLd(
     if (result.status === "fulfilled" && result.value) {
       const { url, types, items_count } = result.value;
       if (!existingUrls.has(url)) {
-        merged.push({ url, types, items_count });
+        merged.push({ url, types, items_count, source: "json_ld" });
         existingUrls.add(url);
         newFindings++;
       }
@@ -617,7 +636,7 @@ async function supplementMicrodataWithJsonLd(
   }
 
   if (newFindings > 0) {
-    console.log(`[SEO] JSON-LD supplementary check: found schema on ${newFindings} additional pages`);
+    console.log(`[SEO] JSON-LD supplementary check: found schema on ${newFindings} additional sampled pages`);
   } else if ((existingMicrodata?.length || 0) === 0) {
     console.log(`[SEO] JSON-LD supplementary check: no JSON-LD found on sampled pages either`);
   }
@@ -775,6 +794,7 @@ export async function gatherAllSeoIntelligence(
   let redirectChains: RedirectChainItem[] | undefined;
   let nonIndexable: NonIndexableItem[] | undefined;
   let microdata: MicrodataItem[] | undefined;
+  let schemaCoverage: SchemaCoverage | undefined;
   let lighthouseResults: LighthouseResult[] | undefined;
   let pagespeedResults: PageSpeedResult[] | undefined;
 
@@ -784,7 +804,7 @@ export async function gatherAllSeoIntelligence(
       console.log(`[SEO] OnPage crawl ready: ${crawlTaskId}`);
 
       // Fetch all OnPage data in parallel
-      const [summary, pages, dupes, redirects, nonIdx, micro] = await Promise.all([
+      const [summary, pages, dupes, redirects, nonIdx, coverage] = await Promise.all([
         getCrawlSummary(dfsClient, crawlTaskId).catch((err) => {
           errors.push(`Crawl summary failed: ${err.message}`);
           return undefined;
@@ -805,8 +825,8 @@ export async function gatherAllSeoIntelligence(
           errors.push(`Non-indexable failed: ${err.message}`);
           return undefined;
         }),
-        getMicrodata(dfsClient, crawlTaskId).catch((err) => {
-          errors.push(`Microdata failed: ${err.message}`);
+        getSchemaCoverage(dfsClient, crawlTaskId).catch((err) => {
+          errors.push(`Schema coverage failed: ${err.message}`);
           return undefined;
         }),
       ]);
@@ -816,8 +836,25 @@ export async function gatherAllSeoIntelligence(
       duplicateTags = dupes;
       redirectChains = redirects;
       nonIndexable = nonIdx;
+      schemaCoverage = coverage;
 
-      // Supplement DataForSEO microdata with direct JSON-LD detection
+      if (coverage) {
+        console.log(
+          `[SEO] Schema coverage: ${coverage.pages_with_schema}/${coverage.pages_checked} pages ` +
+          `(${coverage.coverage_pct ?? "?"}%), ${coverage.pages_with_schema_errors} with markup errors`
+        );
+      }
+
+      // Schema TYPE breakdown — inspect a sample of pages via the per-page
+      // microdata endpoint, then supplement with direct JSON-LD detection.
+      // These sampled types describe WHICH schemas are in use; the coverage
+      // numbers above are what describe HOW MANY pages have them.
+      const typeSampleUrls = pickSchemaSampleUrls(clientDomain, pages);
+      const micro = await getMicrodata(dfsClient, crawlTaskId, typeSampleUrls).catch((err) => {
+        errors.push(`Microdata types failed: ${err.message}`);
+        return undefined;
+      });
+
       microdata = await supplementMicrodataWithJsonLd(micro, clientDomain, pages, errors);
 
       // Run Lighthouse on key pages (homepage + live pages with worst score)
@@ -902,6 +939,7 @@ export async function gatherAllSeoIntelligence(
     redirect_chains: redirectChains,
     non_indexable: nonIndexable,
     microdata: microdata,
+    schema_coverage: schemaCoverage,
     lighthouse_results: lighthouseResults,
     serp_results: serpResults,
     llm_mentions: aeoResult.llmMentions,

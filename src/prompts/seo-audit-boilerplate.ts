@@ -8,6 +8,18 @@
  * Edit the copy here. The schema just receives the string.
  */
 
+/**
+ * Scope + verification disclaimer.
+ *
+ * This audit is a sampled diagnostic, not an exhaustive crawl, and it is built
+ * from a different toolchain (DataForSEO/Moz) than the one developers typically
+ * verify against (Ahrefs/Screaming Frog). Both facts need to be stated on the
+ * face of the report so findings are read as directional and are validated
+ * before any implementation work is scoped or started.
+ */
+export const SEO_AUDIT_METHODOLOGY_NOTE =
+  "About this analysis: these findings are based on a sampled diagnostic crawl and third-party data (DataForSEO, Moz, Google APIs), not an exhaustive page-by-page audit of every URL. The results are intended to be directional — to show where the significant opportunities and risks appear to be and to prioritize where to look more closely. Figures drawn from a sample are labeled as such. Because crawlers, indexes, and crawl depths differ between tools, individual numbers here may not match exactly what you see in Ahrefs, Screaming Frog, Search Console, or your own logs. Before any recommendation in this report is implemented, it should be validated against the live site by a developer or technical SEO — both to confirm the finding still holds and to confirm the fix is technically appropriate for your stack.";
+
 export const SEO_AUDIT_BOILERPLATE = {
   technical_seo:
     "This section provides a comprehensive assessment of your website's technical health — the foundation upon which all SEO success is built. Our analysis combines data from multiple industry-leading intelligence platforms: DataForSEO (site crawl, keyword rankings, backlinks, SERP analysis, AI visibility), Moz (Domain Authority, Spam Score, page authority), Keywords Everywhere (search volume trends, CPC, related keywords), and Google PageSpeed Insights (Core Web Vitals). We crawled your site to identify critical issues affecting search engine accessibility, indexability, and user experience. The analysis covers crawlability, Core Web Vitals performance, structured data implementation, redirect chains, and page-level optimization scores. Each issue is prioritized by severity and accompanied by specific remediation steps.",

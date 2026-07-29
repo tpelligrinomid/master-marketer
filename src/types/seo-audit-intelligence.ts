@@ -14,11 +14,29 @@ export interface OnPageCrawlSummary {
   duplicate_description_count: number;
   redirect_chains_count: number;
   non_indexable_count: number;
-  pages_with_microdata: number;
   onpage_score: number | null;
   crawl_status: string;
-  /** page_metrics.checks — maps check names to page counts */
+  /** page_metrics.checks — maps check names to page counts (raw, unfiltered) */
   checks: Record<string, number>;
+  /** Subset of `checks` where a hit means an actual defect */
+  issue_checks: Record<string, number>;
+  /** Subset of `checks` where a hit means the page is healthy (is_https, has_micromarkup, …) */
+  positive_checks: Record<string, number>;
+}
+
+/**
+ * Site-wide schema coverage, measured across every page crawled via the
+ * per-page `has_micromarkup` check — not extrapolated from a sample.
+ */
+export interface SchemaCoverage {
+  pages_checked: number;
+  pages_with_schema: number;
+  pages_without_schema: number;
+  pages_with_schema_errors: number;
+  coverage_pct: number | null;
+  /** Actual URLs lacking schema — the evidence list needed to action the finding */
+  sample_urls_without_schema: string[];
+  sample_urls_with_schema_errors: string[];
 }
 
 export interface OnPagePageData {
@@ -64,6 +82,8 @@ export interface MicrodataItem {
   url: string;
   types: string[];
   items_count: number;
+  /** Which detector found this — DataForSEO's validator or our direct JSON-LD fetch */
+  source?: "dataforseo" | "json_ld";
 }
 
 export interface LighthouseResult {
@@ -373,6 +393,8 @@ export interface SeoIntelligencePackage {
   redirect_chains?: RedirectChainItem[];
   non_indexable?: NonIndexableItem[];
   microdata?: MicrodataItem[];
+  /** Measured schema coverage across the whole crawl (not a sample extrapolation) */
+  schema_coverage?: SchemaCoverage;
   lighthouse_results?: LighthouseResult[];
 
   // SERP + AEO data

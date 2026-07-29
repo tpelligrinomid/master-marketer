@@ -6,8 +6,36 @@ import {
   RedirectChainItem,
   NonIndexableItem,
   MicrodataItem,
+  SchemaCoverage,
   LighthouseResult,
 } from "../../types/seo-audit-intelligence";
+
+/**
+ * DataForSEO page checks where `true` means the page is HEALTHY (or is merely
+ * descriptive), not that it has a problem. Everything else in `checks` counts
+ * as an issue.
+ *
+ * Without this distinction, `is_https: 150` and `has_micromarkup: 148` get
+ * counted as 150 and 148 "pages with issues" — which is how a healthy site
+ * ends up reported as broken.
+ */
+const NON_ISSUE_CHECKS = new Set([
+  "has_micromarkup",
+  "has_html_doctype",
+  "is_https",
+  "is_www",
+  "canonical",
+  "seo_friendly_url",
+  "seo_friendly_url_characters_check",
+  "seo_friendly_url_dynamic_check",
+  "seo_friendly_url_keywords_check",
+  "seo_friendly_url_relative_length_check",
+]);
+
+/** True when a check name represents an actual defect. */
+export function isIssueCheck(checkName: string): boolean {
+  return !NON_ISSUE_CHECKS.has(checkName);
+}
 
 /**
  * Submit an OnPage crawl task. Returns immediately with a task ID.
@@ -111,7 +139,6 @@ interface OnPageSummaryResult {
     redirect_chains?: number;
     non_indexable?: number;
     checks?: Record<string, number>;
-    pages_with_microdata?: number;
     onpage_score?: number;
   };
 }
@@ -132,11 +159,22 @@ export async function getCrawlSummary(
   const crawlStatus = result?.crawl_status;
   const checks = metrics?.checks || {};
 
-  // Derive pages_with_issues from check counts (pages with any issue)
-  const pagesWithIssues = Object.values(checks).reduce(
-    (max, v) => Math.max(max, v),
+  // Derive pages_with_issues from check counts — only counting checks that
+  // represent actual defects. Positive checks (is_https, has_micromarkup, …)
+  // would otherwise pin this to the full crawl size on a perfectly healthy site.
+  const pagesWithIssues = Object.entries(checks).reduce(
+    (max, [name, count]) => (isIssueCheck(name) ? Math.max(max, count) : max),
     0
   );
+
+  // Split the checks map so downstream consumers can't read a positive signal
+  // as a problem.
+  const issueChecks: Record<string, number> = {};
+  const positiveChecks: Record<string, number> = {};
+  for (const [name, count] of Object.entries(checks)) {
+    if (isIssueCheck(name)) issueChecks[name] = count;
+    else positiveChecks[name] = count;
+  }
 
   return {
     domain: result?.domain_info?.name || "",
@@ -148,10 +186,74 @@ export async function getCrawlSummary(
     duplicate_description_count: metrics?.duplicate_description || 0,
     redirect_chains_count: metrics?.redirect_chains || 0,
     non_indexable_count: metrics?.non_indexable || 0,
-    pages_with_microdata: metrics?.pages_with_microdata || 0,
     onpage_score: metrics?.onpage_score ?? null,
     crawl_status: result?.crawl_progress || "unknown",
     checks,
+    issue_checks: issueChecks,
+    positive_checks: positiveChecks,
+  };
+}
+
+interface PagesFilterResult {
+  total_items_count?: number;
+  items?: Array<{ url?: string }>;
+}
+
+/**
+ * Count how many crawled pages carry schema markup, and list URLs on both sides.
+ *
+ * This replaces the previous approach of inferring site-wide schema coverage
+ * from a handful of sampled pages. DataForSEO exposes `checks.has_micromarkup`
+ * per page, so filtering `on_page/pages` gives the true count across everything
+ * crawled — plus the URL list developers need to verify or action the finding.
+ */
+export async function getSchemaCoverage(
+  client: DataForSeoClient,
+  taskId: string,
+  sampleUrlLimit: number = 25
+): Promise<SchemaCoverage> {
+  const queryByCheck = async (
+    check: string,
+    value: boolean
+  ): Promise<{ count: number; urls: string[] }> => {
+    const response = await client.request<PagesFilterResult>("POST", "on_page/pages", [
+      {
+        id: taskId,
+        limit: sampleUrlLimit,
+        filters: [
+          ["resource_type", "=", "html"],
+          "and",
+          ["status_code", "<", 400],
+          "and",
+          [`checks.${check}`, "=", value],
+        ],
+      },
+    ]);
+
+    const result = client.extractFirstResult(response);
+    return {
+      count: result?.total_items_count ?? 0,
+      urls: (result?.items || []).map((i) => i.url || "").filter(Boolean),
+    };
+  };
+
+  const [withSchema, withoutSchema, withErrors] = await Promise.all([
+    queryByCheck("has_micromarkup", true),
+    queryByCheck("has_micromarkup", false),
+    queryByCheck("has_micromarkup_errors", true).catch(() => ({ count: 0, urls: [] })),
+  ]);
+
+  const totalChecked = withSchema.count + withoutSchema.count;
+
+  return {
+    pages_checked: totalChecked,
+    pages_with_schema: withSchema.count,
+    pages_without_schema: withoutSchema.count,
+    pages_with_schema_errors: withErrors.count,
+    coverage_pct:
+      totalChecked > 0 ? Math.round((withSchema.count / totalChecked) * 100) : null,
+    sample_urls_without_schema: withoutSchema.urls,
+    sample_urls_with_schema_errors: withErrors.urls,
   };
 }
 
@@ -360,31 +462,56 @@ export async function getNonIndexable(
 
 interface MicrodataResult {
   items?: Array<{
-    url?: string;
-    types?: string[];
-    items_count?: number;
+    type?: string;
+    inspection_info?: {
+      types?: string[];
+    };
   }>;
 }
 
 /**
- * Get microdata (schema markup) inventory.
+ * Get the schema types present on specific pages.
+ *
+ * NOTE: `on_page/microdata` is a PER-PAGE endpoint — `url` is a required
+ * parameter alongside `id`. Calling it with only the task id (as this
+ * previously did) returns nothing usable, which is why schema was reported
+ * as near-absent on sites that mark up every page.
+ *
+ * Site-wide coverage comes from getSchemaCoverage(); this call supplies the
+ * TYPE breakdown for the pages we inspect.
  */
 export async function getMicrodata(
   client: DataForSeoClient,
-  taskId: string
+  taskId: string,
+  urls: string[]
 ): Promise<MicrodataItem[]> {
-  const response = await client.request<MicrodataResult>(
-    "POST",
-    "on_page/microdata",
-    [{ id: taskId, limit: 50 }]
+  if (!urls.length) return [];
+
+  const results = await Promise.allSettled(
+    urls.map(async (url): Promise<MicrodataItem | null> => {
+      const response = await client.request<MicrodataResult>("POST", "on_page/microdata", [
+        { id: taskId, url },
+      ]);
+
+      const result = client.extractFirstResult(response);
+      const items = result?.items || [];
+      if (!items.length) return null;
+
+      const types = new Set<string>();
+      for (const item of items) {
+        for (const t of item.inspection_info?.types || []) types.add(t);
+      }
+      if (!types.size) return null;
+
+      return { url, types: [...types], items_count: items.length, source: "dataforseo" };
+    })
   );
 
-  const result = client.extractFirstResult(response);
-  return (result?.items || []).map((item) => ({
-    url: item.url || "",
-    types: item.types || [],
-    items_count: item.items_count || 0,
-  }));
+  return results
+    .filter((r): r is PromiseFulfilledResult<MicrodataItem> =>
+      r.status === "fulfilled" && r.value !== null
+    )
+    .map((r) => r.value);
 }
 
 interface LighthouseRawResult {

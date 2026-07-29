@@ -8,7 +8,9 @@ export {
   getRedirectChains,
   getNonIndexable,
   getMicrodata,
+  getSchemaCoverage,
   getLighthouseResults,
+  isIssueCheck,
 } from "./onpage";
 export {
   getRankedKeywords,

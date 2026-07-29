@@ -2,10 +2,16 @@
 // Section 1: Technical SEO Assessment
 // ─────────────────────────────────────────────
 
+/** Whether a figure was measured across the full crawl or inferred from inspected pages */
+export type EvidenceBasis = "measured" | "sampled";
+
 export interface CriticalIssue {
   issue: string;
   severity: "critical" | "high" | "medium" | "low";
   affected_pages: number;
+  /** Actual URLs from the crawl exhibiting this issue, so a developer can verify it */
+  evidence_urls?: string[];
+  evidence_basis?: EvidenceBasis;
   description: string;
   recommendation: string;
 }
@@ -13,7 +19,9 @@ export interface CriticalIssue {
 export interface SchemaInventoryItem {
   schema_type: string;
   pages_count: number;
+  pages_count_basis?: EvidenceBasis;
   status: "implemented" | "missing" | "incomplete";
+  evidence_urls?: string[];
   recommendation?: string;
 }
 
@@ -29,6 +37,8 @@ export interface CoreWebVitals {
 
 export interface TechnicalSeoSection {
   section_description: string;
+  /** Scope + verification statement injected during assembly — not model-generated */
+  methodology_note: string;
   health_score: number;
   pages_crawled: number;
   critical_issues: CriticalIssue[];

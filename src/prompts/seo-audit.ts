@@ -43,16 +43,27 @@ function formatOnPageData(intel: SeoIntelligencePackage): string {
     parts.push(`- Duplicate Descriptions: ${s.duplicate_description_count}`);
     parts.push(`- Redirect Chains: ${s.redirect_chains_count}`);
     parts.push(`- Non-Indexable Pages: ${s.non_indexable_count}`);
-    parts.push(`- Pages with Microdata: ${s.pages_with_microdata}`);
 
-    // Show the checks breakdown — these are the actual page-level issue counts
-    if (Object.keys(s.checks).length > 0) {
-      parts.push(`\n## Page-Level Checks (issue → page count)`);
+    // Issue checks only — these are genuine defects
+    const issueChecks = Object.entries(s.issue_checks || {})
+      .filter(([, count]) => count > 0)
+      .sort(([, a], [, b]) => b - a);
+    if (issueChecks.length > 0) {
+      parts.push(`\n## Page-Level Issue Checks (issue → page count)`);
       parts.push(`NOTE: "low_content_rate" measures content-to-HTML ratio, NOT content quality or depth. Modern sites with rich templates, navigation, and interactive elements will naturally show high "low_content_rate" counts — this is a template architecture characteristic, not necessarily a content problem. Do NOT report this as "thin content" or a content quality issue unless the actual word counts on pages are genuinely low (under 100 words of unique content). Similarly, "is_render_blocking" counts pages with render-blocking resources — common on any site with CSS/JS, and severity should be proportional to actual CWV impact.`);
-      const sortedChecks = Object.entries(s.checks)
-        .filter(([, count]) => count > 0)
-        .sort(([, a], [, b]) => b - a);
-      for (const [check, count] of sortedChecks) {
+      for (const [check, count] of issueChecks) {
+        parts.push(`- ${check}: ${count}`);
+      }
+    }
+
+    // Positive checks — a hit here means the page is HEALTHY
+    const positiveChecks = Object.entries(s.positive_checks || {})
+      .filter(([, count]) => count > 0)
+      .sort(([, a], [, b]) => b - a);
+    if (positiveChecks.length > 0) {
+      parts.push(`\n## Page-Level Positive Signals (healthy trait → page count)`);
+      parts.push(`CRITICAL: These are things the site is doing RIGHT. A high count here is GOOD. "has_micromarkup: 148" means 148 pages HAVE schema markup — it is NOT 148 pages with a problem. Never report anything in this list as an issue, and never include these counts in affected_pages.`);
+      for (const [check, count] of positiveChecks) {
         parts.push(`- ${check}: ${count}`);
       }
     }
@@ -101,8 +112,45 @@ function formatOnPageData(intel: SeoIntelligencePackage): string {
     }
   }
 
+  // ── Structured data: coverage (measured) vs types (sampled) ──
+  // These are two DIFFERENT measurements and must never be conflated.
+  const cov = intel.schema_coverage;
+  if (cov || intel.microdata?.length) {
+    parts.push(`\n## Structured Data (Schema Markup)`);
+  }
+
+  if (cov) {
+    parts.push(`### Coverage — MEASURED across every page crawled`);
+    parts.push(`- Pages checked: ${cov.pages_checked}`);
+    parts.push(`- Pages WITH schema markup: ${cov.pages_with_schema}${cov.coverage_pct !== null ? ` (${cov.coverage_pct}%)` : ""}`);
+    parts.push(`- Pages WITHOUT schema markup: ${cov.pages_without_schema}`);
+    parts.push(`- Pages with schema markup ERRORS: ${cov.pages_with_schema_errors}`);
+    parts.push(
+      `\nCRITICAL: These coverage numbers are the ONLY valid source for any statement about how many or what share of pages have structured data. They come from the per-page has_micromarkup check across the full crawl. Do NOT derive coverage from the sampled type list below — that list only covers a handful of pages and says nothing about site-wide coverage.`
+    );
+
+    if (cov.sample_urls_without_schema.length) {
+      parts.push(`\nURLs confirmed to have NO schema markup (evidence — cite these):`);
+      for (const url of cov.sample_urls_without_schema.slice(0, 25)) {
+        parts.push(`- ${url}`);
+      }
+      if (cov.pages_without_schema > cov.sample_urls_without_schema.length) {
+        parts.push(`(showing ${cov.sample_urls_without_schema.length} of ${cov.pages_without_schema})`);
+      }
+    } else if (cov.pages_without_schema === 0) {
+      parts.push(`\nEvery page crawled carries schema markup. Do NOT report missing schema as a site-wide gap — any schema recommendation must be about ADDING A SPECIFIC TYPE to specific page templates, not about absent markup.`);
+    }
+
+    if (cov.sample_urls_with_schema_errors.length) {
+      parts.push(`\nURLs with schema markup errors (evidence — cite these):`);
+      for (const url of cov.sample_urls_with_schema_errors.slice(0, 15)) {
+        parts.push(`- ${url}`);
+      }
+    }
+  }
+
   if (intel.microdata?.length) {
-    // Aggregate schema types across the site so Claude can see breadth of implementation
+    // Type breakdown across the SAMPLED pages only
     const typePageCounts: Record<string, number> = {};
     for (const item of intel.microdata) {
       for (const t of item.types) {
@@ -111,16 +159,16 @@ function formatOnPageData(intel: SeoIntelligencePackage): string {
     }
     const sortedTypes = Object.entries(typePageCounts).sort(([, a], [, b]) => b - a);
 
-    parts.push(`\n## Structured Data (Schema Markup)`);
-    parts.push(`Total pages with structured data: ${intel.microdata.length}`);
-    parts.push(`\nSchema Type Distribution (type → pages implemented on):`);
+    parts.push(`\n### Schema Types — SAMPLED from ${intel.microdata.length} inspected page(s)`);
+    parts.push(`Type → number of SAMPLED pages it appeared on (NOT a site-wide count):`);
     for (const [schemaType, count] of sortedTypes) {
-      parts.push(`- ${schemaType}: ${count} pages`);
+      parts.push(`- ${schemaType}: ${count} of ${intel.microdata.length} sampled pages`);
     }
-    parts.push(`\nNOTE: The crawl detects which schema TYPES exist but not their individual properties. A "Person" schema could be bare-bones or richly detailed with additionalType, knowsAbout, hasOccupation, sameAs, and Wikidata links. Do NOT assume an implemented type is incomplete without evidence. When a type IS found, report it as "implemented" and suggest property enrichments rather than claiming it is missing.`);
+    parts.push(`\nNOTE: This inspects which schema TYPES exist, not their individual properties. A "Person" schema could be bare-bones or richly detailed with additionalType, knowsAbout, hasOccupation, sameAs, and Wikidata links. Do NOT assume an implemented type is incomplete without evidence. When a type IS found, report it as "implemented" and suggest property enrichments rather than claiming it is missing.`);
+    parts.push(`Because this is a small sample, a type NOT appearing here is NOT proof it is absent site-wide. Say "not observed on the pages sampled," never "missing from the site."`);
 
-    parts.push(`\nSample URLs with structured data:`);
-    for (const item of intel.microdata.slice(0, 15)) {
+    parts.push(`\nSampled URLs and the types found on each:`);
+    for (const item of intel.microdata.slice(0, 20)) {
       parts.push(`- ${item.url}: ${item.types.join(", ")} (${item.items_count} items)`);
     }
   }
@@ -238,8 +286,20 @@ function formatBacklinkData(intel: SeoIntelligencePackage): string {
   }
 
   if (intel.client.anchors?.length) {
-    parts.push(`\n## Anchor Text Distribution (top 30)`);
-    for (const anchor of intel.client.anchors.slice(0, 30)) {
+    const shown = intel.client.anchors.slice(0, 30);
+    const shownBacklinks = shown.reduce((sum, a) => sum + a.backlinks_count, 0);
+
+    parts.push(`\n## Anchor Text Distribution — TOP ${shown.length} ANCHORS ONLY (truncated list)`);
+    parts.push(
+      `Backlinks represented by these ${shown.length} anchors: ${shownBacklinks}. ` +
+      `Total backlinks to the domain: ${clientBl?.total_backlinks ?? "unknown"}.`
+    );
+    parts.push(
+      `CRITICAL — PERCENTAGE DISCIPLINE: This is a truncated list of the highest-volume anchors, not the full anchor profile. ` +
+      `Do NOT state what share/percentage of the link profile any anchor or group of anchors represents unless you compute it against a denominator stated above, and say which denominator you used. ` +
+      `Do NOT sum referring_domains across multiple anchors and present the result as unique domains — the same domain can supply several anchors, so those counts overlap.`
+    );
+    for (const anchor of shown) {
       parts.push(`- "${anchor.anchor_text}" | Backlinks: ${anchor.backlinks_count} | Domains: ${anchor.referring_domains}`);
     }
   }
@@ -582,6 +642,8 @@ Return a JSON object matching this structure:
         "issue": "Short issue name",
         "severity": "critical|high|medium|low",
         "affected_pages": <number>,
+        "evidence_urls": ["specific URLs from the crawl data exhibiting this issue — up to 10, empty array only if the data genuinely provides none"],
+        "evidence_basis": "measured|sampled — 'measured' if the count comes from a full-crawl figure, 'sampled' if it is extrapolated from inspected pages",
         "description": "What the issue is and why it matters",
         "recommendation": "Specific steps to fix"
       }
@@ -590,7 +652,9 @@ Return a JSON object matching this structure:
       {
         "schema_type": "Organization|Product|FAQ|etc.",
         "pages_count": <number>,
+        "pages_count_basis": "measured|sampled",
         "status": "implemented|missing|incomplete",
+        "evidence_urls": ["URLs where this type was observed, or for 'missing', URLs of the page template that should carry it"],
         "recommendation": "What to do"
       }
     ],
@@ -628,7 +692,15 @@ Guidelines:
 - This is a DIAGNOSTIC SCAN, not a comprehensive crawl. Frame findings as patterns identified in a representative sample. Do not make sweeping claims about the entire site based on 150 pages.
 - section_description should explicitly note this is a representative crawl and that a full technical audit is recommended if critical issues are found
 - Identify 5-10 critical issues sorted by severity
-- CRITICAL — SCHEMA INVENTORY ACCURACY: The crawl data shows which schema types exist on the site (Microdata section). You must CAREFULLY review what is ALREADY IMPLEMENTED before recommending anything as "missing."
+- CRITICAL — EVERY NUMBER MUST TRACE TO THE DATA ABOVE. A developer will check these findings against their own tooling, and a wrong number destroys the credibility of the whole report.
+  - Never state a count or percentage you cannot point to a specific figure for in the data above. If a figure is not provided, describe the finding qualitatively instead of inventing a number.
+  - NEVER present a sample size as a site-wide total. If 6 pages were inspected and 4 had schema, that is "4 of 6 pages inspected" — it is NOT "4 pages on the site," and you may NOT divide it by pages_crawled.
+  - Set evidence_basis to "measured" ONLY for counts taken from a full-crawl figure (crawl summary, issue checks, schema coverage). Use "sampled" for anything derived from the inspected-page lists.
+  - Populate evidence_urls from URLs that actually appear in the data above. Never construct, guess, or pattern-match a URL.
+  - affected_pages must never be drawn from the Positive Signals list.
+- CRITICAL — SCHEMA INVENTORY ACCURACY: Read the Structured Data section carefully — it has TWO distinct parts. "Coverage" is measured across the full crawl and is the only valid basis for how many pages have schema. "Schema Types" is sampled from a few pages and is only valid for saying which types are in use. You must CAREFULLY review what is ALREADY IMPLEMENTED before recommending anything as "missing."
+  - If coverage shows most or all pages already carry schema, you may NOT claim the site lacks structured data. Frame schema work as adding specific TYPES to specific templates.
+  - Set pages_count_basis to "sampled" whenever pages_count comes from the sampled type breakdown.
   - If the data shows "Person" schema on speaker/author/team profile pages, that IS the correct schema type — there is no "Speaker" type in Schema.org. Do NOT recommend adding a non-existent schema type. Instead, acknowledge the implementation and suggest enrichment properties (e.g., hasOccupation, Event schema for events, SpeakableSpecification for voice).
   - Status should be "implemented" when the type exists in the crawl data, even if it could be enriched. Use "incomplete" only if required properties are clearly missing. Use "missing" only for types with ZERO presence in the crawl data that would genuinely benefit the site.
   - The recommendation field for "implemented" schemas should acknowledge the existing implementation and suggest specific property enrichments — NOT imply the schema is absent.
@@ -910,6 +982,11 @@ Return a JSON object:
 Guidelines:
 - Classify anchor text into 5-6 categories with percentages that sum to ~100
 - CRITICAL — ANCHOR TEXT CONTEXT: Interpret anchor text patterns in the context of the client's business model. Service businesses (speaker bureaus, agencies, SaaS companies) naturally produce CTA-style anchors like "Book [Name] to Speak", "Contact [Company]", "Visit Website". These are NOT "exact match keyword spam" — they are natural link patterns generated by the business's own pages and partner sites. Do NOT flag natural business CTAs as "over-optimization" or "algorithmic risk." Only flag anchor text as concerning if there are clear signs of manipulation (e.g., keyword-stuffed commercial terms like "best cheap keynote speaker" making up a large percentage).
+- CRITICAL — TOXIC / MANIPULATIVE LINK CLAIMS: Alleging that a client has spam or link-scheme backlinks is a serious accusation that will be checked. Before making one:
+  - Cite the actual anchor strings and the backlinks_count shown for each. Never aggregate counts across anchors into a "unique domains" figure — referring_domains counts overlap between anchors.
+  - Only state a share of the link profile if you divide by a denominator printed in the data above, and name that denominator in the text (e.g. "X of the domain's Y total backlinks").
+  - Say where the finding can be verified: these anchors come from the domain's INBOUND backlink profile, so they are checkable in Ahrefs Site Explorer → Backlinks/Anchors (NOT in Site Audit, which only covers the client's own pages and outbound links).
+  - If the evidence is a handful of anchors in a truncated list, describe it as "anchors observed in the top anchor sample" and recommend a full backlink review — do not assert a site-wide penalty risk.
 - Include all competitors in comparison
 - CRITICAL — GAP OPPORTUNITIES MUST USE REAL DATA: The gap_opportunities MUST come from the "Backlink Gap" data provided above. Each referring_domain must be a domain that ACTUALLY appears in the backlink intersection data. The domain_rank must be the ACTUAL rank from the data (not a round number you estimate). If the backlink gap data is empty or limited, report fewer gap opportunities rather than inventing domains. Do NOT fabricate gap domains from general SEO knowledge — this destroys credibility if the client checks.
 - Identify up to 10 gap opportunities from the actual data with specific acquisition strategies
