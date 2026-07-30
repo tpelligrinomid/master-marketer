@@ -294,11 +294,9 @@ export const generateSeoAudit = task({
       summary: execSummary,
 
       technical_seo: {
-        // The note is appended to section_description so it renders in the
-        // current viewer without a frontend change, AND exposed as its own
-        // field so the viewer can style it as a callout later. Once the
-        // frontend renders methodology_note, drop it from the description.
-        section_description: `${SEO_AUDIT_BOILERPLATE.technical_seo}\n\n${SEO_AUDIT_METHODOLOGY_NOTE}`,
+        // The viewer now renders methodology_note as its own callout, so the
+        // note is no longer appended here — that would show it twice.
+        section_description: SEO_AUDIT_BOILERPLATE.technical_seo,
         ...(call1Result.technical_seo as Omit<GeneratedSeoAuditOutput["technical_seo"], "section_description">),
         // Set after the spread so the model can never overwrite the scope disclaimer
         methodology_note: SEO_AUDIT_METHODOLOGY_NOTE,
@@ -322,6 +320,8 @@ export const generateSeoAudit = task({
       backlink_profile: {
         // Backlink findings are built from truncated anchor/backlink samples and
         // a different index than Ahrefs — same caveat applies here as technical.
+        // Kept appended here (unlike technical_seo) because BacklinkProfileSection
+        // has no methodology_note field for the viewer to render as a callout.
         section_description: `${SEO_AUDIT_BOILERPLATE.backlink_profile}\n\n${SEO_AUDIT_METHODOLOGY_NOTE}`,
         ...(call4Result.backlink_profile as Omit<GeneratedSeoAuditOutput["backlink_profile"], "section_description">),
       },
