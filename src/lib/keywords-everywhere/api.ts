@@ -1,4 +1,5 @@
 import { KeywordsEverywhereClient } from "./client";
+import { normalizeDomain } from "../domain";
 import {
   KeKeywordData,
   KeRelatedKeyword,
@@ -155,9 +156,13 @@ async function getDomainTrafficSingle(
   domain: string,
   country: string = "us"
 ): Promise<KeDomainTraffic | null> {
+  // KE validates strictly and 400s on a scheme ("https://www" must contain only
+  // letters) — normalize here too, since this is reachable outside the SEO gatherer.
+  const cleanDomain = normalizeDomain(domain);
+
   const response = await client.postJson<KeDomainKeywordsResponse>(
     "get_domain_keywords",
-    { domain, country, currency: "USD", num: 500 }
+    { domain: cleanDomain, country, currency: "USD", num: 500 }
   );
 
   const keywords = response.data;
@@ -172,10 +177,10 @@ async function getDomainTrafficSingle(
     totalTrafficCost += traffic * cpc;
   }
 
-  console.log(`[KE] Domain keywords for ${domain}: ${keywords.length} keywords, ~${totalTraffic.toLocaleString()} monthly traffic`);
+  console.log(`[KE] Domain keywords for ${cleanDomain}: ${keywords.length} keywords, ~${totalTraffic.toLocaleString()} monthly traffic`);
 
   return {
-    domain,
+    domain: cleanDomain,
     estimated_monthly_traffic: totalTraffic,
     organic_keywords: keywords.length,
     organic_traffic_cost: Math.round(totalTrafficCost),

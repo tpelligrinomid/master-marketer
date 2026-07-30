@@ -43,6 +43,7 @@ import {
   getChatGptResponses,
   getPerplexityResponses,
 } from "./dataforseo";
+import { normalizeDomain } from "./domain";
 import { getPageSpeedResults } from "./pagespeed";
 import { getDomainMetrics, getTopPages } from "./moz";
 import { MozDomainMetrics, MozTopPage } from "../types/research-intelligence";
@@ -678,8 +679,11 @@ export async function gatherAllSeoIntelligence(
   }
 
   const dfsClient = new DataForSeoClient(config.dataforseoLogin, config.dataforseoPassword);
-  const clientDomain = input.client.domain;
-  const competitorDomains = input.competitors.map((c) => c.domain);
+  // Normalize once here — several consumers build URLs by interpolating this
+  // (`https://${clientDomain}`), which silently produces an invalid URL when the
+  // caller supplies a scheme, and Keywords Everywhere 400s on one outright.
+  const clientDomain = normalizeDomain(input.client.domain);
+  const competitorDomains = input.competitors.map((c) => normalizeDomain(c.domain));
 
   // Build keyword list for SERP + AEO analysis
   const seedKeywords = input.seed_topics || [];
