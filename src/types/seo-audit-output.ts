@@ -299,5 +299,15 @@ export interface GeneratedSeoAuditOutput {
     data_sources: DataSource[];
     /** Pages crawled during OnPage analysis */
     pages_crawled?: number;
+    /**
+     * Crawl scope, for a neutral coverage note in the viewer.
+     * `complete: false` means the crawl was still running when analysis began —
+     * findings describe pages_analyzed only. This is scope, not an error.
+     */
+    crawl_coverage?: {
+      pages_analyzed: number;
+      pages_not_analyzed: number;
+      complete: boolean;
+    };
   };
 }

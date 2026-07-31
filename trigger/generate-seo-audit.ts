@@ -345,6 +345,13 @@ export const generateSeoAudit = task({
         intelligence_errors: intel.errors,
         data_sources: buildDataSources(intel),
         pages_crawled: intel.onpage_summary?.pages_crawled,
+        ...(intel.onpage_summary && {
+          crawl_coverage: {
+            pages_analyzed: intel.onpage_summary.pages_crawled,
+            pages_not_analyzed: intel.onpage_summary.pages_in_queue,
+            complete: intel.onpage_summary.crawl_complete,
+          },
+        }),
       },
     };
 

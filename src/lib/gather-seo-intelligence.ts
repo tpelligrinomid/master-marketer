@@ -915,9 +915,15 @@ export async function gatherAllSeoIntelligence(
       } else {
         // Partial results are still a usable diagnostic sample — proceed rather
         // than discarding a crawl we already spent the time on.
-        errors.push(
-          `OnPage crawl did not finish within ${Math.round(poll.waited_seconds / 60)} min — ` +
-          `analysis covers ${poll.pages_crawled} crawled pages (${poll.pages_in_queue} still queued)`
+        //
+        // Deliberately NOT pushed into `errors`: that array is internal
+        // diagnostics (raw vendor API failures) and surfaces in the client-facing
+        // report. A partial crawl is a scope fact, not a failure — it is carried
+        // on onpage_summary.crawl_complete, disclosed in prose by the model, and
+        // exposed as metadata.crawl_coverage for the viewer to render neutrally.
+        console.warn(
+          `[SEO] Proceeding with partial crawl: ${poll.pages_crawled} pages analysed, ` +
+          `${poll.pages_in_queue} still queued after ${Math.round(poll.waited_seconds / 60)} min`
         );
       }
 
