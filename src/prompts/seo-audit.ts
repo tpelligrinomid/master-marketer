@@ -36,6 +36,15 @@ function formatOnPageData(intel: SeoIntelligencePackage): string {
     parts.push(`## Crawl Summary`);
     parts.push(`- Domain: ${s.domain}`);
     parts.push(`- Pages Crawled: ${s.pages_crawled}`);
+    if (s.crawl_complete === false) {
+      parts.push(
+        `- CRAWL INCOMPLETE: the crawl was still running when analysis began — ` +
+        `${s.pages_in_queue} further pages were queued and NOT analysed. Every count and ` +
+        `percentage below describes ONLY the ${s.pages_crawled} pages actually crawled. ` +
+        `Say so when citing them ("across the ${s.pages_crawled} pages crawled"), never imply ` +
+        `site-wide coverage, and note in section_description that the crawl was partial.`
+      );
+    }
     parts.push(`- Overall OnPage Score: ${s.onpage_score ?? "N/A"}/100`);
     parts.push(`- Broken Resources (images/JS/CSS, NOT pages): ${s.broken_resources}`);
     parts.push(`- Broken Links: ${s.broken_links_count}`);

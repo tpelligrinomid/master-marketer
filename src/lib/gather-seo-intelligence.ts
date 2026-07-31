@@ -646,6 +646,62 @@ async function supplementMicrodataWithJsonLd(
   return merged;
 }
 
+/**
+ * The client's commercially important pages, for crawl prioritisation and CWV.
+ *
+ * GSC top pages (by clicks) are the best proxy for "money pages" — they are
+ * what actually earns traffic. Moz top pages (by authority) are the fallback
+ * when GSC isn't connected. Both calls are fast (~1-2s), so fetching them
+ * before submitting the crawl costs almost nothing and lets a crawl that gets
+ * cut short still cover what matters.
+ */
+async function fetchMoneyPages(
+  config: GatherSeoConfig,
+  clientDomain: string,
+  limit = 20
+): Promise<string[]> {
+  const urls: string[] = [];
+
+  try {
+    if (config.googleClientId && config.googleClientSecret && config.googleGscRefreshToken) {
+      const gscClient = new GoogleSearchConsoleClient(
+        config.googleClientId,
+        config.googleClientSecret,
+        config.googleGscRefreshToken
+      );
+      const siteUrl = await checkSiteAccess(gscClient, clientDomain);
+      if (siteUrl) {
+        const { startDate, endDate } = buildDateRange();
+        const topPages = await getGscTopPages(gscClient, siteUrl, startDate, endDate);
+        for (const p of topPages) {
+          if (p.page) urls.push(p.page);
+          if (urls.length >= limit) break;
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("[SEO] GSC money-page lookup failed:", err instanceof Error ? err.message : err);
+  }
+
+  if (urls.length < limit && config.mozApiKey) {
+    try {
+      const mozTop = await getTopPages(clientDomain, config.mozApiKey, limit);
+      for (const p of mozTop) {
+        // MozTopPage uses `url`; GscTopPage above uses `page`
+        if (p.url && !urls.includes(p.url)) urls.push(p.url);
+        if (urls.length >= limit) break;
+      }
+    } catch (err) {
+      console.warn("[SEO] Moz money-page lookup failed:", err instanceof Error ? err.message : err);
+    }
+  }
+
+  // priority_urls must be absolute and on the target domain
+  return urls
+    .filter((u) => /^https?:\/\//i.test(u) && u.includes(clientDomain.replace(/^www\./, "")))
+    .slice(0, limit);
+}
+
 function dedupeByKeyword<T extends { keyword: string }>(items: T[]): T[] {
   const seen = new Set<string>();
   return items.filter((item) => {
@@ -693,7 +749,16 @@ export async function gatherAllSeoIntelligence(
   // ──────────────────────────────────────────
   let crawlTaskId: string | undefined;
   try {
-    crawlTaskId = await submitCrawlTask(dfsClient, clientDomain, input.max_crawl_pages);
+    const moneyPages = await fetchMoneyPages(config, clientDomain);
+    if (moneyPages.length) {
+      console.log(`[SEO] Prioritising ${moneyPages.length} money pages in the crawl`);
+    }
+    crawlTaskId = await submitCrawlTask(
+      dfsClient,
+      clientDomain,
+      input.max_crawl_pages,
+      moneyPages
+    );
     console.log(`[SEO] OnPage crawl submitted: ${crawlTaskId}`);
   } catch (err) {
     const msg = `OnPage crawl submission failed: ${err instanceof Error ? err.message : err}`;
@@ -803,15 +868,25 @@ export async function gatherAllSeoIntelligence(
   let issueEvidence: Record<string, string[]> | undefined;
   let lighthouseResults: LighthouseResult[] | undefined;
   let pagespeedResults: PageSpeedResult[] | undefined;
+  let lighthouseTargets: string[] = [];
 
   if (crawlTaskId) {
     try {
-      await pollCrawlReady(dfsClient, crawlTaskId);
-      console.log(`[SEO] OnPage crawl ready: ${crawlTaskId}`);
+      const poll = await pollCrawlReady(dfsClient, crawlTaskId);
+      if (poll.finished) {
+        console.log(`[SEO] OnPage crawl ready: ${crawlTaskId}`);
+      } else {
+        // Partial results are still a usable diagnostic sample — proceed rather
+        // than discarding a crawl we already spent the time on.
+        errors.push(
+          `OnPage crawl did not finish within ${Math.round(poll.waited_seconds / 60)} min — ` +
+          `analysis covers ${poll.pages_crawled} crawled pages (${poll.pages_in_queue} still queued)`
+        );
+      }
 
       // Fetch all OnPage data in parallel
       const [summary, pages, dupes, redirects, nonIdx, coverage] = await Promise.all([
-        getCrawlSummary(dfsClient, crawlTaskId).catch((err) => {
+        getCrawlSummary(dfsClient, crawlTaskId, poll).catch((err) => {
           errors.push(`Crawl summary failed: ${err.message}`);
           return undefined;
         }),
@@ -883,17 +958,35 @@ export async function gatherAllSeoIntelligence(
 
       microdata = await supplementMicrodataWithJsonLd(micro, clientDomain, pages, errors);
 
-      // Run Lighthouse on key pages (homepage + live pages with worst score)
+      // Core Web Vitals on the pages that actually earn traffic, not the
+      // worst-scoring ones. CWV costs revenue where visitors are; testing LCP
+      // on the five most broken pages says nothing about that, and those pages
+      // are often ones nobody visits. GSC/Moz top pages first, worst-scoring
+      // only as a fallback when neither is available.
+      const crawledLive = (pages || []).filter(
+        (p) => p.status_code >= 200 && p.status_code < 400 && !p.is_broken && !p.is_redirect
+      );
+      const crawledUrls = new Set(crawledLive.map((p) => p.url));
+      const moneyPageUrls = (await fetchMoneyPages(config, clientDomain, 10)).filter((u) =>
+        crawledUrls.size === 0 ? true : crawledUrls.has(u)
+      );
+      const worstScoring = crawledLive
+        .slice()
+        .sort((a, b) => (a.onpage_score || 100) - (b.onpage_score || 100))
+        .map((p) => p.url);
+
       const keyUrls = [
         `https://${clientDomain}`,
-        ...(pages || [])
-          .filter((p) => p.status_code >= 200 && p.status_code < 400 && !p.is_broken && !p.is_redirect)
-          .sort((a, b) => (a.onpage_score || 100) - (b.onpage_score || 100))
-          .slice(0, 5)
-          .map((p) => p.url),
+        ...moneyPageUrls,
+        ...worstScoring, // fallback only — trimmed by the slice below
       ];
       const uniqueUrls = [...new Set(keyUrls)].slice(0, 6);
+      console.log(
+        `[SEO] CWV targets: ${uniqueUrls.length} URLs ` +
+        `(${moneyPageUrls.length} money pages, rest homepage/fallback)`
+      );
 
+      lighthouseTargets = uniqueUrls;
       lighthouseResults = await getLighthouseResults(dfsClient, uniqueUrls).catch((err) => {
         errors.push(`Lighthouse failed: ${err.message}`);
         return undefined;
@@ -906,10 +999,12 @@ export async function gatherAllSeoIntelligence(
   }
 
   // PageSpeed Insights (supplements Lighthouse with field data)
-  const pageSpeedUrls = [
-    `https://${clientDomain}`,
-    ...(onpagePages || []).slice(0, 5).map((p) => p.url),
-  ];
+  // Same targets as Lighthouse so the two datasets describe the same pages.
+  // lighthouseTargets is set above when a crawl ran; fall back to the homepage
+  // plus money pages when it didn't.
+  const pageSpeedUrls = lighthouseTargets.length
+    ? lighthouseTargets
+    : [`https://${clientDomain}`, ...(await fetchMoneyPages(config, clientDomain, 5))];
   const uniquePageSpeedUrls = [...new Set(pageSpeedUrls)].slice(0, 6);
 
   try {

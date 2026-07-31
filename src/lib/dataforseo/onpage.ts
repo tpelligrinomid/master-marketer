@@ -44,17 +44,43 @@ export function isIssueCheck(checkName: string): boolean {
 /**
  * Submit an OnPage crawl task. Returns immediately with a task ID.
  */
+/**
+ * Hard ceiling on crawl size.
+ *
+ * The audit only ever shows the model ~60 crawled pages; beyond that, extra
+ * pages refine aggregate percentages and widen the evidence pool but add no
+ * page-level detail. Meanwhile crawl rate varies hugely by site — one observed
+ * site crawled at ~4 pages/min, where 150 pages alone would exceed the run's
+ * entire time budget. 100 is reachable on fast sites and degrades to a useful
+ * partial crawl on slow ones.
+ */
+export const MAX_CRAWL_PAGES = 100;
+
 export async function submitCrawlTask(
   client: DataForSeoClient,
   domain: string,
-  maxPages: number = 150
+  maxPages: number = MAX_CRAWL_PAGES,
+  priorityUrls?: string[]
 ): Promise<string> {
   const cleanDomain = domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  const cappedPages = Math.max(1, Math.min(maxPages, MAX_CRAWL_PAGES));
+
+  if (maxPages > MAX_CRAWL_PAGES) {
+    console.log(`[OnPage] Requested ${maxPages} pages, capped to ${MAX_CRAWL_PAGES}`);
+  }
 
   const response = await client.request<{ id: string }>("POST", "on_page/task_post", [
     {
       target: cleanDomain,
-      max_crawl_pages: maxPages,
+      max_crawl_pages: cappedPages,
+      // Crawl the client's commercially important pages first, bypassing the
+      // queue, so a crawl that gets cut short still covered what matters.
+      // DataForSEO accepts up to 20.
+      ...(priorityUrls?.length ? { priority_urls: priorityUrls.slice(0, 20) } : {}),
+      // Then follow sitemap order rather than raw link discovery, which keeps
+      // budget on real pages instead of pagination and faceted-nav traps.
+      // Note: this disables max_crawl_depth, which we don't set.
+      respect_sitemap: true,
       validate_micromarkup: true,
       enable_browser_rendering: true,
       enable_javascript: true,
@@ -79,13 +105,34 @@ export async function submitCrawlTask(
  * This is more reliable than `tasks_ready` which is designed for batch processing
  * and may not list tasks that finished with partial results or errors.
  */
+export interface CrawlPollResult {
+  /** false when we stopped waiting before DataForSEO finished */
+  finished: boolean;
+  pages_crawled: number;
+  pages_in_queue: number;
+  waited_seconds: number;
+}
+
+/**
+ * Wait for the crawl, but return a status instead of throwing on timeout.
+ *
+ * A partial crawl is still a usable diagnostic sample — DataForSEO serves
+ * whatever it has crawled so far from the same endpoints. Previously a timeout
+ * threw and the caller skipped every OnPage fetch, so one run spent 30 minutes
+ * crawling 68 pages and then discarded all of them.
+ *
+ * The default wait is deliberately well under the task's own maxDuration so
+ * there is room left for the model calls that follow.
+ */
 export async function pollCrawlReady(
   client: DataForSeoClient,
   taskId: string,
   intervalMs: number = 30000,
-  timeoutMs: number = 1800000
-): Promise<void> {
+  timeoutMs: number = 1080000 // 18 min — leaves headroom for the 6 model calls
+): Promise<CrawlPollResult> {
   const startTime = Date.now();
+  let lastCrawled = 0;
+  let lastQueued = 0;
 
   while (Date.now() - startTime < timeoutMs) {
     const response = await client.request<OnPageSummaryResult>(
@@ -107,10 +154,13 @@ export async function pollCrawlReady(
     const progress = result?.crawl_progress;
     const crawled = result?.crawl_status?.pages_crawled ?? 0;
     const queued = result?.crawl_status?.pages_in_queue ?? 0;
+    lastCrawled = crawled;
+    lastQueued = queued;
 
     if (progress === "finished") {
+      const waited = Math.round((Date.now() - startTime) / 1000);
       console.log(`[OnPage] Crawl ${taskId} finished — ${crawled} pages crawled`);
-      return;
+      return { finished: true, pages_crawled: crawled, pages_in_queue: 0, waited_seconds: waited };
     }
 
     const elapsed = Math.round((Date.now() - startTime) / 1000);
@@ -121,7 +171,17 @@ export async function pollCrawlReady(
     await new Promise((r) => setTimeout(r, intervalMs));
   }
 
-  throw new Error(`OnPage crawl timed out after ${timeoutMs / 1000}s`);
+  const waited = Math.round((Date.now() - startTime) / 1000);
+  console.warn(
+    `[OnPage] Crawl ${taskId} still running after ${waited}s — proceeding with ` +
+    `${lastCrawled} crawled pages (${lastQueued} still queued). Results will be partial.`
+  );
+  return {
+    finished: false,
+    pages_crawled: lastCrawled,
+    pages_in_queue: lastQueued,
+    waited_seconds: waited,
+  };
 }
 
 interface OnPageSummaryResult {
@@ -152,7 +212,8 @@ interface OnPageSummaryResult {
  */
 export async function getCrawlSummary(
   client: DataForSeoClient,
-  taskId: string
+  taskId: string,
+  poll?: { finished: boolean; pages_in_queue: number }
 ): Promise<OnPageCrawlSummary> {
   const response = await client.request<OnPageSummaryResult>("POST", "on_page/summary", [
     { id: taskId },
@@ -195,6 +256,8 @@ export async function getCrawlSummary(
     checks,
     issue_checks: issueChecks,
     positive_checks: positiveChecks,
+    crawl_complete: poll ? poll.finished : result?.crawl_progress === "finished",
+    pages_in_queue: poll?.pages_in_queue ?? crawlStatus?.pages_in_queue ?? 0,
   };
 }
 

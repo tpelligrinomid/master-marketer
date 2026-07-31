@@ -22,6 +22,10 @@ export interface OnPageCrawlSummary {
   issue_checks: Record<string, number>;
   /** Subset of `checks` where a hit means the page is healthy (is_https, has_micromarkup, …) */
   positive_checks: Record<string, number>;
+  /** False when we stopped waiting before the crawl finished — findings cover only what was crawled */
+  crawl_complete: boolean;
+  /** Pages still queued when we stopped waiting (0 when complete) */
+  pages_in_queue: number;
 }
 
 /**

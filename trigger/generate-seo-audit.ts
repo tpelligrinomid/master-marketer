@@ -154,7 +154,7 @@ async function callClaude(
 
 export const generateSeoAudit = task({
   id: "generate-seo-audit",
-  maxDuration: 2700, // 45 minutes — crawl polling + 6 Claude calls
+  maxDuration: 3600, // 60 min — 18 min crawl poll ceiling + 6 model calls, with headroom
   retry: {
     maxAttempts: 5,
     minTimeoutInMs: 5000,

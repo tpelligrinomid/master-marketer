@@ -34,7 +34,14 @@ export const SeoAuditInputSchema = z.object({
   research_context: ResearchContextSchema.optional(),
 
   /** Max pages to crawl (default 150 — browser rendering is ~10s/page) */
-  max_crawl_pages: z.number().min(1).max(2000).default(150),
+  // Clamp rather than reject: the frontend may still send larger values, and
+  // failing validation would kill the whole audit. See MAX_CRAWL_PAGES in
+  // lib/dataforseo/onpage.ts for why 100 is the ceiling.
+  max_crawl_pages: z
+    .number()
+    .min(1)
+    .default(100)
+    .transform((n) => Math.min(n, 100)),
 
   instructions: z.string().optional(),
 
