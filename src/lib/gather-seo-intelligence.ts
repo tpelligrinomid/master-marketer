@@ -696,10 +696,47 @@ async function fetchMoneyPages(
     }
   }
 
-  // priority_urls must be absolute and on the target domain
-  return urls
-    .filter((u) => /^https?:\/\//i.test(u) && u.includes(clientDomain.replace(/^www\./, "")))
-    .slice(0, limit);
+  // priority_urls must be absolute and on the target domain. Normalise rather
+  // than reject: Moz returns scheme-less URLs ("example.com/path"), so a strict
+  // ^https?:// filter would silently discard every Moz fallback result.
+  const targetHost = clientDomain.replace(/^www\./i, "").toLowerCase();
+  const seen = new Set<string>();
+  const out: string[] = [];
+
+  for (const raw of urls) {
+    const abs = toAbsoluteUrl(raw);
+    if (!abs) continue;
+
+    let host: string;
+    try {
+      host = new URL(abs).hostname.replace(/^www\./i, "").toLowerCase();
+    } catch {
+      continue;
+    }
+    if (host !== targetHost && !host.endsWith(`.${targetHost}`)) continue;
+
+    if (seen.has(abs)) continue;
+    seen.add(abs);
+    out.push(abs);
+    if (out.length >= limit) break;
+  }
+
+  return out;
+}
+
+/** Add a scheme when missing and discard anything that still isn't a valid URL. */
+function toAbsoluteUrl(input: string): string | null {
+  const trimmed = (input || "").trim();
+  if (!trimmed) return null;
+  const candidate = /^https?:\/\//i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed.replace(/^\/+/, "")}`;
+  try {
+    new URL(candidate);
+    return candidate;
+  } catch {
+    return null;
+  }
 }
 
 function dedupeByKeyword<T extends { keyword: string }>(items: T[]): T[] {
@@ -966,10 +1003,11 @@ export async function gatherAllSeoIntelligence(
       const crawledLive = (pages || []).filter(
         (p) => p.status_code >= 200 && p.status_code < 400 && !p.is_broken && !p.is_redirect
       );
-      const crawledUrls = new Set(crawledLive.map((p) => p.url));
-      const moneyPageUrls = (await fetchMoneyPages(config, clientDomain, 10)).filter((u) =>
-        crawledUrls.size === 0 ? true : crawledUrls.has(u)
-      );
+      // Deliberately NOT filtered to the crawled-page sample: Lighthouse and
+      // PageSpeed can test any URL, that sample is only ~100 pages, and exact
+      // string matching would drop money pages over a trailing slash or a
+      // www/protocol difference between GSC and the crawler.
+      const moneyPageUrls = await fetchMoneyPages(config, clientDomain, 10);
       const worstScoring = crawledLive
         .slice()
         .sort((a, b) => (a.onpage_score || 100) - (b.onpage_score || 100))
