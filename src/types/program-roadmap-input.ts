@@ -59,6 +59,14 @@ const ProcessLibraryHoursEntrySchema = z.object({
   stage: StageSchema,
   service_category: z.string().min(1),
   baseline_hours: z.number().positive(),
+  /**
+   * Library item id, echoed onto every generated row that draws from it.
+   *
+   * Resolved by exact task-name match during assembly rather than copied by the
+   * model: both baseline flags skip rows with a null id, so a hallucinated or
+   * mistyped id would silently disable them on the row it lands on.
+   */
+  process_id: z.string().nullable().optional(),
 });
 
 export type ProcessLibraryHoursEntry = z.infer<typeof ProcessLibraryHoursEntrySchema>;

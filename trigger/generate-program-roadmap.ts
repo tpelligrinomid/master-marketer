@@ -204,6 +204,61 @@ function normalizeHoursPlan(
   };
 }
 
+/**
+ * Echo library-owned fields onto every generated row by exact task-name match.
+ *
+ * `process_id` is resolved here rather than asked for in the prompt: both baseline
+ * flags skip rows with a null id, so a mistyped or hallucinated id would silently
+ * disable them. A row that matches nothing keeps a null id, which is the honest
+ * representation — it is a task the generator invented rather than drew.
+ *
+ * `baseline_hours`, `service_category` and `stage` are owned by the library too, so
+ * they are taken from it rather than from the model's transcription. `hours` and
+ * `adjustment_reason` are the generator's and are never touched.
+ */
+function resolveLibraryFields(
+  hoursPlan: z.infer<typeof HoursPlanSchema>,
+  input: ProgramRoadmapInput,
+  optionId: string
+): z.infer<typeof HoursPlanSchema> {
+  const byTask = new Map(
+    input.process_library_hours.map((item) => [
+      item.task.trim().toLowerCase(),
+      item,
+    ])
+  );
+
+  const unmatched: string[] = [];
+
+  const months = hoursPlan.months.map((month) => ({
+    ...month,
+    tasks: month.tasks.map((row) => {
+      const match = byTask.get(row.task.trim().toLowerCase());
+      if (!match) {
+        unmatched.push(row.task);
+        return { ...row, process_id: null };
+      }
+      return {
+        ...row,
+        process_id: match.process_id ?? null,
+        baseline_hours: match.baseline_hours,
+        service_category: match.service_category,
+        stage: match.stage,
+      };
+    }),
+  }));
+
+  if (unmatched.length) {
+    console.warn(
+      `[ProgramRoadmap] ${optionId}: ${unmatched.length} row(s) matched no library item and carry a null process_id: ${[
+        ...new Set(unmatched),
+      ].join(", ")}`
+    );
+  }
+
+  return { ...hoursPlan, months };
+}
+
 function findOverCapacityMonths(
   hoursPlan: z.infer<typeof HoursPlanSchema>,
   option: RoadmapOption
@@ -235,7 +290,11 @@ async function generateOption(
     `option:${option.option_id}`
   );
 
-  let hoursPlan = normalizeHoursPlan(result.hours_plan, option);
+  let hoursPlan = resolveLibraryFields(
+    normalizeHoursPlan(result.hours_plan, option),
+    input,
+    option.option_id
+  );
   let over = findOverCapacityMonths(hoursPlan, option);
   let repairs = 0;
 
@@ -260,7 +319,11 @@ async function generateOption(
       `repair:${option.option_id}`
     );
 
-    hoursPlan = normalizeHoursPlan(repaired, option);
+    hoursPlan = resolveLibraryFields(
+      normalizeHoursPlan(repaired, option),
+      input,
+      option.option_id
+    );
     over = findOverCapacityMonths(hoursPlan, option);
   }
 
@@ -488,6 +551,8 @@ export const generateProgramRoadmap = task({
         hours_available: option.hours_available,
         overhead_hours: option.overhead_hours,
         program_hours: option.program_hours,
+        term_months: option.term_months ?? null,
+        commitment: option.commitment ?? null,
 
         goals: {
           section_description: PROGRAM_ROADMAP_BOILERPLATE.goals,

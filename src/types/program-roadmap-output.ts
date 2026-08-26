@@ -345,6 +345,16 @@ export const ProgramRoadmapOutputSchema = z.object({
         overhead_hours: z.number(),
         program_hours: z.number(),
 
+        /**
+         * Contract framing, echoed from the generation form. Narrative-only — neither
+         * affects capacity, tier, or any flag — but both have to survive onto the
+         * document for the viewer and the SOW to read them.
+         */
+        term_months: z.number().int().positive().nullable(),
+        commitment: z
+          .enum(["monthly", "quarterly", "semiannual", "annual"])
+          .nullable(),
+
         goals: withSectionDescription(GoalsSchema),
         roadmap_phases: withSectionDescription(RoadmapPhasesSchema),
         quarterly_initiatives: withSectionDescription(QuarterlyInitiativesSchema),
