@@ -2,7 +2,7 @@ import { defineConfig } from "@trigger.dev/sdk/v3";
 
 export default defineConfig({
   project: "proj_gnaoyrrpmfvdbrxsyhzu",
-  runtime: "node",
+  runtime: "node-24",
   logLevel: "log",
   maxDuration: 900, // 15 minutes for research pipeline (intelligence gathering + sequential Claude calls)
   retries: {
