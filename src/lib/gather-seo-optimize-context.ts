@@ -39,6 +39,18 @@ function stripDomain(input: string): string {
   return input.replace(/^https?:\/\//i, "").replace(/^www\./i, "").replace(/\/.*$/, "");
 }
 
+// The live LLM calls can take 5–20s; cap them well inside the endpoint's 15s
+// budget so a slow engine lands in `errors[]` instead of timing out the request.
+const AEO_TIMEOUT_MS = 10_000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  let handle: NodeJS.Timeout | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    handle = setTimeout(() => reject(new Error(`${label} exceeded ${ms / 1000}s`)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(handle));
+}
+
 interface OrchestratorConfig {
   dataforseoLogin: string;
   dataforseoPassword: string;
@@ -145,9 +157,9 @@ export async function gatherSeoOptimizeContext(
     competing_brands_in_llm_responses: string[];
   } | null> = includeAeo
     ? Promise.allSettled([
-        getLlmMentions(client, req.client_brand!, [keyword]),
-        getChatGptResponses(client, [keyword]),
-        getPerplexityResponses(client, [keyword]),
+        withTimeout(getLlmMentions(client, req.client_brand!, [keyword]), AEO_TIMEOUT_MS, "LLM mentions"),
+        withTimeout(getChatGptResponses(client, [keyword]), AEO_TIMEOUT_MS, "ChatGPT"),
+        withTimeout(getPerplexityResponses(client, [keyword]), AEO_TIMEOUT_MS, "Perplexity"),
       ]).then(([mentionsRes, chatgptRes, perplexityRes]) => {
         const brand = req.client_brand!.toLowerCase();
 
