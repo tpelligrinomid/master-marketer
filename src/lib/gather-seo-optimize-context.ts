@@ -42,6 +42,7 @@ function stripDomain(input: string): string {
 // The live LLM calls can take 5–20s; cap them well inside the endpoint's 15s
 // budget so a slow engine lands in `errors[]` instead of timing out the request.
 const AEO_TIMEOUT_MS = 10_000;
+const STREAM_TIMEOUT_MS = 12_000;
 
 function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
   let handle: NodeJS.Timeout | undefined;
@@ -83,25 +84,29 @@ export async function gatherSeoOptimizeContext(
   const includeAeo = !!req.client_brand;
 
   // ── Fan-out: every sub-call runs concurrently ─────────────────────────────
-  const overviewPromise = getKeywordOverview(client, keyword, locationCode).catch((err) => {
-    errors.push(`Keyword overview failed: ${err instanceof Error ? err.message : String(err)}`);
-    return null;
-  });
+  // Each stream is capped inside the endpoint budget, so one slow upstream call
+  // degrades to an `errors[]` entry instead of a 504 that discards everything.
+  const timings: Record<string, number> = {};
+  const stream = <T>(label: string, work: Promise<T>, fallback: T): Promise<T> => {
+    const started = Date.now();
+    return withTimeout(work, STREAM_TIMEOUT_MS, label)
+      .catch((err) => {
+        errors.push(`${label} failed: ${err instanceof Error ? err.message : String(err)}`);
+        return fallback;
+      })
+      .finally(() => {
+        timings[label] = Date.now() - started;
+      });
+  };
 
-  const intentPromise = getSearchIntent(client, [keyword], locationCode).catch((err) => {
-    errors.push(`Search intent failed: ${err instanceof Error ? err.message : String(err)}`);
-    return [];
-  });
-
-  const serpPromise = getSerpResults(client, [keyword], locationCode, 1).catch((err) => {
-    errors.push(`SERP fetch failed: ${err instanceof Error ? err.message : String(err)}`);
-    return [];
-  });
-
-  const relatedPromise = getRelatedKeywords(client, keyword, locationCode, 30).catch((err) => {
-    errors.push(`Related keywords failed: ${err instanceof Error ? err.message : String(err)}`);
-    return [];
-  });
+  const overviewPromise = stream("Keyword overview", getKeywordOverview(client, keyword, locationCode), null);
+  const intentPromise = stream("Search intent", getSearchIntent(client, [keyword], locationCode), []);
+  const serpPromise = stream("SERP fetch", getSerpResults(client, [keyword], locationCode, 1), []);
+  const relatedPromise = stream(
+    "Related keywords",
+    getRelatedKeywords(client, keyword, locationCode, 30),
+    []
+  );
 
   const contentGapPromise: Promise<
     Array<{
@@ -111,7 +116,7 @@ export async function gatherSeoOptimizeContext(
       search_volume: number;
     }>
   > = includeContentGap
-    ? Promise.allSettled(
+    ? stream("Content gap", Promise.allSettled(
         competitorDomains.map((competitor) =>
           getDomainIntersection(client, clientDomain!, competitor, locationCode, 100)
         )
@@ -147,7 +152,7 @@ export async function gatherSeoOptimizeContext(
         return Array.from(merged.values())
           .sort((a, b) => b.search_volume - a.search_volume)
           .slice(0, 15);
-      })
+      }), [])
     : Promise.resolve([]);
 
   const aeoPromise: Promise<{
@@ -221,8 +226,13 @@ export async function gatherSeoOptimizeContext(
     aeoPromise,
   ]);
 
-  // Hard fail only when DFS truly knows nothing about the keyword.
+  console.log(`[seo/enrich-keyword] "${keyword}" stream timings (ms):`, timings);
+
+  // Hard fail only when DFS truly knows nothing about the keyword. A failed or
+  // timed-out overview call is an upstream problem, not a missing keyword.
   if (!overview) {
+    const overviewError = errors.find((e) => e.startsWith("Keyword overview failed"));
+    if (overviewError) throw new Error(overviewError);
     throw new KeywordNotFoundError(keyword);
   }
 
