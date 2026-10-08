@@ -160,12 +160,18 @@ export async function getLatestHistoricalSerp(
   keyword: string,
   locationCode: number = 2840
 ): Promise<(SerpResult & { snapshot_date?: string }) | null> {
-  const dateFrom = new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const response = await client.request<HistoricalSerpTaskResult>(
     "POST",
     "dataforseo_labs/google/historical_serps/live",
-    [{ keyword, location_code: locationCode, language_code: "en", date_from: dateFrom }]
+    [{ keyword, location_code: locationCode, language_code: "en" }]
   );
+
+  // The client only checks the top-level status; a rejected task would
+  // otherwise look the same as "no snapshot".
+  const task = response.tasks?.[0];
+  if (task && task.status_code !== 20000) {
+    throw new Error(`DataForSEO task error (${task.status_code}): ${task.status_message}`);
+  }
 
   const snapshots = client.extractFirstResult(response)?.items ?? [];
   const latest = snapshots
