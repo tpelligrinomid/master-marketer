@@ -73,6 +73,14 @@ export interface SeoEnrichKeywordResponse {
     appears_in_chatgpt_responses: boolean;
     appears_in_perplexity_responses: boolean;
     competing_brands_in_llm_responses: string[];
+    // What each engine actually answered, so callers can see why it did or didn't mention the brand.
+    responses: Array<{
+      engine: "chatgpt" | "perplexity";
+      prompt: string;
+      brand_mentioned: boolean;
+      excerpt: string | null;
+      cited_urls: string[];
+    }>;
   };
   ranking_status?: {
     client_currently_ranks: boolean;

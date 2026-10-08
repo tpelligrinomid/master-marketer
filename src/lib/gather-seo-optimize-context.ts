@@ -101,7 +101,7 @@ export async function gatherSeoOptimizeContext(
 
   const overviewPromise = stream("Keyword overview", getKeywordOverview(client, keyword, locationCode), null);
   const intentPromise = stream("Search intent", getSearchIntent(client, [keyword], locationCode), []);
-  const serpPromise = stream("SERP fetch", getSerpResults(client, [keyword], locationCode, 1), []);
+  const serpPromise = stream("SERP fetch", getSerpResults(client, [keyword], locationCode, 1, 0), []);
   const relatedPromise = stream(
     "Related keywords",
     getRelatedKeywords(client, keyword, locationCode, 30),
@@ -155,16 +155,15 @@ export async function gatherSeoOptimizeContext(
       }), [])
     : Promise.resolve([]);
 
-  const aeoPromise: Promise<{
-    llm_mentions_count: number;
-    appears_in_chatgpt_responses: boolean;
-    appears_in_perplexity_responses: boolean;
-    competing_brands_in_llm_responses: string[];
-  } | null> = includeAeo
+  // A bare keyword gets a definition back; a buyer's question is what makes an
+  // engine name vendors, which is what brand visibility is about.
+  const aeoPrompt = `Which companies or products would you recommend for "${keyword}"?`;
+
+  const aeoPromise: Promise<SeoEnrichKeywordResponse["aeo"] | null> = includeAeo
     ? Promise.allSettled([
         withTimeout(getLlmMentions(client, req.client_brand!, [keyword]), AEO_TIMEOUT_MS, "LLM mentions"),
-        withTimeout(getChatGptResponses(client, [keyword]), AEO_TIMEOUT_MS, "ChatGPT"),
-        withTimeout(getPerplexityResponses(client, [keyword]), AEO_TIMEOUT_MS, "Perplexity"),
+        withTimeout(getChatGptResponses(client, [aeoPrompt]), AEO_TIMEOUT_MS, "ChatGPT"),
+        withTimeout(getPerplexityResponses(client, [aeoPrompt]), AEO_TIMEOUT_MS, "Perplexity"),
       ]).then(([mentionsRes, chatgptRes, perplexityRes]) => {
         const brand = req.client_brand!.toLowerCase();
 
@@ -208,11 +207,29 @@ export async function gatherSeoOptimizeContext(
           }
         }
 
+        const responses = [...chatgpt, ...perplexity].map((r) => {
+          const text = r.response_text ?? "";
+          const idx = text.toLowerCase().indexOf(brand);
+          const excerpt = !text
+            ? null
+            : idx >= 0
+              ? text.slice(Math.max(0, idx - 200), idx + brand.length + 200)
+              : text.slice(0, 400);
+          return {
+            engine: r.engine as "chatgpt" | "perplexity",
+            prompt: r.query,
+            brand_mentioned: idx >= 0,
+            excerpt,
+            cited_urls: (r.references ?? []).map((ref) => ref.url).slice(0, 10),
+          };
+        });
+
         return {
           llm_mentions_count: llmMentionsCount,
           appears_in_chatgpt_responses: chatgptHit,
           appears_in_perplexity_responses: perplexityHit,
           competing_brands_in_llm_responses: Array.from(competing),
+          responses,
         };
       })
     : Promise.resolve(null);

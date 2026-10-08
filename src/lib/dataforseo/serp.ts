@@ -37,7 +37,9 @@ export async function getSerpResults(
   client: DataForSeoClient,
   keywords: string[],
   locationCode: number = 2840,
-  maxKeywords: number = 30
+  maxKeywords: number = 30,
+  // Expanding People Also Ask is the slow part of a live SERP; quick lookups pass 0.
+  peopleAlsoAskClickDepth: number = 2
 ): Promise<SerpResult[]> {
   const targetKeywords = keywords.slice(0, maxKeywords);
 
@@ -55,7 +57,7 @@ export async function getSerpResults(
             os: "windows",
             depth: 20,
             load_async_ai_overview: true,
-            people_also_ask_click_depth: 2,
+            ...(peopleAlsoAskClickDepth > 0 && { people_also_ask_click_depth: peopleAlsoAskClickDepth }),
           },
         ]
       );
