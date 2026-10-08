@@ -28,7 +28,7 @@ export {
   getReferringDomains,
   getBacklinkIntersection,
 } from "./backlinks";
-export { getSerpResults } from "./serp";
+export { getSerpResults, getLatestHistoricalSerp } from "./serp";
 export {
   getLlmMentions,
   getChatGptResponses,

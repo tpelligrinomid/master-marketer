@@ -1,6 +1,6 @@
 import {
   DataForSeoClient,
-  getSerpResults,
+  getLatestHistoricalSerp,
   getSearchIntent,
   getKeywordOverview,
   getRelatedKeywords,
@@ -39,10 +39,10 @@ function stripDomain(input: string): string {
   return input.replace(/^https?:\/\//i, "").replace(/^www\./i, "").replace(/\/.*$/, "");
 }
 
-// The live LLM calls can take 5–20s; cap them well inside the endpoint's 15s
-// budget so a slow engine lands in `errors[]` instead of timing out the request.
-const AEO_TIMEOUT_MS = 10_000;
-const STREAM_TIMEOUT_MS = 12_000;
+// The live LLM calls can take 5–20s; cap them inside the endpoint's 25s budget
+// so a slow engine lands in `errors[]` instead of timing out the request.
+const AEO_TIMEOUT_MS = 20_000;
+const STREAM_TIMEOUT_MS = 20_000;
 
 function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
   let handle: NodeJS.Timeout | undefined;
@@ -101,7 +101,15 @@ export async function gatherSeoOptimizeContext(
 
   const overviewPromise = stream("Keyword overview", getKeywordOverview(client, keyword, locationCode), null);
   const intentPromise = stream("Search intent", getSearchIntent(client, [keyword], locationCode), []);
-  const serpPromise = stream("SERP fetch", getSerpResults(client, [keyword], locationCode, 1, 0), []);
+  // Stored monthly snapshot, not a live SERP: a live one regularly ran past the budget.
+  const serpPromise = stream(
+    "SERP snapshot",
+    getLatestHistoricalSerp(client, keyword, locationCode).then((snap) => {
+      if (!snap) errors.push("No stored SERP snapshot for this keyword");
+      return snap ? [snap] : [];
+    }),
+    []
+  );
   const relatedPromise = stream(
     "Related keywords",
     getRelatedKeywords(client, keyword, locationCode, 30),
@@ -258,7 +266,7 @@ export async function gatherSeoOptimizeContext(
 
   // Derive ranking_status by scanning the SERP we already pulled (no extra labs call).
   let rankingStatus: SeoEnrichKeywordResponse["ranking_status"] | undefined;
-  if (clientDomain) {
+  if (clientDomain && serp) {
     const match = serp?.organic_results.find((r) => stripDomain(r.domain) === clientDomain);
     rankingStatus = match
       ? { client_currently_ranks: true, client_position: match.position, client_url: match.url }
@@ -314,6 +322,7 @@ export async function gatherSeoOptimizeContext(
       people_also_ask: peopleAlsoAsk,
       featured_snippet: featuredSnippet,
       serp_features: serp?.serp_features ?? [],
+      snapshot_date: serp?.snapshot_date ?? null,
     },
     related_keywords: related.slice(0, 15).map((r) => ({
       keyword: r.keyword,

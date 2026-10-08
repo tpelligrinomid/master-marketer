@@ -55,6 +55,8 @@ export interface SeoEnrichKeywordResponse {
       description: string;
     } | null;
     serp_features: string[];
+    // Date of the stored SERP snapshot these results come from; null if none exists.
+    snapshot_date: string | null;
   };
   related_keywords: Array<{
     keyword: string;

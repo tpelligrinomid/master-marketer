@@ -10,7 +10,7 @@ import {
 } from "../../lib/gather-seo-optimize-context";
 import { getEnv } from "../../config/env";
 
-const ENDPOINT_TIMEOUT_MS = 15_000;
+const ENDPOINT_TIMEOUT_MS = 25_000;
 
 function send(
   res: Response,

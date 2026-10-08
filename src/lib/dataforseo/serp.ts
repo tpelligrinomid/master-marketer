@@ -9,6 +9,7 @@ interface SerpItem {
   domain?: string;
   description?: string;
   items?: Array<{
+    title?: string;
     question?: string;
     expanded_element?: Array<{
       description?: string;
@@ -16,6 +17,7 @@ interface SerpItem {
   }>;
   // AI overview fields
   text?: string;
+  markdown?: string;
   references?: Array<{
     url?: string;
     title?: string;
@@ -65,62 +67,7 @@ export async function getSerpResults(
       const result = client.extractFirstResult(response);
       if (!result) return null;
 
-      const items = result.items || [];
-      const serpFeatures = result.item_types || [];
-
-      // Extract organic results
-      const organicResults = items
-        .filter((item) => item.type === "organic")
-        .map((item) => ({
-          position: item.rank_group || 0,
-          url: item.url || "",
-          title: item.title || "",
-          domain: item.domain || "",
-        }));
-
-      // Extract featured snippet
-      const snippetItem = items.find((item) => item.type === "featured_snippet");
-      const featured_snippet = snippetItem
-        ? {
-            url: snippetItem.url || "",
-            title: snippetItem.title || "",
-            description: snippetItem.description || "",
-          }
-        : undefined;
-
-      // Extract People Also Ask
-      const paaItem = items.find((item) => item.type === "people_also_ask");
-      const people_also_ask = paaItem?.items?.map((q) => ({
-        question: q.question || "",
-        expanded_element: q.expanded_element?.[0]?.description,
-      }));
-
-      // Extract AI Overview
-      const aiItem = items.find(
-        (item) => item.type === "ai_overview" || item.type === "google_ai_overview"
-      );
-      const ai_overview = aiItem
-        ? {
-            present: true,
-            content: aiItem.text || aiItem.description,
-            references: aiItem.references?.map((ref) => ({
-              url: ref.url || "",
-              title: ref.title || "",
-            })),
-          }
-        : serpFeatures.includes("ai_overview")
-          ? { present: true }
-          : undefined;
-
-      return {
-        keyword: result.keyword || keyword,
-        search_volume: result.search_volume,
-        organic_results: organicResults,
-        featured_snippet,
-        people_also_ask,
-        ai_overview,
-        serp_features: serpFeatures,
-      };
+      return parseSerpItems(result.keyword || keyword, result.items || [], result.item_types || [], result.search_volume);
     })
   );
 
@@ -130,4 +77,105 @@ export async function getSerpResults(
     )
     .map((r) => r.value)
     .filter((r): r is SerpResult => r !== null);
+}
+
+/**
+ * Shape raw SERP items (live or historical) into a SerpResult.
+ */
+function parseSerpItems(
+  keyword: string,
+  items: SerpItem[],
+  serpFeatures: string[],
+  searchVolume?: number
+): SerpResult {
+  const organicResults = items
+    .filter((item) => item.type === "organic")
+    .map((item) => ({
+      position: item.rank_group || 0,
+      url: item.url || "",
+      title: item.title || "",
+      domain: item.domain || "",
+    }));
+
+  const snippetItem = items.find((item) => item.type === "featured_snippet");
+  const featured_snippet = snippetItem
+    ? {
+        url: snippetItem.url || "",
+        title: snippetItem.title || "",
+        description: snippetItem.description || "",
+      }
+    : undefined;
+
+  // DataForSEO puts the PAA question in `title`.
+  const paaItem = items.find((item) => item.type === "people_also_ask");
+  const people_also_ask = paaItem?.items?.map((q) => ({
+    question: q.title || q.question || "",
+    expanded_element: q.expanded_element?.[0]?.description,
+  }));
+
+  const aiItem = items.find(
+    (item) => item.type === "ai_overview" || item.type === "google_ai_overview"
+  );
+  const ai_overview = aiItem
+    ? {
+        present: true,
+        content: aiItem.markdown || aiItem.text || aiItem.description,
+        references: aiItem.references?.map((ref) => ({
+          url: ref.url || "",
+          title: ref.title || "",
+        })),
+      }
+    : serpFeatures.includes("ai_overview")
+      ? { present: true }
+      : undefined;
+
+  return {
+    keyword,
+    search_volume: searchVolume,
+    organic_results: organicResults,
+    featured_snippet,
+    people_also_ask,
+    ai_overview,
+    serp_features: serpFeatures,
+  };
+}
+
+interface HistoricalSerpSnapshot {
+  datetime?: string;
+  item_types?: string[];
+  items?: SerpItem[];
+}
+
+interface HistoricalSerpTaskResult {
+  items?: HistoricalSerpSnapshot[];
+}
+
+/**
+ * Most recent stored SERP for a keyword from DataForSEO Labs (monthly
+ * snapshots). Returns in a second or two, unlike a live SERP; use it when
+ * "as of the last snapshot" is good enough. Returns null if no snapshot exists.
+ */
+export async function getLatestHistoricalSerp(
+  client: DataForSeoClient,
+  keyword: string,
+  locationCode: number = 2840
+): Promise<(SerpResult & { snapshot_date?: string }) | null> {
+  const dateFrom = new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const response = await client.request<HistoricalSerpTaskResult>(
+    "POST",
+    "dataforseo_labs/google/historical_serps/live",
+    [{ keyword, location_code: locationCode, language_code: "en", date_from: dateFrom }]
+  );
+
+  const snapshots = client.extractFirstResult(response)?.items ?? [];
+  const latest = snapshots
+    .filter((snap) => snap.datetime)
+    // "yyyy-mm-dd hh:mm:ss +00:00" isn't reliably Date.parse-able but sorts as text.
+    .sort((a, b) => b.datetime!.localeCompare(a.datetime!))[0];
+  if (!latest) return null;
+
+  return {
+    ...parseSerpItems(keyword, latest.items || [], latest.item_types || []),
+    snapshot_date: latest.datetime!.slice(0, 10),
+  };
 }
