@@ -2,10 +2,7 @@ import { Request, Response } from "express";
 import { z, ZodTypeAny } from "zod";
 import { getEnv } from "../../config/env";
 import { DataForSeoClient } from "../../lib/dataforseo/client";
-import {
-  getCompetitorDomains,
-  getRelatedKeywords,
-} from "../../lib/dataforseo/labs";
+import { getRelatedKeywords } from "../../lib/dataforseo/labs";
 import { getBacklinkSummary } from "../../lib/dataforseo/backlinks";
 
 /**
@@ -167,12 +164,41 @@ async function keywordGap(client: DataForSeoClient, req: z.infer<typeof KeywordG
 
 const CompetitorDomainsSchema = z.object({ domain, location_code: locationCode });
 
+/** Domains sharing the most ranking keywords, excluding giant platforms. */
 async function competitorDomains(client: DataForSeoClient, req: z.infer<typeof CompetitorDomainsSchema>) {
-  const competitors = await getCompetitorDomains(client, req.domain, req.location_code);
+  const response = await client.request<{
+    items?: Array<{
+      domain?: string;
+      avg_position?: number;
+      intersections?: number;
+      full_domain_metrics?: { organic?: { count?: number; etv?: number } };
+    }>;
+  }>("POST", "dataforseo_labs/google/competitors_domain/live", [
+    {
+      target: req.domain,
+      location_code: req.location_code,
+      language_code: "en",
+      // Leaves out YouTube, Reddit, LinkedIn and the like, which share
+      // keywords with everyone.
+      exclude_top_domains: true,
+      item_types: ["organic"],
+      limit: 21,
+    },
+  ]);
+  const items = client.extractFirstResult(response)?.items ?? [];
   return {
     domain: req.domain,
-    // The domain itself comes back as its own top "competitor".
-    competitors: competitors.filter((c) => c.domain !== req.domain),
+    competitors: items
+      // The domain itself comes back as its own top "competitor".
+      .filter((c) => c.domain && c.domain !== req.domain)
+      .slice(0, 20)
+      .map((c) => ({
+        domain: c.domain,
+        shared_keywords: c.intersections ?? 0,
+        avg_position_on_shared: round(c.avg_position, 1),
+        total_organic_keywords: c.full_domain_metrics?.organic?.count ?? null,
+        estimated_monthly_organic_traffic: round(c.full_domain_metrics?.organic?.etv, 0) ?? null,
+      })),
   };
 }
 
@@ -207,6 +233,7 @@ async function relatedKeywords(client: DataForSeoClient, req: z.infer<typeof Rel
   return {
     keyword: req.keyword,
     related: related
+      .filter((r) => r.keyword.toLowerCase() !== req.keyword.toLowerCase())
       .map((r) => ({ ...r, cpc: undefined, cpc_usd: round(r.cpc) }))
       .sort((a, b) => b.search_volume - a.search_volume),
   };
